@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  
+  <link rel="icon" type="image/png" href="https://img.icons8.com/?size=100&id=jAc6FZyLm06C&format=png&color=000000">
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>QuizBíblia</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom, #e3f2fd, #bbdefb);
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      color: #0d47a1;
+      text-shadow: 1px 1px 2px #90caf9;
+    }
+    .buttons {
+      margin: 20px 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+    .buttons button {
+      padding: 15px 25px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background-color: #42a5f5;
+      color: white;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+      transition: 0.3s;
+    }
+    .buttons button:hover {
+      background-color: #1e88e5;
+    }
+    #quiz, #result {
+      margin-top: 30px;
+      display: none;
+    }
+    #question {
+      font-size: 22px;
+      margin-bottom: 20px;
+      color: #0d47a1;
+    }
+    .option {
+      display: block;
+      margin: 10px auto;
+      padding: 12px 25px;
+      background-color: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      width: 80%;
+      max-width: 300px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      box-shadow: 0 3px 5px rgba(0,0,0,0.2);
+    }
+    .option:hover {
+      background-color: #1565c0;
+    }
+    .correct {
+      background-color: #4CAF50 !important;
+    }
+    .wrong {
+      background-color: #f44336 !important;
+    }
+    #finalizarBtn {
+      margin-top: 20px;
+      padding: 12px 24px;
+      font-size: 16px;
+      background-color: #ff9800;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+    }
+    #finalizarBtn:hover {
+      background-color: #fb8c00;
+    }
+    #modal {
+      display: none;
+      position: fixed;
+      z-index: 2;
+      padding-top: 100px;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+    #modalContent {
+      background-color: #fff;
+      margin: auto;
+      padding: 20px;
+      border-radius: 10px;
+      width: 85%;
+      text-align: left;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    #closeModal {
+      float: right;
+      font-size: 28px;
+      cursor: pointer;
+      color: red;
+    }
+    @media (max-width: 600px) {
+      .buttons button {
+        width: 100%;
+      }
+    }
+  </style>
+  
+</head>
+<body>
+
+<h1>QuizBíblia</h1>
+
+<div class="buttons">
+  <button onclick="startQuiz('ANTIGO')">Antigo Testamento</button>
+  <button onclick="startQuiz('NOVO')">NovoTestamento</button>
+  <button onclick="startQuiz('MISTO')">Antigo/Novo</button>
+  
+</div>
+
+<p style="color: blue;">Estudar a Bíblia é conhecer o autor da vida!!!</p>
+
+<div id="quiz">
+  <div id="question"></div>
+  <div id="options"></div>
+  <button id="finalizarBtn" onclick="finalizarQuiz()">Finalizar Quiz</button>
+</div>
+
+<div id="result"></div>
+
+<script>
+const quizzes = {
+  ANTIGO: [
+
+{ question: "Quem construiu a arca para escapar do dilúvio?", options: ["Moisés", "Abraão", "Noé", "Davi"], answer: "Noé" },
+{ question: "Qual o primeiro livro da Bíblia?", options: ["Êxodo", "Gênesis", "Levítico", "Números"], answer: "Gênesis" },
+{ question: "Quem foi lançado na cova dos leões?", options: ["Elias", "Daniel", "José", "Jonas"], answer: "Daniel" },
+{ question: "Qual rei foi conhecido por sua sabedoria?", options: ["Davi", "Salomão", "Saul", "Ezequias"], answer: "Salomão" },
+{ question: "Qual profeta enfrentou os profetas de Baal no Monte Carmelo?", options: ["Elias", "Isaías", "Jeremias", "Ezequiel"], answer: "Elias" },
+{ question: "Quem foi vendido por seus irmãos e levado ao Egito?", options: ["Moisés", "José", "Abraão", "Isaque"], answer: "José" },
+{ question: "Qual era o nome da esposa de Abraão?", options: ["Rebeca", "Raquel", "Sara", "Miriã"], answer: "Sara" },
+{ question: "Quem recebeu as Tábuas da Lei no Monte Sinai?", options: ["Josué", "Arão", "Moisés", "Elias"], answer: "Moisés" },
+{ question: "Em que cidade os muros caíram após a marcha dos israelitas?", options: ["Jerusalém", "Jericó", "Betel", "Hebrom"], answer: "Jericó" },
+{ question: "Quem matou Golias com uma pedra?", options: ["Saul", "Davi", "Eliabe", "Natã"], answer: "Davi" },
+
+{ question: "Quem foi o primeiro rei de Israel?", options: ["Saul", "Davi", "Salomão", "Samuel"], answer: "Saul" },
+{ question: "Qual o nome do profeta que foi engolido por um grande peixe?", options: ["Isaías", "Jeremias", "Jonas", "Ezequiel"], answer: "Jonas" },
+{ question: "Quem foi o líder que sucedeu Moisés e levou os israelitas à Terra Prometida?", options: ["Davi", "Josué", "Saul", "Elias"], answer: "Josué" },
+{ question: "Quem traiu Jesus por 30 peças de prata?", options: ["Pedro", "Judas", "Tiago", "João"], answer: "Judas" },
+{ question: "Quem foi o profeta que desafiou o rei Acabe e a rainha Jezabel?", options: ["Isaías", "Elias", "Jeremias", "Amós"], answer: "Elias" },
+{ question: "Quem foi o líder militar que derrotou os midianitas com apenas 300 homens?", options: ["Sansão", "Gideão", "Davi", "Josué"], answer: "Gideão" },
+{ question: "Qual o nome do filho de Abraão com Agar?", options: ["Isaque", "Ismael", "Jacó", "Esaú"], answer: "Ismael" },
+{ question: "Quem foi o profeta que viu a visão de ossos secos?", options: ["Ezequiel", "Daniel", "Isaías", "Amós"], answer: "Ezequiel" },
+{ question: "Quem foi o patriarca que teve 12 filhos que deram origem às 12 tribos de Israel?", options: ["Abraão", "Jacó", "Isaque", "Moisés"], answer: "Jacó" },
+{ question: "Qual o nome da esposa de Jacó, que era irmã de Lia?", options: ["Raquel", "Sara", "Rebeca", "Miriã"], answer: "Raquel" },
+{ question: "Qual o nome do livro que descreve a criação do mundo?", options: ["Êxodo", "Gênesis", "Levítico", "Números"], answer: "Gênesis" },
+{ question: "Quem teve os 10 mandamentos revelados no Monte Sinai?", options: ["Moisés", "Elias", "Josué", "Salomão"], answer: "Moisés" },
+{ question: "Quem derrotou o gigante Golias?", options: ["Moisés", "Josué", "Davi", "Saul"], answer: "Davi" },
+{ question: "Qual o nome do primeiro assassino da Bíblia?", options: ["Caim", "Abel", "Ismael", "Davi"], answer: "Caim" },
+{ question: "Quem foi o profeta que casou com Gomer, uma prostituta?", options: ["Amós", "Oséias", "Isaías", "Jeremias"], answer: "Oséias" },
+{ question: "Quem desafiou os falsos profetas de Baal no Monte Carmelo?", options: ["Elias", "Eliseu", "Isaías", "Moisés"], answer: "Elias" },
+
+{ question: "Quem foi lançado na fornalha ardente?", options: ["Daniel", "Sadraque", "Misaque", "Abednego"], answer: "Sadraque, Misaque e Abednego" },
+{ question: "Qual o nome do livro que fala sobre a sabedoria de Salomão?", options: ["Provérbios", "Eclesiastes", "Cânticos", "Salmos"], answer: "Provérbios" },
+{ question: "Qual o nome da mãe de Samuel?", options: ["Ana", "Elisabete", "Raquel", "Miriã"], answer: "Ana" },
+{ question: "Quem interpretou o sonho do faraó do Egito?", options: ["José", "Daniel", "Moisés", "Salomão"], answer: "José" },
+{ question: "Em que livro da Bíblia encontramos a história de Noé e a arca?", options: ["Êxodo", "Gênesis", "Levítico", "Deuteronômio"], answer: "Gênesis" },
+{ question: "Quem escreveu o livro de Lamentações?", options: ["Isaías", "Jeremias", "Ezequiel", "Amós"], answer: "Jeremias" },
+{ question: "Quem foi o último juiz de Israel?", options: ["Samuel", "Davi", "Saul", "Gideão"], answer: "Samuel" },
+{ question: "Quem foi o profeta que desafiou o rei Acabe e venceu com a ajuda de Deus?", options: ["Moisés", "Elias", "Isaías", "Ezequiel"], answer: "Elias" },
+{ question: "Quem foi a primeira mulher mencionada na Bíblia?", options: ["Sara", "Eva", "Raquel", "Rebeca"], answer: "Eva" },
+{ question: "Qual o nome do livro que relata a história de Rute?", options: ["Rute", "Gênesis", "Juízes", "Êxodo"], answer: "Rute" },
+{ question: "Quem destruiu as muralhas de Jericó?", options: ["Josué", "Davi", "Moisés", "Gideão"], answer: "Josué" },
+{ question: "Quem foi o rei que construiu o templo de Jerusalém?", options: ["Salomão", "Davi", "Ezequias", "Josias"], answer: "Salomão" },
+{ question: "Qual é o nome do livro que conta a história de Ester?", options: ["Ester", "Esdras", "Neemias", "Levítico"], answer: "Ester" },
+{ question: "Quem foi o profeta que confrontou o rei Davi sobre seu pecado com Bate-Seba?", options: ["Elias", "Natã", "Isaías", "Jeremias"], answer: "Natã" },
+{ question: "Qual o nome do rei que foi curado de uma doença por oração?", options: ["Ezequias", "Saul", "Salomão", "Davi"], answer: "Ezequias" },
+{ question: "Quem foi o homem que foi levado ao céu num redemoinho?", options: ["Moisés", "Elias", "Isaías", "Jeremias"], answer: "Elias" },
+{ question: "Quem foi o líder que libertou os israelitas da escravidão no Egito?", options: ["Moisés", "Josué", "Davi", "Gideão"], answer: "Moisés" },
+{ question: "Quem foi o profeta que teve uma visão do vale de ossos secos?", options: ["Ezequiel", "Amós", "Isaías", "Jeremias"], answer: "Ezequiel" },
+{ question: "Em qual livro da Bíblia é encontrada a história de Jó?", options: ["Salmos", "Provérbios", "Jó", "Eclesiastes"], answer: "Jó" },
+{ question: "Qual o nome do profeta que teve uma visão de uma roda dentro de uma roda?", options: ["Ezequiel", "Isaías", "Daniel", "Amós"], answer: "Ezequiel" },
+{ question: "Quem matou o gigante Golias com uma pedra?", options: ["Davi", "Moisés", "Saul", "Josué"], answer: "Davi" },
+
+{ question: "Quem foi o pai de Moisés?", options: ["Amram", "Isaque", "Davi", "Abraão"], answer: "Amram" },
+{ question: "Qual o nome da irmã de Moisés?", options: ["Miriã", "Raquel", "Lia", "Sara"], answer: "Miriã" },
+{ question: "Em que livro da Bíblia é descrito o êxodo dos israelitas do Egito?", options: ["Êxodo", "Levítico", "Números", "Deuteronômio"], answer: "Êxodo" },
+{ question: "Qual o nome do irmão de Moisés que foi sacerdote?", options: ["Arão", "Davi", "Josué", "Salomão"], answer: "Arão" },
+{ question: "Quem foi o profeta que teve a visão do trono de Deus em um carro de fogo?", options: ["Isaías", "Ezequiel", "Daniel", "Elias"], answer: "Ezequiel" },
+{ question: "Quem foi a esposa de Isaac?", options: ["Raquel", "Rebeca", "Sara", "Miriã"], answer: "Rebeca" },
+{ question: "Quem foi o primeiro sacerdote de Israel?", options: ["Arão", "Eli", "Zadoque", "Moisés"], answer: "Arão" },
+{ question: "Quem ajudou os espiões de Israel em Jericó?", options: ["Raquel", "Rute", "Débora", "Raabe"], answer: "Raabe" },
+{ question: "Quem foi o profeta que desafiou Acabe e Jezabel em Israel?", options: ["Elias", "Eliseu", "Amós", "Jonas"], answer: "Elias" },
+{ question: "Quem foi o rei de Judá que foi curado por Deus após orar?", options: ["Ezequias", "Josias", "Davi", "Salomão"], answer: "Ezequias" },
+{ question: "Qual profeta teve a visão do 'vale de ossos secos'?", options: ["Ezequiel", "Amós", "Isaías", "Daniel"], answer: "Ezequiel" },
+{ question: "Quem foi o homem que escreveu os provérbios?", options: ["Salomão", "Davi", "Isaías", "Ezequiel"], answer: "Salomão" },
+{ question: "Qual o nome da esposa de Davi que teve um filho chamado Salomão?", options: ["Bate-Seba", "Raquel", "Miriã", "Rebeca"], answer: "Bate-Seba" },
+{ question: "Quem foi o profeta que anunciou o nascimento de Jesus em Belém?", options: ["Isaías", "Jeremias", "Ezequiel", "Miquéias"], answer: "Miquéias" },
+{ question: "Qual o nome do livro que conta a história da libertação dos israelitas do Egito?", options: ["Êxodo", "Levítico", "Gênesis", "Deuteronômio"], answer: "Êxodo" },
+{ question: "Quem escreveu o livro de Salmos?", options: ["Salomão", "Davi", "Isaías", "Moisés"], answer: "Davi" },
+{ question: "Quem foi o profeta que desafiou os falsos profetas de Baal?", options: ["Elias", "Isaías", "Jeremias", "Ezequiel"], answer: "Elias" },
+{ question: "Quem foi o profeta que passou 40 dias e 40 noites sem comer?", options: ["Moisés", "Elias", "Jonas", "Davi"], answer: "Moisés" },
+
+{ question: "Qual é o nome do livro que descreve a sabedoria de Salomão?", options: ["Provérbios", "Eclesiastes", "Cânticos", "Salmos"], answer: "Provérbios" },
+{ question: "Qual foi o profeta que viu a glória de Deus e descreveu como um carro de fogo?", options: ["Ezequiel", "Isaías", "Daniel", "Elias"], answer: "Ezequiel" },
+{ question: "Quem foi o patriarca que teve 12 filhos, que deram origem às 12 tribos de Israel?", options: ["Abraão", "Isaac", "Jacó", "Moisés"], answer: "Jacó" },
+{ question: "Qual o nome do livro que conta a história de Ester?", options: ["Ester", "Rute", "Esdras", "Neemias"], answer: "Ester" },
+{ question: "Quem foi o profeta que viveu no exílio e viu a visão de um trono de fogo?", options: ["Isaías", "Ezequiel", "Amós", "Daniel"], answer: "Ezequiel" },
+{ question: "Qual é o nome do livro que descreve a viagem dos israelitas pelo deserto?", options: ["Êxodo", "Levítico", "Números", "Deuteronômio"], answer: "Números" },
+{ question: "Quem foi o profeta que escreveu o livro de Lamentações?", options: ["Isaías", "Jeremias", "Ezequiel", "Amós"], answer: "Jeremias" },
+{ question: "Quem foi o último juiz de Israel?", options: ["Eli", "Samuel", "Davi", "Saul"], answer: "Samuel" },
+{ question: "Qual o nome do rei de Israel que construiu o templo em Jerusalém?", options: ["Salomão", "Davi", "Ezequias", "Saul"], answer: "Salomão" },
+{ question: "Quem desafiou os falsos profetas de Baal no Monte Carmelo?", options: ["Elias", "Daniel", "Ezequiel", "Moisés"], answer: "Elias" },
+{ question: "Quem foi o profeta que falou sobre a vinda do Messias?", options: ["Isaías", "Miquéias", "Amós", "Joel"], answer: "Isaías" },
+{ question: "Quem foi o profeta que foi levado por um carro de fogo aos céus?", options: ["Elias", "Isaías", "Jeremias", "Daniel"], answer: "Elias" },
+{ question: "Qual foi o nome do povo que foi liberto da escravidão no Egito?", options: ["Egípcios", "Filisteus", "Amalequitas", "Israelitas"], answer: "Israelitas" },
+{ question: "Quem foi o profeta que teve uma visão das quatro bestas?", options: ["Isaías", "Daniel", "Jeremias", "Ezequiel"], answer: "Daniel" },
+{ question: "Quem foi o homem que interpretou os sonhos do faraó?", options: ["José", "Daniel", "Moisés", "Salomão"], answer: "José" },
+{ question: "Quem foi o líder que liderou a conquista da Terra Prometida?", options: ["Davi", "Moisés", "Josué", "Salomão"], answer: "Josué" },
+{ question: "Quem foi o homem que teve um encontro com Deus numa sarça ardente?", options: ["Abraão", "Moisés", "Elias", "Daniel"], answer: "Moisés" },
+{ question: "Quem foi o rei de Judá que restaurou o templo?", options: ["Josias", "Ezequias", "Davi", "Salomão"], answer: "Josias" },
+{ question: "Quem foi o líder que desceu do monte Sinai com as tábuas da lei?", options: ["Moisés", "Josué", "Davi", "Ezequias"], answer: "Moisés" },
+{ question: "Quem era o profeta conhecido por sua coragem em defender o nome de Deus?", options: ["Elias", "Isaías", "Daniel", "Jeremias"], answer: "Elias" },
+{ question: "Quem foi o homem que fugiu de Nínive após pregar o arrependimento?", options: ["Jonas", "Isaías", "Amós", "Jeremias"], answer: "Jonas" },
+
+{ question: "Quem foi o profeta que desafiou o rei Acabe e os 450 profetas de Baal no Monte Carmelo?", options: ["Elias", "Isaías", "Ezequiel", "Amós"], answer: "Elias" },
+{ question: "Qual foi a última praga que Deus enviou sobre o Egito antes da libertação dos israelitas?", options: ["Morte dos primogênitos", "Invasão de rãs", "Trevas", "Gafanhotos"], answer: "Morte dos primogênitos" },
+{ question: "Quem foi o profeta que profetizou a queda de Nínive?", options: ["Jonas", "Amós", "Miquéias", "Ezequiel"], answer: "Jonas" },
+{ question: "Qual rei de Israel foi o primeiro a construir um templo para Deus?", options: ["Salomão", "Davi", "Ezequias", "Saul"], answer: "Salomão" },
+{ question: "Qual dos filhos de Jacó recebeu a bênção de liderança sobre seus irmãos?", options: ["Judá", "José", "Rúben", "Levi"], answer: "Judá" },
+{ question: "Quem foi o juiz que matou 600 homens com uma espada", options: ["Sãcar", "Jefté", "Sansão", "Débora"], answer: "Sansão" },
+{ question: "Quem interpretou os sonhos do faraó e se tornou um alto oficial no Egito?", options: ["José", "Moisés", "Daniel", "Ezequiel"], answer: "José" },
+{ question: "Quem foi o profeta que escreveu o livro de Lamentações?", options: ["Jeremias", "Isaías", "Daniel", "Amós"], answer: "Jeremias" },
+{ question: "Em qual cidade Davi foi ungido como rei de Judá?", options: ["Hebrom", "Jerusalém", "Samaria", "Betel"], answer: "Hebrom" },
+{ question: "Qual foi a mãe de Samuel?", options: ["Ana", "Raquel", "Miriã", "Débora"], answer: "Ana" },
+{ question: "Qual é o nome do livro que conta a história de Rute?", options: ["Rute", "Ester", "Juízes", "Gênesis"], answer: "Rute" },
+
+{ question: "Quem foi o rei que desobedeceu a Deus e foi rejeitado como rei?", options: ["Saul", "Davi", "Salomão", "Ezequias"], answer: "Saul" },
+{ question: "Quem foi o profeta que teve uma visão do vale de ossos secos?", options: ["Ezequiel", "Isaías", "Daniel", "Amós"], answer: "Ezequiel" },
+{ question: "Quem foi o rei que fez um acordo com os filisteus e colocou um altar para Dagon?", options: ["Saul", "Davi", "Salomão", "Acabe"], answer: "Saul" },
+{ question: "Quem foi o profeta que profetizou que o Messias viria de Belém?", options: ["Miquéias", "Isaías", "Amós", "Daniel"], answer: "Miquéias" },
+{ question: "Qual livro da Bíblia descreve a sabedoria de Salomão?", options: ["Provérbios", "Eclesiastes", "Cânticos", "Salmos"], answer: "Provérbios" },
+{ question: "Quem foi o profeta que foi levado por um carro de fogo aos céus?", options: ["Elias", "Isaías", "Jeremias", "Daniel"], answer: "Elias" },
+{ question: "Quem foi o rei de Judá que começou a reinar com 8 anos?", options: ["Josias", "Ezequias", "Davi", "Saul"], answer: "Josias" },
+{ question: "Qual é o nome do livro que descreve a queda de Jerusalém e o exílio dos judeus?", options: ["Lamentações", "Jeremias", "Ezequiel", "Daniel"], answer: "Lamentações" },
+{ question: "Qual foi o nome do homem que teve 12 filhos que se tornaram as 12 tribos de Israel?", options: ["Jacó", "Abraão", "Isaac", "Moisés"], answer: "Jacó" },
+{ question: "Qual era o nome de Davi antes de ser rei?", options: ["Davi", "Gideão", "Salomão", "Jonatas"], answer: "Davi" },
+{ question: "Qual o nome do rei de Judá que fez uma reforma religiosa e destruiu os ídolos?", options: ["Josias", "Ezequias", "Salomão", "Davi"], answer: "Josias" },
+{ question: "Qual era o nome do profeta que foi chamado para ir até Nínive para pregar o arrependimento?", options: ["Jonas", "Daniel", "Isaías", "Amós"], answer: "Jonas" },
+
+{ question: "Em qual livro da Bíblia está a história da torre de Babel?", options: ["Gênesis", "Êxodo", "Levítico", "Números"], answer: "Gênesis" },
+{ question: "Qual foi o rei que escreveu o livro de Eclesiastes?", options: ["Salomão", "Davi", "Josias", "Ezequias"], answer: "Salomão" },
+{ question: "Quem foi o profeta que teve a visão das quatro bestas no livro de Daniel?", options: ["Daniel", "Isaías", "Jeremias", "Ezequiel"], answer: "Daniel" },
+{ question: "Quem foi o profeta que falou sobre a vinda de um novo pacto em Jeremias 31?", options: ["Jeremias", "Isaías", "Ezequiel", "Amós"], answer: "Jeremias" },
+{ question: "Quem foi o profeta que alertou o povo de Israel sobre a destruição de Jerusalém?", options: ["Jeremias", "Daniel", "Ezequiel", "Amós"], answer: "Jeremias" },
+{ question: "Quem foi o profeta que previu que o Messias seria nascido de uma virgem?", options: ["Isaías", "Miquéias", "Amós", "Ezequiel"], answer: "Isaías" },
+{ question: "Qual o nome do livro que descreve a conquista da Terra Prometida por Josué?", options: ["Josué", "Juízes", "1 Samuel", "2 Samuel"], answer: "Josué" },
+{ question: "Qual foi o rei de Israel que escreveu muitos Salmos?", options: ["Davi", "Salomão", "Ezequias", "Saul"], answer: "Davi" },
+{ question: "Quem foi o profeta que teve a visão do trono de Deus em um carro de fogo?", options: ["Ezequiel", "Isaías", "Amós", "Daniel"], answer: "Ezequiel" },
+{ question: "Qual profeta escreveu o livro que contém uma oração de arrependimento por parte de Israel?", options: ["Daniel", "Ezequiel", "Amós", "Neemias"], answer: "Daniel" },
+{ question: "Qual rei de Israel reconstruiu o templo de Jerusalém após o exílio?", options: ["Zorobabel", "Salomão", "Ezequias", "Josias"], answer: "Zorobabel" },
+{ question: "Quem foi o homem que herdou o trono após a morte de Moisés e levou o povo à Terra Prometida?", options: ["Josué", "Davi", "Saul", "Ezequias"], answer: "Josué" },
+{ question: "Em que livro da Bíblia é relatada a história de uma batalha onde o sol se deteve?", options: ["Josué", "Juízes", "1 Samuel", "Gênesis"], answer: "Josué" },
+{ question: "Quem foi o profeta que teve visões de quatro cavaleiros representando juízos futuros?", options: ["Zacarias", "Daniel", "Amós", "Isaías"], answer: "Zacarias" },
+{ question: "Qual livro da Bíblia fala sobre o arrependimento de Israel durante o período dos juízes?", options: ["Juízes", "1 Samuel", "2 Samuel", "Rute"], answer: "Juízes" },
+
+{ question: "Quem foi o profeta que teve uma visão de uma árvore de amendoeira e uma panela fervente?", options: ["Amós", "Ezequiel", "Jeremias", "Isaías"], answer: "Amós" },
+{ question: "Quem foi o patriarca que Deus ordenou que sacrificasse seu filho Isaac?", options: ["Abraão", "Isaac", "Jacó", "Moisés"], answer: "Abraão" },
+{ question: "Quem foi o profeta que viveu durante o exílio na Babilônia e interpretou os sonhos do rei Nabucodonosor?", options: ["Daniel", "Ezequiel", "Isaías", "Jeremias"], answer: "Daniel" },
+{ question: "Quem foi o profeta que aconselhou o rei Davi a não fazer o censo em Israel?", options: ["Gade", "Natã", "Eliseu", "Amós"], answer: "Gade" },
+{ question: "Qual o nome do rei de Judá que mandou destruir os ídolos e restaurar o templo?", options: ["Josias", "Ezequias", "Salomão", "Davi"], answer: "Josias" },
+{ question: "Quem foi o profeta que teve a visão das sete igrejas e das futuras revelações em Apocalipse?", options: ["Ezequiel", "Isaías", "Daniel", "João"], answer: "Daniel" },
+{ question: "Em que livro da Bíblia estão as leis de sacrifícios e purificação?", options: ["Levítico", "Êxodo", "Deuteronômio", "Números"], answer: "Levítico" },
+{ question: "Quem foi o último juiz de Israel?", options: ["Samuel", "Davi", "Saul", "Josué"], answer: "Samuel" },
+{ question: "Quem foi o profeta que teve a visão de um rolo com uma palavra de juízo contra o templo?", options: ["Ezequiel", "Amós", "Isaías", "Jeremias"], answer: "Ezequiel" },
+
+{ question: "Quem foi o profeta que desafiou o rei Acabe e os 450 profetas de Baal no Monte Carmelo?", options: ["Elias", "Isaías", "Ezequiel", "Amós"], answer: "Elias" },
+{ question: "Qual foi o nome do profeta que foi chamado para pregar em Nínive?", options: ["Jonas", "Miquéias", "Jeremias", "Amós"], answer: "Jonas" },
+{ question: "Quem foi o profeta que teve a visão das quatro bestas no livro de Daniel?", options: ["Daniel", "Isaías", "Ezequiel", "Amós"], answer: "Daniel" },
+{ question: "Quem foi o primeiro rei de Israel?", options: ["Saul", "Davi", "Salomão", "Ezequias"], answer: "Saul" },
+{ question: "Quem foi o rei que escreveu muitos dos Salmos?", options: ["Davi", "Salomão", "Ezequias", "Josias"], answer: "Davi" },
+{ question: "Quem foi o patriarca que teve 12 filhos que se tornaram as 12 tribos de Israel?", options: ["Jacó", "Isaac", "Abraão", "Moisés"], answer: "Jacó" },
+{ question: "Qual era o nome de Moisés antes de se tornar líder dos israelitas?", options: ["Moisés", "Ezequias", "Saul", "Davi"], answer: "Moisés" },
+{ question: "Qual foi a última praga enviada sobre o Egito antes da libertação dos israelitas?", options: ["Morte dos primogênitos", "Gafanhotos", "Rãs", "Sangue"], answer: "Morte dos primogênitos" },
+{ question: "Quem foi o profeta que teve uma visão do vale de ossos secos?", options: ["Ezequiel", "Isaías", "Amós", "Miquéias"], answer: "Ezequiel" },
+{ question: "Em qual cidade Davi foi ungido como rei de Judá?", options: ["Hebrom", "Jerusalém", "Samaria", "Betel"], answer: "Hebrom" },
+{ question: "Quem foi o profeta que recebeu a visão de um novo céu e uma nova terra?", options: ["Isaías", "Daniel", "Ezequiel", "Apocalipse"], answer: "Isaías" },
+{ question: "Quem foi o juiz que derrotou os midianitas com apenas 300 homens?", options: ["Gideão", "Jefté", "Sansão", "Davi"], answer: "Gideão" },
+{ question: "Qual livro da Bíblia descreve a história de Ester e a salvação do povo judeu?", options: ["Ester", "Rute", "Juízes", "Neemias"], answer: "Ester" },
+{ question: "Quem foi o rei de Judá que restaurou o templo e as práticas religiosas?", options: ["Josias", "Ezequias", "Davi", "Salomão"], answer: "Josias" },
+{ question: "Qual foi o nome do homem que teve um sonho onde 12 estrelas representavam os 12 filhos de Israel?", options: ["José", "Jacó", "Davi", "Moisés"], answer: "José" },
+{ question: "Quem foi o profeta que escreveu o livro de Lamentações?", options: ["Jeremias", "Isaías", "Daniel", "Ezequiel"], answer: "Jeremias" },
+{ question: "Qual livro da Bíblia relata a destruição de Jerusalém e o cativeiro babilônico?", options: ["Jeremias", "Lamentações", "Daniel", "Amós"], answer: "Jeremias" },
+{ question: "Quem foi o rei de Israel que construiu o templo de Jerusalém?", options: ["Salomão", "Davi", "Ezequias", "Saul"], answer: "Salomão" },
+{ question: "Quem foi o profeta que previu o nascimento de Jesus e falou sobre o servo sofredor?", options: ["Isaías", "Amós", "Ezequiel", "Jeremias"], answer: "Isaías" },
+{ question: "Quem foi o profeta que teve uma visão do trono de Deus em um carro de fogo?", options: ["Ezequiel", "Isaías", "Amós", "Daniel"], answer: "Ezequiel" },
+{ question: "Qual rei de Judá fez uma reforma religiosa e destruiu os altares de Baal?", options: ["Josias", "Ezequias", "Salomão", "Davi"], answer: "Josias" },
+{ question: "Quem foi o profeta que alertou o povo de Israel sobre a destruição de Jerusalém?", options: ["Jeremias", "Daniel", "Ezequiel", "Amós"], answer: "Jeremias" },
+
+ ],
+ 
+ NOVO: [
+ 
+{ question: "Quem foi o primeiro apóstolo a ser chamado por Jesus?", options: ["Pedro", "João", "Tiago", "André"], answer: "André" },
+{ question: "Quem foi o médico que escreveu o Evangelho de Lucas?", options: ["Lucas", "Marcos", "Mateus", "João"], answer: "Lucas" },
+{ question: "Qual evangelho é considerado o mais teológico e profundo?", options: ["João", "Mateus", "Marcos", "Lucas"], answer: "João" },
+{ question: "Quem batizou Jesus no rio Jordão?", options: ["João Batista", "Pedro", "Tiago", "André"], answer: "João Batista" },
+{ question: "Qual foi o nome do discípulo que traiu Jesus?", options: ["Judas Iscariotes", "Pedro", "João", "Tiago"], answer: "Judas Iscariotes" },
+{ question: "Em qual cidade Jesus nasceu?", options: ["Belém", "Jerusalém", "Nazaré", "Cafarnaum"], answer: "Belém" },
+{ question: "Quem foi o apóstolo que negou Jesus três vezes?", options: ["Pedro", "João", "Tiago", "André"], answer: "Pedro" },
+{ question: "Qual é o sermão mais famoso de Jesus, que inclui as Bem-aventuranças?", options: ["Sermão da Montanha", "Sermão do Monte das Oliveiras", "Sermão da Última Ceia", "Sermão no Templo"], answer: "Sermão da Montanha" },
+{ question: "Quem escreveu o livro de Atos dos Apóstolos?", options: ["Lucas", "Pedro", "Paulo", "João"], answer: "Lucas" },
+{ question: "Qual apóstolo foi conhecido como 'o apóstolo dos gentios'?", options: ["Paulo", "Pedro", "Tiago", "João"], answer: "Paulo" },
+{ question: "Quem foi o imperador romano durante a crucificação de Jesus?", options: ["Pôncio Pilatos", "César Augusto", "Nero", "Tiberio"], answer: "Pôncio Pilatos" },
+{ question: "Qual é o nome da mãe de Jesus?", options: ["Maria", "Marta", "Elisabete", "Ana"], answer: "Maria" },
+{ question: "Qual foi o primeiro milagre de Jesus registrado nos Evangelhos?", options: ["Transformar água em vinho", "Curar o cego de Jericó", "Multiplicar os pães e peixes", "Curar o paralítico"], answer: "Transformar água em vinho" },
+{ question: "Qual apóstolo escreveu o livro de Apocalipse?", options: ["João", "Pedro", "Paulo", "Tiago"], answer: "João" },
+{ question: "Quem foi o apóstolo que, ao ser libertado da prisão, foi visitado por um anjo?", options: ["Pedro", "Paulo", "Tiago", "João"], answer: "Pedro" },
+{ question: "Onde Paulo foi preso e escreveu várias de suas epístolas?", options: ["Roma", "Éfeso", "Corinto", "Antióquia"], answer: "Roma" },
+
+{ question: "O que Jesus fez na Última Ceia?", options: ["Instituiu a Eucaristia", "Lavou os pés dos discípulos", "Fez um sermão", "Fez uma oração"], answer: "Instituiu a Eucaristia" },
+{ question: "Qual discípulo duvidou da ressurreição de Jesus até ver as suas feridas?", options: ["Tomé", "Pedro", "Tiago", "João"], answer: "Tomé" },
+{ question: "Onde Paulo pregou seu famoso discurso sobre o 'Deus desconhecido'?", options: ["Atenas", "Éfeso", "Corinto", "Antióquia"], answer: "Atenas" },
+{ question: "Quem foi o apóstolo que escreveu a maioria das epístolas no Novo Testamento?", options: ["Paulo", "Pedro", "Tiago", "João"], answer: "Paulo" },
+{ question: "Qual foi a resposta de Jesus à mulher samaritana no poço?", options: ["Ela deveria beber da água viva", "Ela deveria se converter ao judaísmo", "Ela deveria se arrepender de seus pecados", "Ela deveria falar a verdade"], answer: "Ela deveria beber da água viva" },
+{ question: "Quem era o fariseu que procurou Jesus durante a noite, conforme o Evangelho de João?", options: ["Nicodemos", "Judas", "Zaqueu", "Simão"], answer: "Nicodemos" },
+{ question: "Qual apóstolo teve uma visão em que foi chamado para pregar aos gentios?", options: ["Pedro", "Paulo", "João", "Tiago"], answer: "Pedro" },
+{ question: "O que aconteceu no dia de Pentecostes?", options: ["O Espírito Santo desceu sobre os apóstolos", "A crucificação de Jesus", "A ressurreição de Jesus", "A ascensão de Jesus"], answer: "O Espírito Santo desceu sobre os apóstolos" },
+{ question: "Quem foi o primeiro mártir cristão?", options: ["Estevão", "Tiago", "Pedro", "Paulo"], answer: "Estevão" },
+{ question: "Qual livro do Novo Testamento contém as bem-aventuranças?", options: ["Mateus", "Marcos", "Lucas", "João"], answer: "Mateus" },
+{ question: "Quem foi o discípulo que substituiu Judas Iscariotes após sua morte?", options: ["Matias", "Barnabé", "Paulo", "Tiago"], answer: "Matias" },
+{ question: "Qual apóstolo foi martirizado em Roma durante o reinado de Nero?", options: ["Pedro", "Paulo", "Tiago", "João"], answer: "Pedro" },
+{ question: "Quem foi o centurião que teve fé suficiente para pedir a cura de seu servo, sendo elogiado por Jesus?", options: ["O centurião de Cafarnaum", "Cornélio", "Pilatos", "Zaqueu"], answer: "O centurião de Cafarnaum" },
+{ question: "Quem escreveu o Evangelho de Mateus?", options: ["Mateus", "Marcos", "Lucas", "João"], answer: "Mateus" },
+{ question: "Onde Jesus realizou o sermão sobre o monte?", options: ["Montanha", "Jerusalém", "Cafarnaum", "Betânia"], answer: "Montanha" },
+{ question: "Quantos discípulos Jesus escolheu?", options: ["Doze", "Trinta e dois", "Vinte", "Setenta"], answer: "Doze" },
+{ question: "Qual foi o motivo da expulsão dos mercadores do templo por Jesus?", options: ["Eles estavam fazendo comércio no templo", "Eles estavam blasfemando", "Eles estavam enganando os pobres", "Eles estavam fazendo sacrifícios ilícitos"], answer: "Eles estavam fazendo comércio no templo" },
+{ question: "Qual é o primeiro livro do Novo Testamento?", options: ["Mateus", "Marcos", "Lucas", "João"], answer: "Mateus" },
+{ question: "Qual discípulo foi chamado de 'o discípulo amado'?", options: ["João", "Pedro", "Tiago", "André"], answer: "João" },
+{ question: "Quem foi o governante romano que deu ordem para a crucificação de Jesus?", options: ["Pôncio Pilatos", "Nero", "César Augusto", "Tiberio"], answer: "Pôncio Pilatos" },
+{ question: "Em que cidade Paulo teve sua conversão enquanto viajava para Damasco?", options: ["Damasco", "Antióquia", "Éfeso", "Jerusalém"], answer: "Damasco" },
+{ question: "Qual apóstolo escreveu o livro de Tiago?", options: ["Tiago", "Pedro", "Paulo", "João"], answer: "Tiago" },
+{ question: "Quem foi o imperador romano durante a época da vida de Jesus?", options: ["César Augusto", "Nero", "Tiberio", "Calígula"], answer: "César Augusto" },
+
+{ question: "Qual apóstolo escreveu a Epístola aos Hebreus?", options: ["Paulo", "Pedro", "João", "Tiago"], answer: "Paulo" },
+{ question: "Em qual cidade Paulo pregou a sua famosa defesa perante o Areópago?", options: ["Atenas", "Éfeso", "Corinto", "Antióquia"], answer: "Atenas" },
+{ question: "Quantos milagres de Jesus são descritos nos Evangelhos?", options: ["37", "20", "40", "50"], answer: "37" },
+{ question: "Quem foi o chefe do Sinédrio que mandou prender Pedro e João?", options: ["Anás", "Caiáfas", "Herodes", "Pilatos"], answer: "Anás" },
+{ question: "Em qual livro do Novo Testamento está registrada a história da conversão de Paulo?", options: ["Atos dos Apóstolos", "Romanos", "Efésios", "Filipenses"], answer: "Atos dos Apóstolos" },
+{ question: "Quem foi o discípulo que recebeu a visão de um anjo para pregar para o centurião Cornélio?", options: ["Pedro", "Paulo", "Tiago", "João"], answer: "Pedro" },
+{ question: "Qual apóstolo escreveu a Epístola de Tiago?", options: ["Tiago", "Pedro", "João", "Paulo"], answer: "Tiago" },
+{ question: "Quantos capítulos tem o livro de Atos dos Apóstolos?", options: ["28", "25", "30", "32"], answer: "28" },
+{ question: "Quem foi o apóstolo que escreveu a primeira, segunda e terceira epístolas de João?", options: ["João", "Pedro", "Paulo", "Tiago"], answer: "João" },
+{ question: "Qual discípulo escreveu o Evangelho de Marcos?", options: ["Marcos", "Mateus", "Lucas", "João"], answer: "Marcos" },
+{ question: "Qual foi o apóstolo que teve sua cabeça cortada durante o reinado de Nero?", options: ["Paulo", "Pedro", "Tiago", "João"], answer: "Paulo" },
+{ question: "Em qual cidade Paulo foi preso antes de ser levado a Roma?", options: ["Filipos", "Éfeso", "Jerusalém", "Césaréia"], answer: "Césaréia" },
+{ question: "Qual apóstolo escreveu a carta aos Romanos?", options: ["Paulo", "Pedro", "João", "Tiago"], answer: "Paulo" },
+{ question: "Qual é o livro que está no final do Novo Testamento?", options: ["Apocalipse", "Judas", "2 João", "Filemom"], answer: "Apocalipse" },
+{ question: "O que significa o nome 'Emmanuel', que foi dado a Jesus?", options: ["Deus conosco", "Rei dos reis", "Salvador", "Filho de Deus"], answer: "Deus conosco" },
+{ question: "Qual é o nome do rei que procurou matar o menino Jesus?", options: ["Herodes", "César", "Nabucodonosor", "Pilatos"], answer: "Herodes" },
+{ question: "Quem foi o apóstolo conhecido como 'o irmão de Tiago'?", options: ["Judas Tadeu", "Tomé", "Felipe", "André"], answer: "Judas Tadeu" },
+{ question: "Quem foi o chefe dos apóstolos, também conhecido como o 'príncipe dos apóstolos'?", options: ["Pedro", "João", "Tiago", "Paulo"], answer: "Pedro" },
+{ question: "Em que cidade Jesus realizou o milagre da multiplicação dos pães e peixes?", options: ["Cafarnaum", "Nazaré", "Betsaida", "Jerusalém"], answer: "Betsaida" },
+{ question: "Quem foi o apóstolo conhecido por sua profissão de pescador antes de seguir Jesus?", options: ["Pedro", "João", "Tiago", "André"], answer: "Pedro" },
+{ question: "Qual apóstolo escreveu a Epístola aos Filipenses?", options: ["Paulo", "Pedro", "João", "Tiago"], answer: "Paulo" },
+{ question: "Qual apóstolo negou Jesus três vezes antes de o galinho cantar?", options: ["Pedro", "João", "Tiago", "André"], answer: "Pedro" },
+{ question: "Quem foi o apóstolo que escreveu o livro de Filipenses?", options: ["Paulo", "Pedro", "João", "Tiago"], answer: "Paulo" },
+{ question: "Em qual livro do Novo Testamento está o 'Hino do Amor'?", options: ["1 Coríntios", "Efésios", "Filipenses", "Colossenses"], answer: "1 Coríntios" },
+{ question: "Qual apóstolo foi o primeiro a ser martirizado?", options: ["Tiago", "Pedro", "João", "Paulo"], answer: "Tiago" },
+{ question: "Quem foi o apóstolo conhecido como 'o apóstolo dos gentios'?", options: ["Paulo", "Pedro", "Tiago", "João"], answer: "Paulo" },
+{ question: "Qual é o nome do discípulo que traçou a 'linha de pensamento' sobre as bem-aventuranças?", options: ["Mateus", "Lucas", "Marcos", "João"], answer: "Mateus" },
+{ question: "O que Jesus disse no sermão da montanha sobre as 'bem-aventuranças'?", options: ["Bem-aventurados os pobres de espírito", "Bem-aventurados os ricos", "Bem-aventurados os que jejuam", "Bem-aventurados os que oram"], answer: "Bem-aventurados os pobres de espírito" },
+{ question: "Quem foi o centurião que teve a fé suficiente para fazer Jesus curar seu servo à distância?", options: ["O centurião de Cafarnaum", "Cornélio", "Zaqueu", "Nicodemos"], answer: "O centurião de Cafarnaum" },
+{ question: "Qual apóstolo escreveu a carta aos Hebreus?", options: ["Paulo", "Pedro", "Tiago", "João"], answer: "Paulo" },
+{ question: "Quem foi o discípulo que negou conhecer Jesus no momento de sua prisão?", options: ["Pedro", "Tomé", "João", "Tiago"], answer: "Pedro" },
+{ question: "Qual foi o título do primeiro livro que Paulo escreveu?", options: ["1 Tessalonicenses", "Romanos", "Filipenses", "1 Coríntios"], answer: "1 Tessalonicenses" },
+{ question: "Onde Jesus fez o milagre da ressurreição de Lázaro?", options: ["Betânia", "Cafarnaum", "Jerusalém", "Nazaré"], answer: "Betânia" },
+
+{ question: "Quem foi o apóstolo que escreveu o livro de Atos dos Apóstolos?", options: ["Lucas", "Mateus", "João", "Paulo"], answer: "Lucas" },
+{ question: "Qual apóstolo era conhecido como o 'discípulo amado'?", options: ["João", "Pedro", "Tiago", "André"], answer: "João" },
+{ question: "Quem foi o homem que ajudou a enterrar Jesus?", options: ["José de Arimateia", "Nicodemos", "Simão Cireneu", "Judas Iscariotes"], answer: "José de Arimateia" },
+{ question: "Quem foi o primeiro homem a pregar o evangelho aos gentios?", options: ["Paulo", "Pedro", "Tiago", "João"], answer: "Pedro" },
+{ question: "Onde Jesus nasceu?", options: ["Belém", "Nazaré", "Cafarnaum", "Jerusalém"], answer: "Belém" },
+{ question: "Quem escreveu o Evangelho de Mateus?", options: ["Mateus", "Marcos", "Lucas", "João"], answer: "Mateus" },
+{ question: "Qual apóstolo escreveu a carta aos Efésios?", options: ["Paulo", "Pedro", "João", "Tiago"], answer: "Paulo" },
+{ question: "Qual discípulo escreveu a Epístola de Judas?", options: ["Judas", "Tiago", "Paulo", "Pedro"], answer: "Judas" },
+{ question: "Quem foi o apóstolo que negou Jesus três vezes antes do galo cantar?", options: ["Pedro", "João", "Tiago", "André"], answer: "Pedro" },
+{ question: "Quem foi o apóstolo que escreveu a carta aos Colossenses?", options: ["Paulo", "Tiago", "João", "Pedro"], answer: "Paulo" },
+{ question: "Onde Paulo escreveu a maioria de suas epístolas?", options: ["Prisão", "Éfeso", "Antioquia", "Corinto"], answer: "Prisão" },
+{ question: "Qual livro do Novo Testamento fala sobre o Apocalipse?", options: ["Apocalipse", "Judas", "Atos dos Apóstolos", "Tiago"], answer: "Apocalipse" },
+{ question: "Quem escreveu o Evangelho de Lucas?", options: ["Lucas", "Mateus", "João", "Marcos"], answer: "Lucas" },
+{ question: "Quem foi o responsável por escrever as cartas às igrejas na Ásia Menor?", options: ["Paulo", "Pedro", "Tiago", "João"], answer: "Paulo" },
+{ question: "Qual apóstolo escreveu a carta aos Gálatas?", options: ["Paulo", "Pedro", "João", "Tiago"], answer: "Paulo" },
+{ question: "Quem foi o apóstolo que escreveu a carta aos Tessalonicenses?", options: ["Paulo", "Pedro", "Tiago", "João"], answer: "Paulo" },
+{ question: "O que aconteceu quando Jesus foi batizado por João Batista?", options: ["O Espírito Santo desceu como uma pomba", "Jesus foi transfigurado", "Ele começou a pregar", "Ele foi levado ao deserto"], answer: "O Espírito Santo desceu como uma pomba" },
+{ question: "Qual foi o primeiro milagre de Jesus registrado no Evangelho?", options: ["Transformar água em vinho", "Curar um cego", "Curar um paralítico", "Ressuscitar Lázaro"], answer: "Transformar água em vinho" },
+{ question: "Quem foi o apóstolo que escreveu a carta aos Romanos?", options: ["Paulo", "Pedro", "Tiago", "João"], answer: "Paulo" },
+
+{ question: "Quem eram os dois apóstolos irmãos chamados 'filhos do trovão'?", options: ["Tiago e João", "Pedro e André", "Mateus e Tomé", "Felipe e Bartolomeu"], answer: "Tiago e João" },
+{ question: "O que Jesus fez após a última ceia com seus discípulos?", options: ["Foi ao Jardim do Getsêmani", "Subiu ao monte", "Foi ao templo", "Curou enfermos"], answer: "Foi ao Jardim do Getsêmani" },
+{ question: "Qual foi o discípulo que escreveu o Evangelho de João?", options: ["João", "Mateus", "Marcos", "Lucas"], answer: "João" },
+{ question: "Quem foi o apóstolo que ajudou a fundar a Igreja em Corinto?", options: ["Paulo", "Pedro", "Tiago", "João"], answer: "Paulo" },
+{ question: "Quem foi o apóstolo que negou Jesus antes de ser crucificado?", options: ["Pedro", "João", "Tiago", "André"], answer: "Pedro" },
+{ question: "Em qual cidade Jesus curou um cego ao passar e lhe tocar os olhos?", options: ["Jerusalém", "Cafarnaum", "Betânia", "Jericó"], answer: "Jericó" },
+{ question: "Quem foi o apóstolo que traiu Jesus?", options: ["Judas Iscariotes", "Pedro", "Tomé", "Simão"], answer: "Judas Iscariotes" },
+{ question: "Qual é o último versículo do Evangelho de Mateus?", options: ["E eis que eu estou convosco todos os dias, até a consumação dos séculos.", "Vão e preguem o evangelho a todas as nações.", "O Senhor é a minha luz e a minha salvação.", "Eu sou o pão da vida."], answer: "E eis que eu estou convosco todos os dias, até a consumação dos séculos." },
+{ question: "Qual apóstolo escreveu a carta aos Efésios?", options: ["Paulo", "Pedro", "João", "Tiago"], answer: "Paulo" },
+{ question: "Em qual livro do Novo Testamento encontramos as 'bem-aventuranças'?", options: ["Evangelho de Mateus", "Evangelho de Lucas", "Evangelho de Marcos", "Atos dos Apóstolos"], answer: "Evangelho de Mateus" },
+{ question: "Onde Jesus foi crucificado?", options: ["Gólgota", "Monte Sinai", "Monte das Oliveiras", "Jerusalém"], answer: "Gólgota" },
+{ question: "Quem foram os dois ladrões crucificados ao lado de Jesus?", options: ["Dimas e Gestas", "Felipe e Bartolomeu", "André e Tiago", "Simão e Judas"], answer: "Dimas e Gestas" },
+{ question: "Quem era o discípulo que, antes de seguir Jesus, estava coletando impostos?", options: ["Mateus", "Lucas", "João", "Tiago"], answer: "Mateus" },
+{ question: "Quem escreveu a carta a Tito?", options: ["Paulo", "Pedro", "Tiago", "João"], answer: "Paulo" },
+{ question: "Em qual livro da Bíblia está registrada a oração do Pai Nosso?", options: ["Evangelho de Mateus", "Evangelho de Lucas", "Evangelho de João", "Evangelho de Marcos"], answer: "Evangelho de Mateus" },
+{ question: "Em que cidade Paulo fundou uma das primeiras igrejas cristãs?", options: ["Filipos", "Corinto", "Éfeso", "Antióquia"], answer: "Filipos" },
+{ question: "Qual apóstolo escreveu a carta aos Filipenses?", options: ["Paulo", "Pedro", "Tiago", "João"], answer: "Paulo" },
+
+{ question: "Qual apóstolo foi conhecido por ser o 'apóstolo dos gentios'?", options: ["Paulo", "Pedro", "Tiago", "João"], answer: "Paulo" },
+{ question: "Quem foi o primeiro cristão a ser martirizado?", options: ["Estêvão", "Tiago", "Pedro", "João"], answer: "Estêvão" },
+{ question: "Onde Paulo foi preso por pregar o evangelho?", options: ["Roma", "Corinto", "Éfeso", "Filipos"], answer: "Roma" },
+{ question: "Em qual cidade Paulo teve sua visão de Cristo no caminho para Damasco?", options: ["Damasco", "Jerusalém", "Éfeso", "Antióquia"], answer: "Damasco" },
+{ question: "Qual apóstolo escreveu a carta aos Hebreus?", options: ["Paulo", "Lucas", "Pedro", "João"], answer: "Paulo" },
+{ question: "Quem foi o discípulo que escreveu o livro de Apocalipse?", options: ["João", "Pedro", "Tiago", "Mateus"], answer: "João" },
+{ question: "Qual foi a primeira cidade que Paulo visitou em sua primeira viagem missionária?", options: ["Antioquia", "Salamina", "Listra", "Derbe"], answer: "Antioquia" },
+{ question: "Quem ajudou Paulo a escapar de um cesto durante uma perseguição em Damasco?", options: ["Barnabé", "Silas", "Ananias", "Lucas"], answer: "Barnabé" },
+{ question: "Em qual livro do Novo Testamento está o 'Fruto do Espírito' mencionado?", options: ["Gálatas", "Efésios", "Romanos", "Filipenses"], answer: "Gálatas" },
+{ question: "Qual foi o nome do discípulo que substituiu Judas Iscariotes como apóstolo?", options: ["Matias", "Barnabé", "Paulo", "Tiago"], answer: "Matias" },
+{ question: "O que Paulo disse ser o salário do pecado?", options: ["Morte", "Pobreza", "Dor", "Perdição"], answer: "Morte" },
+{ question: "Quem foi o apóstolo que escreveu a carta de 1 João?", options: ["João", "Pedro", "Tiago", "Paulo"], answer: "João" },
+{ question: "Em que cidade Paulo foi apedrejado e deixado por morto?", options: ["Listra", "Antioquia", "Éfeso", "Corinto"], answer: "Listra" },
+{ question: "Onde Jesus foi crucificado?", options: ["Gólgota", "Monte das Oliveiras", "Jerusalém", "Cafarnaum"], answer: "Gólgota" },
+{ question: "Quem foi o apóstolo que escreveu a carta aos Filipenses?", options: ["Paulo", "Pedro", "Tiago", "João"], answer: "Paulo" },
+{ question: "Quem foi o discípulo que traiu Jesus?", options: ["Judas Iscariotes", "Pedro", "Tiago", "João"], answer: "Judas Iscariotes" },
+{ question: "Qual apóstolo fundou a igreja em Roma?", options: ["Pedro", "Paulo", "Tiago", "João"], answer: "Pedro" },
+{ question: "Quem foi o primeiro a ser batizado por Paulo?", options: ["Lídia", "Saulo", "Timóteo", "Apolo"], answer: "Lídia" },
+
+{ question: "Qual foi o nome do rei que prendeu Pedro na prisão?", options: ["Herodes Agripa", "César", "Felipe", "Pilatos"], answer: "Herodes Agripa" },
+{ question: "O que Paulo falava ser a 'armadura de Deus'?", options: ["A fé", "A oração", "A palavra de Deus", "A justiça"], answer: "A fé" },
+{ question: "Qual apóstolo escreveu a carta aos Gálatas?", options: ["Paulo", "Pedro", "João", "Tiago"], answer: "Paulo" },
+{ question: "Quem foi o apóstolo que estava preso junto com Paulo quando houve um terremoto?", options: ["Silas", "Barnabé", "Lucas", "Tiago"], answer: "Silas" },
+{ question: "Quem era o discípulo que foi um médico e companheiro de Paulo?", options: ["Lucas", "Barnabé", "Timóteo", "Tito"], answer: "Lucas" },
+{ question: "Onde Paulo se encontrou com os presbíteros da igreja de Éfeso?", options: ["Mileto", "Filipos", "Corinto", "Tessalônica"], answer: "Mileto" },
+{ question: "Qual era o nome do governante romano que condenou Jesus à crucificação?", options: ["Pôncio Pilatos", "Herodes", "César", "Felipe"], answer: "Pôncio Pilatos" },
+{ question: "Quem foi o primeiro discípulo a ser martirizado?", options: ["Tiago", "Pedro", "Paulo", "Estêvão"], answer: "Tiago" },
+{ question: "Qual apóstolo escreveu a carta a Filemom?", options: ["Paulo", "Pedro", "João", "Tiago"], answer: "Paulo" },
+{ question: "Onde estava Paulo quando escreveu a carta aos Filipenses?", options: ["Na prisão", "Em Roma", "Em Antioquia", "Em Corinto"], answer: "Na prisão" },
+{ question: "Em qual cidade Paulo realizou seu famoso discurso no Areópago?", options: ["Atenas", "Corinto", "Éfeso", "Roma"], answer: "Atenas" },
+{ question: "Quem foi o apóstolo que teve uma visão de Cristo no Monte da Transfiguração?", options: ["Pedro", "Tiago", "João", "André"], answer: "Pedro" },
+{ question: "Quem foi o apóstolo que pregou o evangelho na Índia?", options: ["Tomé", "Tiago", "Paulo", "Pedro"], answer: "Tomé" },
+{ question: "Qual foi a cidade onde os seguidores de Jesus foram chamados pela primeira vez de 'cristãos'?", options: ["Antioquia", "Jerusalém", "Éfeso", "Corinto"], answer: "Antioquia" },
+{ question: "O que Paulo escreveu sobre a ressurreição em 1 Coríntios 15?", options: ["É o fundamento da nossa fé", "É uma alegoria", "É uma esperança futura", "Não acontece de fato"], answer: "É o fundamento da nossa fé" },
+{ question: "Quem foi o apóstolo que curou o coxo à porta do templo?", options: ["Pedro", "Tiago", "João", "Paulo"], answer: "Pedro" },
+{ question: "Em qual cidade Paulo foi preso e enfrentou julgamento diante de Félix?", options: ["Césaréia", "Antioquia", "Roma", "Jerusalém"], answer: "Césaréia" },
+{ question: "O que Jesus disse sobre o amor em João 13:34?", options: ["Amai-vos uns aos outros como eu vos amei", "Amarás a Deus de todo o coração", "Ama o teu próximo como a ti mesmo", "O amor é a chave para o Reino de Deus"], answer: "Amai-vos uns aos outros como eu vos amei" },
+{ question: "Qual apóstolo escreveu a carta a Tito?", options: ["Paulo", "Pedro", "Tiago", "João"], answer: "Paulo" },
+
+
+    
+ ],
+ 
+ MISTO: [
+{ question: "Quem construiu a arca para escapar do dilúvio?", options: ["Moisés", "Abraão", "Noé", "Davi"], answer: "Noé" },
+{ question: "Qual o primeiro livro da Bíblia?", options: ["Êxodo", "Gênesis", "Levítico", "Números"], answer: "Gênesis" },
+{ question: "Quem foi lançado na cova dos leões?", options: ["Elias", "Daniel", "José", "Jonas"], answer: "Daniel" },
+{ question: "Qual rei foi conhecido por sua sabedoria?", options: ["Davi", "Salomão", "Saul", "Ezequias"], answer: "Salomão" },
+{ question: "Qual profeta enfrentou os profetas de Baal no Monte Carmelo?", options: ["Elias", "Isaías", "Jeremias", "Ezequiel"], answer: "Elias" },
+{ question: "Quem foi vendido por seus irmãos e levado ao Egito?", options: ["Moisés", "José", "Abraão", "Isaque"], answer: "José" },
+{ question: "Qual era o nome da esposa de Abraão?", options: ["Rebeca", "Raquel", "Sara", "Miriã"], answer: "Sara" },
+{ question: "Quem recebeu as Tábuas da Lei no Monte Sinai?", options: ["Josué", "Arão", "Moisés", "Elias"], answer: "Moisés" },
+{ question: "Em que cidade os muros caíram após a marcha dos israelitas?", options: ["Jerusalém", "Jericó", "Betel", "Hebrom"], answer: "Jericó" },
+{ question: "Quem matou Golias com uma pedra?", options: ["Saul", "Davi", "Eliabe", "Natã"], answer: "Davi" },
+
+{ question: "Quem foi o primeiro rei de Israel?", options: ["Saul", "Davi", "Salomão", "Samuel"], answer: "Saul" },
+{ question: "Qual o nome do profeta que foi engolido por um grande peixe?", options: ["Isaías", "Jeremias", "Jonas", "Ezequiel"], answer: "Jonas" },
+{ question: "Quem foi o líder que sucedeu Moisés e levou os israelitas à Terra Prometida?", options: ["Davi", "Josué", "Saul", "Elias"], answer: "Josué" },
+{ question: "Quem traiu Jesus por 30 peças de prata?", options: ["Pedro", "Judas", "Tiago", "João"], answer: "Judas" },
+{ question: "Quem foi o profeta que desafiou o rei Acabe e a rainha Jezabel?", options: ["Isaías", "Elias", "Jeremias", "Amós"], answer: "Elias" },
+{ question: "Quem foi o líder militar que derrotou os midianitas com apenas 300 homens?", options: ["Sansão", "Gideão", "Davi", "Josué"], answer: "Gideão" },
+{ question: "Qual o nome do filho de Abraão com Agar?", options: ["Isaque", "Ismael", "Jacó", "Esaú"], answer: "Ismael" },
+{ question: "Quem foi o profeta que viu a visão de ossos secos?", options: ["Ezequiel", "Daniel", "Isaías", "Amós"], answer: "Ezequiel" },
+{ question: "Quem foi o patriarca que teve 12 filhos que deram origem às 12 tribos de Israel?", options: ["Abraão", "Jacó", "Isaque", "Moisés"], answer: "Jacó" },
+{ question: "Qual o nome da esposa de Jacó, que era irmã de Lia?", options: ["Raquel", "Sara", "Rebeca", "Miriã"], answer: "Raquel" },
+{ question: "Qual o nome do livro que descreve a criação do mundo?", options: ["Êxodo", "Gênesis", "Levítico", "Números"], answer: "Gênesis" },
+{ question: "Quem teve os 10 mandamentos revelados no Monte Sinai?", options: ["Moisés", "Elias", "Josué", "Salomão"], answer: "Moisés" },
+{ question: "Quem derrotou o gigante Golias?", options: ["Moisés", "Josué", "Davi", "Saul"], answer: "Davi" },
+{ question: "Qual o nome do primeiro assassino da Bíblia?", options: ["Caim", "Abel", "Ismael", "Davi"], answer: "Caim" },
+{ question: "Quem foi o profeta que casou com Gomer, uma prostituta?", options: ["Amós", "Oséias", "Isaías", "Jeremias"], answer: "Oséias" },
+{ question: "Quem desafiou os falsos profetas de Baal no Monte Carmelo?", options: ["Elias", "Eliseu", "Isaías", "Moisés"], answer: "Elias" },
+
+{ question: "Quem foi lançado na fornalha ardente?", options: ["Daniel", "Sadraque", "Misaque", "Abednego"], answer: "Sadraque, Misaque e Abednego" },
+{ question: "Qual o nome do livro que fala sobre a sabedoria de Salomão?", options: ["Provérbios", "Eclesiastes", "Cânticos", "Salmos"], answer: "Provérbios" },
+{ question: "Qual o nome da mãe de Samuel?", options: ["Ana", "Elisabete", "Raquel", "Miriã"], answer: "Ana" },
+{ question: "Quem interpretou o sonho do faraó do Egito?", options: ["José", "Daniel", "Moisés", "Salomão"], answer: "José" },
+{ question: "Em que livro da Bíblia encontramos a história de Noé e a arca?", options: ["Êxodo", "Gênesis", "Levítico", "Deuteronômio"], answer: "Gênesis" },
+{ question: "Quem escreveu o livro de Lamentações?", options: ["Isaías", "Jeremias", "Ezequiel", "Amós"], answer: "Jeremias" },
+{ question: "Quem foi o último juiz de Israel?", options: ["Samuel", "Davi", "Saul", "Gideão"], answer: "Samuel" },
+{ question: "Quem foi o profeta que desafiou o rei Acabe e venceu com a ajuda de Deus?", options: ["Moisés", "Elias", "Isaías", "Ezequiel"], answer: "Elias" },
+{ question: "Quem foi a primeira mulher mencionada na Bíblia?", options: ["Sara", "Eva", "Raquel", "Rebeca"], answer: "Eva" },
+{ question: "Qual o nome do livro que relata a história de Rute?", options: ["Rute", "Gênesis", "Juízes", "Êxodo"], answer: "Rute" },
+{ question: "Quem destruiu as muralhas de Jericó?", options: ["Josué", "Davi", "Moisés", "Gideão"], answer: "Josué" },
+{ question: "Quem foi o rei que construiu o templo de Jerusalém?", options: ["Salomão", "Davi", "Ezequias", "Josias"], answer: "Salomão" },
+{ question: "Qual é o nome do livro que conta a história de Ester?", options: ["Ester", "Esdras", "Neemias", "Levítico"], answer: "Ester" },
+{ question: "Quem foi o profeta que confrontou o rei Davi sobre seu pecado com Bate-Seba?", options: ["Elias", "Natã", "Isaías", "Jeremias"], answer: "Natã" },
+{ question: "Qual o nome do rei que foi curado de uma doença por oração?", options: ["Ezequias", "Saul", "Salomão", "Davi"], answer: "Ezequias" },
+{ question: "Quem foi o homem que foi levado ao céu num redemoinho?", options: ["Moisés", "Elias", "Isaías", "Jeremias"], answer: "Elias" },
+{ question: "Quem foi o líder que libertou os israelitas da escravidão no Egito?", options: ["Moisés", "Josué", "Davi", "Gideão"], answer: "Moisés" },
+{ question: "Quem foi o profeta que teve uma visão do vale de ossos secos?", options: ["Ezequiel", "Amós", "Isaías", "Jeremias"], answer: "Ezequiel" },
+{ question: "Em qual livro da Bíblia é encontrada a história de Jó?", options: ["Salmos", "Provérbios", "Jó", "Eclesiastes"], answer: "Jó" },
+{ question: "Qual o nome do profeta que teve uma visão de uma roda dentro de uma roda?", options: ["Ezequiel", "Isaías", "Daniel", "Amós"], answer: "Ezequiel" },
+{ question: "Quem matou o gigante Golias com uma pedra?", options: ["Davi", "Moisés", "Saul", "Josué"], answer: "Davi" },
+
+{ question: "Quem foi o pai de Moisés?", options: ["Amram", "Isaque", "Davi", "Abraão"], answer: "Amram" },
+{ question: "Qual o nome da irmã de Moisés?", options: ["Miriã", "Raquel", "Lia", "Sara"], answer: "Miriã" },
+{ question: "Em que livro da Bíblia é descrito o êxodo dos israelitas do Egito?", options: ["Êxodo", "Levítico", "Números", "Deuteronômio"], answer: "Êxodo" },
+{ question: "Qual o nome do irmão de Moisés que foi sacerdote?", options: ["Arão", "Davi", "Josué", "Salomão"], answer: "Arão" },
+{ question: "Quem foi o profeta que teve a visão do trono de Deus em um carro de fogo?", options: ["Isaías", "Ezequiel", "Daniel", "Elias"], answer: "Ezequiel" },
+{ question: "Quem foi a esposa de Isaac?", options: ["Raquel", "Rebeca", "Sara", "Miriã"], answer: "Rebeca" },
+{ question: "Quem foi o primeiro sacerdote de Israel?", options: ["Arão", "Eli", "Zadoque", "Moisés"], answer: "Arão" },
+{ question: "Quem ajudou os espiões de Israel em Jericó?", options: ["Raquel", "Rute", "Débora", "Raabe"], answer: "Raabe" },
+{ question: "Quem foi o profeta que desafiou Acabe e Jezabel em Israel?", options: ["Elias", "Eliseu", "Amós", "Jonas"], answer: "Elias" },
+{ question: "Quem foi o rei de Judá que foi curado por Deus após orar?", options: ["Ezequias", "Josias", "Davi", "Salomão"], answer: "Ezequias" },
+{ question: "Qual profeta teve a visão do 'vale de ossos secos'?", options: ["Ezequiel", "Amós", "Isaías", "Daniel"], answer: "Ezequiel" },
+{ question: "Quem foi o homem que escreveu os provérbios?", options: ["Salomão", "Davi", "Isaías", "Ezequiel"], answer: "Salomão" },
+{ question: "Qual o nome da esposa de Davi que teve um filho chamado Salomão?", options: ["Bate-Seba", "Raquel", "Miriã", "Rebeca"], answer: "Bate-Seba" },
+{ question: "Quem foi o profeta que anunciou o nascimento de Jesus em Belém?", options: ["Isaías", "Jeremias", "Ezequiel", "Miquéias"], answer: "Miquéias" },
+{ question: "Qual o nome do livro que conta a história da libertação dos israelitas do Egito?", options: ["Êxodo", "Levítico", "Gênesis", "Deuteronômio"], answer: "Êxodo" },
+{ question: "Quem escreveu o livro de Salmos?", options: ["Salomão", "Davi", "Isaías", "Moisés"], answer: "Davi" },
+{ question: "Quem foi o profeta que desafiou os falsos profetas de Baal?", options: ["Elias", "Isaías", "Jeremias", "Ezequiel"], answer: "Elias" },
+{ question: "Quem foi o profeta que passou 40 dias e 40 noites sem comer?", options: ["Moisés", "Elias", "Jonas", "Davi"], answer: "Moisés" },
+
+{ question: "Qual é o nome do livro que descreve a sabedoria de Salomão?", options: ["Provérbios", "Eclesiastes", "Cânticos", "Salmos"], answer: "Provérbios" },
+{ question: "Qual foi o profeta que viu a glória de Deus e descreveu como um carro de fogo?", options: ["Ezequiel", "Isaías", "Daniel", "Elias"], answer: "Ezequiel" },
+{ question: "Quem foi o patriarca que teve 12 filhos, que deram origem às 12 tribos de Israel?", options: ["Abraão", "Isaac", "Jacó", "Moisés"], answer: "Jacó" },
+{ question: "Qual o nome do livro que conta a história de Ester?", options: ["Ester", "Rute", "Esdras", "Neemias"], answer: "Ester" },
+{ question: "Quem foi o profeta que viveu no exílio e viu a visão de um trono de fogo?", options: ["Isaías", "Ezequiel", "Amós", "Daniel"], answer: "Ezequiel" },
+{ question: "Qual é o nome do livro que descreve a viagem dos israelitas pelo deserto?", options: ["Êxodo", "Levítico", "Números", "Deuteronômio"], answer: "Números" },
+{ question: "Quem foi o profeta que escreveu o livro de Lamentações?", options: ["Isaías", "Jeremias", "Ezequiel", "Amós"], answer: "Jeremias" },
+{ question: "Quem foi o último juiz de Israel?", options: ["Eli", "Samuel", "Davi", "Saul"], answer: "Samuel" },
+{ question: "Qual o nome do rei de Israel que construiu o templo em Jerusalém?", options: ["Salomão", "Davi", "Ezequias", "Saul"], answer: "Salomão" },
+{ question: "Quem desafiou os falsos profetas de Baal no Monte Carmelo?", options: ["Elias", "Daniel", "Ezequiel", "Moisés"], answer: "Elias" },
+{ question: "Quem foi o profeta que falou sobre a vinda do Messias?", options: ["Isaías", "Miquéias", "Amós", "Joel"], answer: "Isaías" },
+{ question: "Quem foi o profeta que foi levado por um carro de fogo aos céus?", options: ["Elias", "Isaías", "Jeremias", "Daniel"], answer: "Elias" },
+{ question: "Qual foi o nome do povo que foi liberto da escravidão no Egito?", options: ["Egípcios", "Filisteus", "Amalequitas", "Israelitas"], answer: "Israelitas" },
+{ question: "Quem foi o profeta que teve uma visão das quatro bestas?", options: ["Isaías", "Daniel", "Jeremias", "Ezequiel"], answer: "Daniel" },
+{ question: "Quem foi o homem que interpretou os sonhos do faraó?", options: ["José", "Daniel", "Moisés", "Salomão"], answer: "José" },
+{ question: "Quem foi o líder que liderou a conquista da Terra Prometida?", options: ["Davi", "Moisés", "Josué", "Salomão"], answer: "Josué" },
+{ question: "Quem foi o homem que teve um encontro com Deus numa sarça ardente?", options: ["Abraão", "Moisés", "Elias", "Daniel"], answer: "Moisés" },
+{ question: "Quem foi o rei de Judá que restaurou o templo?", options: ["Josias", "Ezequias", "Davi", "Salomão"], answer: "Josias" },
+{ question: "Quem foi o líder que desceu do monte Sinai com as tábuas da lei?", options: ["Moisés", "Josué", "Davi", "Ezequias"], answer: "Moisés" },
+{ question: "Quem era o profeta conhecido por sua coragem em defender o nome de Deus?", options: ["Elias", "Isaías", "Daniel", "Jeremias"], answer: "Elias" },
+{ question: "Quem foi o homem que fugiu de Nínive após pregar o arrependimento?", options: ["Jonas", "Isaías", "Amós", "Jeremias"], answer: "Jonas" },
+
+{ question: "Quem foi o profeta que desafiou o rei Acabe e os 450 profetas de Baal no Monte Carmelo?", options: ["Elias", "Isaías", "Ezequiel", "Amós"], answer: "Elias" },
+{ question: "Qual foi a última praga que Deus enviou sobre o Egito antes da libertação dos israelitas?", options: ["Morte dos primogênitos", "Invasão de rãs", "Trevas", "Gafanhotos"], answer: "Morte dos primogênitos" },
+{ question: "Quem foi o profeta que profetizou a queda de Nínive?", options: ["Jonas", "Amós", "Miquéias", "Ezequiel"], answer: "Jonas" },
+{ question: "Qual rei de Israel foi o primeiro a construir um templo para Deus?", options: ["Salomão", "Davi", "Ezequias", "Saul"], answer: "Salomão" },
+{ question: "Qual dos filhos de Jacó recebeu a bênção de liderança sobre seus irmãos?", options: ["Judá", "José", "Rúben", "Levi"], answer: "Judá" },
+{ question: "Quem foi o juiz que matou 600 homens com uma espada", options: ["Sãcar", "Jefté", "Sansão", "Débora"], answer: "Sansão" },
+{ question: "Quem interpretou os sonhos do faraó e se tornou um alto oficial no Egito?", options: ["José", "Moisés", "Daniel", "Ezequiel"], answer: "José" },
+{ question: "Quem foi o profeta que escreveu o livro de Lamentações?", options: ["Jeremias", "Isaías", "Daniel", "Amós"], answer: "Jeremias" },
+{ question: "Em qual cidade Davi foi ungido como rei de Judá?", options: ["Hebrom", "Jerusalém", "Samaria", "Betel"], answer: "Hebrom" },
+{ question: "Qual foi a mãe de Samuel?", options: ["Ana", "Raquel", "Miriã", "Débora"], answer: "Ana" },
+{ question: "Qual é o nome do livro que conta a história de Rute?", options: ["Rute", "Ester", "Juízes", "Gênesis"], answer: "Rute" },
+
+{ question: "Quem foi o rei que desobedeceu a Deus e foi rejeitado como rei?", options: ["Saul", "Davi", "Salomão", "Ezequias"], answer: "Saul" },
+{ question: "Quem foi o profeta que teve uma visão do vale de ossos secos?", options: ["Ezequiel", "Isaías", "Daniel", "Amós"], answer: "Ezequiel" },
+{ question: "Quem foi o rei que fez um acordo com os filisteus e colocou um altar para Dagon?", options: ["Saul", "Davi", "Salomão", "Acabe"], answer: "Saul" },
+{ question: "Quem foi o profeta que profetizou que o Messias viria de Belém?", options: ["Miquéias", "Isaías", "Amós", "Daniel"], answer: "Miquéias" },
+{ question: "Qual livro da Bíblia descreve a sabedoria de Salomão?", options: ["Provérbios", "Eclesiastes", "Cânticos", "Salmos"], answer: "Provérbios" },
+{ question: "Quem foi o profeta que foi levado por um carro de fogo aos céus?", options: ["Elias", "Isaías", "Jeremias", "Daniel"], answer: "Elias" },
+{ question: "Quem foi o rei de Judá que começou a reinar com 8 anos?", options: ["Josias", "Ezequias", "Davi", "Saul"], answer: "Josias" },
+{ question: "Qual é o nome do livro que descreve a queda de Jerusalém e o exílio dos judeus?", options: ["Lamentações", "Jeremias", "Ezequiel", "Daniel"], answer: "Lamentações" },
+{ question: "Qual foi o nome do homem que teve 12 filhos que se tornaram as 12 tribos de Israel?", options: ["Jacó", "Abraão", "Isaac", "Moisés"], answer: "Jacó" },
+{ question: "Qual era o nome de Davi antes de ser rei?", options: ["Davi", "Gideão", "Salomão", "Jonatas"], answer: "Davi" },
+{ question: "Qual o nome do rei de Judá que fez uma reforma religiosa e destruiu os ídolos?", options: ["Josias", "Ezequias", "Salomão", "Davi"], answer: "Josias" },
+{ question: "Qual era o nome do profeta que foi chamado para ir até Nínive para pregar o arrependimento?", options: ["Jonas", "Daniel", "Isaías", "Amós"], answer: "Jonas" },
+
+{ question: "Em qual livro da Bíblia está a história da torre de Babel?", options: ["Gênesis", "Êxodo", "Levítico", "Números"], answer: "Gênesis" },
+{ question: "Qual foi o rei que escreveu o livro de Eclesiastes?", options: ["Salomão", "Davi", "Josias", "Ezequias"], answer: "Salomão" },
+{ question: "Quem foi o profeta que teve a visão das quatro bestas no livro de Daniel?", options: ["Daniel", "Isaías", "Jeremias", "Ezequiel"], answer: "Daniel" },
+{ question: "Quem foi o profeta que falou sobre a vinda de um novo pacto em Jeremias 31?", options: ["Jeremias", "Isaías", "Ezequiel", "Amós"], answer: "Jeremias" },
+{ question: "Quem foi o profeta que alertou o povo de Israel sobre a destruição de Jerusalém?", options: ["Jeremias", "Daniel", "Ezequiel", "Amós"], answer: "Jeremias" },
+{ question: "Quem foi o profeta que previu que o Messias seria nascido de uma virgem?", options: ["Isaías", "Miquéias", "Amós", "Ezequiel"], answer: "Isaías" },
+{ question: "Qual o nome do livro que descreve a conquista da Terra Prometida por Josué?", options: ["Josué", "Juízes", "1 Samuel", "2 Samuel"], answer: "Josué" },
+{ question: "Qual foi o rei de Israel que escreveu muitos Salmos?", options: ["Davi", "Salomão", "Ezequias", "Saul"], answer: "Davi" },
+{ question: "Quem foi o profeta que teve a visão do trono de Deus em um carro de fogo?", options: ["Ezequiel", "Isaías", "Amós", "Daniel"], answer: "Ezequiel" },
+{ question: "Qual profeta escreveu o livro que contém uma oração de arrependimento por parte de Israel?", options: ["Daniel", "Ezequiel", "Amós", "Neemias"], answer: "Daniel" },
+{ question: "Qual rei de Israel reconstruiu o templo de Jerusalém após o exílio?", options: ["Zorobabel", "Salomão", "Ezequias", "Josias"], answer: "Zorobabel" },
+{ question: "Quem foi o homem que herdou o trono após a morte de Moisés e levou o povo à Terra Prometida?", options: ["Josué", "Davi", "Saul", "Ezequias"], answer: "Josué" },
+{ question: "Em que livro da Bíblia é relatada a história de uma batalha onde o sol se deteve?", options: ["Josué", "Juízes", "1 Samuel", "Gênesis"], answer: "Josué" },
+{ question: "Quem foi o profeta que teve visões de quatro cavaleiros representando juízos futuros?", options: ["Zacarias", "Daniel", "Amós", "Isaías"], answer: "Zacarias" },
+{ question: "Qual livro da Bíblia fala sobre o arrependimento de Israel durante o período dos juízes?", options: ["Juízes", "1 Samuel", "2 Samuel", "Rute"], answer: "Juízes" },
+
+{ question: "Quem foi o profeta que teve uma visão de uma árvore de amendoeira e uma panela fervente?", options: ["Amós", "Ezequiel", "Jeremias", "Isaías"], answer: "Amós" },
+{ question: "Quem foi o patriarca que Deus ordenou que sacrificasse seu filho Isaac?", options: ["Abraão", "Isaac", "Jacó", "Moisés"], answer: "Abraão" },
+{ question: "Quem foi o profeta que viveu durante o exílio na Babilônia e interpretou os sonhos do rei Nabucodonosor?", options: ["Daniel", "Ezequiel", "Isaías", "Jeremias"], answer: "Daniel" },
+{ question: "Quem foi o profeta que aconselhou o rei Davi a não fazer o censo em Israel?", options: ["Gade", "Natã", "Eliseu", "Amós"], answer: "Gade" },
+{ question: "Qual o nome do rei de Judá que mandou destruir os ídolos e restaurar o templo?", options: ["Josias", "Ezequias", "Salomão", "Davi"], answer: "Josias" },
+{ question: "Quem foi o profeta que teve a visão das sete igrejas e das futuras revelações em Apocalipse?", options: ["Ezequiel", "Isaías", "Daniel", "João"], answer: "Daniel" },
+{ question: "Em que livro da Bíblia estão as leis de sacrifícios e purificação?", options: ["Levítico", "Êxodo", "Deuteronômio", "Números"], answer: "Levítico" },
+{ question: "Quem foi o último juiz de Israel?", options: ["Samuel", "Davi", "Saul", "Josué"], answer: "Samuel" },
+{ question: "Quem foi o profeta que teve a visão de um rolo com uma palavra de juízo contra o templo?", options: ["Ezequiel", "Amós", "Isaías", "Jeremias"], answer: "Ezequiel" },
+
+{ question: "Quem foi o profeta que desafiou o rei Acabe e os 450 profetas de Baal no Monte Carmelo?", options: ["Elias", "Isaías", "Ezequiel", "Amós"], answer: "Elias" },
+{ question: "Qual foi o nome do profeta que foi chamado para pregar em Nínive?", options: ["Jonas", "Miquéias", "Jeremias", "Amós"], answer: "Jonas" },
+{ question: "Quem foi o profeta que teve a visão das quatro bestas no livro de Daniel?", options: ["Daniel", "Isaías", "Ezequiel", "Amós"], answer: "Daniel" },
+{ question: "Quem foi o primeiro rei de Israel?", options: ["Saul", "Davi", "Salomão", "Ezequias"], answer: "Saul" },
+{ question: "Quem foi o rei que escreveu muitos dos Salmos?", options: ["Davi", "Salomão", "Ezequias", "Josias"], answer: "Davi" },
+{ question: "Quem foi o patriarca que teve 12 filhos que se tornaram as 12 tribos de Israel?", options: ["Jacó", "Isaac", "Abraão", "Moisés"], answer: "Jacó" },
+{ question: "Qual era o nome de Moisés antes de se tornar líder dos israelitas?", options: ["Moisés", "Ezequias", "Saul", "Davi"], answer: "Moisés" },
+{ question: "Qual foi a última praga enviada sobre o Egito antes da libertação dos israelitas?", options: ["Morte dos primogênitos", "Gafanhotos", "Rãs", "Sangue"], answer: "Morte dos primogênitos" },
+{ question: "Quem foi o profeta que teve uma visão do vale de ossos secos?", options: ["Ezequiel", "Isaías", "Amós", "Miquéias"], answer: "Ezequiel" },
+{ question: "Em qual cidade Davi foi ungido como rei de Judá?", options: ["Hebrom", "Jerusalém", "Samaria", "Betel"], answer: "Hebrom" },
+{ question: "Quem foi o profeta que recebeu a visão de um novo céu e uma nova terra?", options: ["Isaías", "Daniel", "Ezequiel", "Apocalipse"], answer: "Isaías" },
+{ question: "Quem foi o juiz que derrotou os midianitas com apenas 300 homens?", options: ["Gideão", "Jefté", "Sansão", "Davi"], answer: "Gideão" },
+{ question: "Qual livro da Bíblia descreve a história de Ester e a salvação do povo judeu?", options: ["Ester", "Rute", "Juízes", "Neemias"], answer: "Ester" },
+{ question: "Quem foi o rei de Judá que restaurou o templo e as práticas religiosas?", options: ["Josias", "Ezequias", "Davi", "Salomão"], answer: "Josias" },
+{ question: "Qual foi o nome do homem que teve um sonho onde 12 estrelas representavam os 12 filhos de Israel?", options: ["José", "Jacó", "Davi", "Moisés"], answer: "José" },
+{ question: "Quem foi o profeta que escreveu o livro de Lamentações?", options: ["Jeremias", "Isaías", "Daniel", "Ezequiel"], answer: "Jeremias" },
+{ question: "Qual livro da Bíblia relata a destruição de Jerusalém e o cativeiro babilônico?", options: ["Jeremias", "Lamentações", "Daniel", "Amós"], answer: "Jeremias" },
+{ question: "Quem foi o rei de Israel que construiu o templo de Jerusalém?", options: ["Salomão", "Davi", "Ezequias", "Saul"], answer: "Salomão" },
+{ question: "Quem foi o profeta que previu o nascimento de Jesus e falou sobre o servo sofredor?", options: ["Isaías", "Amós", "Ezequiel", "Jeremias"], answer: "Isaías" },
+{ question: "Quem foi o profeta que teve uma visão do trono de Deus em um carro de fogo?", options: ["Ezequiel", "Isaías", "Amós", "Daniel"], answer: "Ezequiel" },
+{ question: "Qual rei de Judá fez uma reforma religiosa e destruiu os altares de Baal?", options: ["Josias", "Ezequias", "Salomão", "Davi"], answer: "Josias" },
+{ question: "Quem foi o profeta que alertou o povo de Israel sobre a destruição de Jerusalém?", options: ["Jeremias", "Daniel", "Ezequiel", "Amós"], answer: "Jeremias" },
+
+ 
+{ question: "Quem foi o primeiro apóstolo a ser chamado por Jesus?", options: ["Pedro", "João", "Tiago", "André"], answer: "André" },
+{ question: "Quem foi o médico que escreveu o Evangelho de Lucas?", options: ["Lucas", "Marcos", "Mateus", "João"], answer: "Lucas" },
+{ question: "Qual evangelho é considerado o mais teológico e profundo?", options: ["João", "Mateus", "Marcos", "Lucas"], answer: "João" },
+{ question: "Quem batizou Jesus no rio Jordão?", options: ["João Batista", "Pedro", "Tiago", "André"], answer: "João Batista" },
+{ question: "Qual foi o nome do discípulo que traiu Jesus?", options: ["Judas Iscariotes", "Pedro", "João", "Tiago"], answer: "Judas Iscariotes" },
+{ question: "Em qual cidade Jesus nasceu?", options: ["Belém", "Jerusalém", "Nazaré", "Cafarnaum"], answer: "Belém" },
+{ question: "Quem foi o apóstolo que negou Jesus três vezes?", options: ["Pedro", "João", "Tiago", "André"], answer: "Pedro" },
+{ question: "Qual é o sermão mais famoso de Jesus, que inclui as Bem-aventuranças?", options: ["Sermão da Montanha", "Sermão do Monte das Oliveiras", "Sermão da Última Ceia", "Sermão no Templo"], answer: "Sermão da Montanha" },
+{ question: "Quem escreveu o livro de Atos dos Apóstolos?", options: ["Lucas", "Pedro", "Paulo", "João"], answer: "Lucas" },
+{ question: "Qual apóstolo foi conhecido como 'o apóstolo dos gentios'?", options: ["Paulo", "Pedro", "Tiago", "João"], answer: "Paulo" },
+{ question: "Quem foi o imperador romano durante a crucificação de Jesus?", options: ["Pôncio Pilatos", "César Augusto", "Nero", "Tiberio"], answer: "Pôncio Pilatos" },
+{ question: "Qual é o nome da mãe de Jesus?", options: ["Maria", "Marta", "Elisabete", "Ana"], answer: "Maria" },
+{ question: "Qual foi o primeiro milagre de Jesus registrado nos Evangelhos?", options: ["Transformar água em vinho", "Curar o cego de Jericó", "Multiplicar os pães e peixes", "Curar o paralítico"], answer: "Transformar água em vinho" },
+{ question: "Qual apóstolo escreveu o livro de Apocalipse?", options: ["João", "Pedro", "Paulo", "Tiago"], answer: "João" },
+{ question: "Quem foi o apóstolo que, ao ser libertado da prisão, foi visitado por um anjo?", options: ["Pedro", "Paulo", "Tiago", "João"], answer: "Pedro" },
+{ question: "Onde Paulo foi preso e escreveu várias de suas epístolas?", options: ["Roma", "Éfeso", "Corinto", "Antióquia"], answer: "Roma" },
+
+{ question: "O que Jesus fez na Última Ceia?", options: ["Instituiu a Eucaristia", "Lavou os pés dos discípulos", "Fez um sermão", "Fez uma oração"], answer: "Instituiu a Eucaristia" },
+{ question: "Qual discípulo duvidou da ressurreição de Jesus até ver as suas feridas?", options: ["Tomé", "Pedro", "Tiago", "João"], answer: "Tomé" },
+{ question: "Onde Paulo pregou seu famoso discurso sobre o 'Deus desconhecido'?", options: ["Atenas", "Éfeso", "Corinto", "Antióquia"], answer: "Atenas" },
+{ question: "Quem foi o apóstolo que escreveu a maioria das epístolas no Novo Testamento?", options: ["Paulo", "Pedro", "Tiago", "João"], answer: "Paulo" },
+{ question: "Qual foi a resposta de Jesus à mulher samaritana no poço?", options: ["Ela deveria beber da água viva", "Ela deveria se converter ao judaísmo", "Ela deveria se arrepender de seus pecados", "Ela deveria falar a verdade"], answer: "Ela deveria beber da água viva" },
+{ question: "Quem era o fariseu que procurou Jesus durante a noite, conforme o Evangelho de João?", options: ["Nicodemos", "Judas", "Zaqueu", "Simão"], answer: "Nicodemos" },
+{ question: "Qual apóstolo teve uma visão em que foi chamado para pregar aos gentios?", options: ["Pedro", "Paulo", "João", "Tiago"], answer: "Pedro" },
+{ question: "O que aconteceu no dia de Pentecostes?", options: ["O Espírito Santo desceu sobre os apóstolos", "A crucificação de Jesus", "A ressurreição de Jesus", "A ascensão de Jesus"], answer: "O Espírito Santo desceu sobre os apóstolos" },
+{ question: "Quem foi o primeiro mártir cristão?", options: ["Estevão", "Tiago", "Pedro", "Paulo"], answer: "Estevão" },
+{ question: "Qual livro do Novo Testamento contém as bem-aventuranças?", options: ["Mateus", "Marcos", "Lucas", "João"], answer: "Mateus" },
+{ question: "Quem foi o discípulo que substituiu Judas Iscariotes após sua morte?", options: ["Matias", "Barnabé", "Paulo", "Tiago"], answer: "Matias" },
+{ question: "Qual apóstolo foi martirizado em Roma durante o reinado de Nero?", options: ["Pedro", "Paulo", "Tiago", "João"], answer: "Pedro" },
+{ question: "Quem foi o centurião que teve fé suficiente para pedir a cura de seu servo, sendo elogiado por Jesus?", options: ["O centurião de Cafarnaum", "Cornélio", "Pilatos", "Zaqueu"], answer: "O centurião de Cafarnaum" },
+{ question: "Quem escreveu o Evangelho de Mateus?", options: ["Mateus", "Marcos", "Lucas", "João"], answer: "Mateus" },
+{ question: "Onde Jesus realizou o sermão sobre o monte?", options: ["Montanha", "Jerusalém", "Cafarnaum", "Betânia"], answer: "Montanha" },
+{ question: "Quantos discípulos Jesus escolheu?", options: ["Doze", "Trinta e dois", "Vinte", "Setenta"], answer: "Doze" },
+{ question: "Qual foi o motivo da expulsão dos mercadores do templo por Jesus?", options: ["Eles estavam fazendo comércio no templo", "Eles estavam blasfemando", "Eles estavam enganando os pobres", "Eles estavam fazendo sacrifícios ilícitos"], answer: "Eles estavam fazendo comércio no templo" },
+{ question: "Qual é o primeiro livro do Novo Testamento?", options: ["Mateus", "Marcos", "Lucas", "João"], answer: "Mateus" },
+{ question: "Qual discípulo foi chamado de 'o discípulo amado'?", options: ["João", "Pedro", "Tiago", "André"], answer: "João" },
+{ question: "Quem foi o governante romano que deu ordem para a crucificação de Jesus?", options: ["Pôncio Pilatos", "Nero", "César Augusto", "Tiberio"], answer: "Pôncio Pilatos" },
+{ question: "Em que cidade Paulo teve sua conversão enquanto viajava para Damasco?", options: ["Damasco", "Antióquia", "Éfeso", "Jerusalém"], answer: "Damasco" },
+{ question: "Qual apóstolo escreveu o livro de Tiago?", options: ["Tiago", "Pedro", "Paulo", "João"], answer: "Tiago" },
+{ question: "Quem foi o imperador romano durante a época da vida de Jesus?", options: ["César Augusto", "Nero", "Tiberio", "Calígula"], answer: "César Augusto" },
+
+{ question: "Qual apóstolo escreveu a Epístola aos Hebreus?", options: ["Paulo", "Pedro", "João", "Tiago"], answer: "Paulo" },
+{ question: "Em qual cidade Paulo pregou a sua famosa defesa perante o Areópago?", options: ["Atenas", "Éfeso", "Corinto", "Antióquia"], answer: "Atenas" },
+{ question: "Quantos milagres de Jesus são descritos nos Evangelhos?", options: ["37", "20", "40", "50"], answer: "37" },
+{ question: "Quem foi o chefe do Sinédrio que mandou prender Pedro e João?", options: ["Anás", "Caiáfas", "Herodes", "Pilatos"], answer: "Anás" },
+{ question: "Em qual livro do Novo Testamento está registrada a história da conversão de Paulo?", options: ["Atos dos Apóstolos", "Romanos", "Efésios", "Filipenses"], answer: "Atos dos Apóstolos" },
+{ question: "Quem foi o discípulo que recebeu a visão de um anjo para pregar para o centurião Cornélio?", options: ["Pedro", "Paulo", "Tiago", "João"], answer: "Pedro" },
+{ question: "Qual apóstolo escreveu a Epístola de Tiago?", options: ["Tiago", "Pedro", "João", "Paulo"], answer: "Tiago" },
+{ question: "Quantos capítulos tem o livro de Atos dos Apóstolos?", options: ["28", "25", "30", "32"], answer: "28" },
+{ question: "Quem foi o apóstolo que escreveu a primeira, segunda e terceira epístolas de João?", options: ["João", "Pedro", "Paulo", "Tiago"], answer: "João" },
+{ question: "Qual discípulo escreveu o Evangelho de Marcos?", options: ["Marcos", "Mateus", "Lucas", "João"], answer: "Marcos" },
+{ question: "Qual foi o apóstolo que teve sua cabeça cortada durante o reinado de Nero?", options: ["Paulo", "Pedro", "Tiago", "João"], answer: "Paulo" },
+{ question: "Em qual cidade Paulo foi preso antes de ser levado a Roma?", options: ["Filipos", "Éfeso", "Jerusalém", "Césaréia"], answer: "Césaréia" },
+{ question: "Qual apóstolo escreveu a carta aos Romanos?", options: ["Paulo", "Pedro", "João", "Tiago"], answer: "Paulo" },
+{ question: "Qual é o livro que está no final do Novo Testamento?", options: ["Apocalipse", "Judas", "2 João", "Filemom"], answer: "Apocalipse" },
+{ question: "O que significa o nome 'Emmanuel', que foi dado a Jesus?", options: ["Deus conosco", "Rei dos reis", "Salvador", "Filho de Deus"], answer: "Deus conosco" },
+{ question: "Qual é o nome do rei que procurou matar o menino Jesus?", options: ["Herodes", "César", "Nabucodonosor", "Pilatos"], answer: "Herodes" },
+{ question: "Quem foi o apóstolo conhecido como 'o irmão de Tiago'?", options: ["Judas Tadeu", "Tomé", "Felipe", "André"], answer: "Judas Tadeu" },
+{ question: "Quem foi o chefe dos apóstolos, também conhecido como o 'príncipe dos apóstolos'?", options: ["Pedro", "João", "Tiago", "Paulo"], answer: "Pedro" },
+{ question: "Em que cidade Jesus realizou o milagre da multiplicação dos pães e peixes?", options: ["Cafarnaum", "Nazaré", "Betsaida", "Jerusalém"], answer: "Betsaida" },
+{ question: "Quem foi o apóstolo conhecido por sua profissão de pescador antes de seguir Jesus?", options: ["Pedro", "João", "Tiago", "André"], answer: "Pedro" },
+{ question: "Qual apóstolo escreveu a Epístola aos Filipenses?", options: ["Paulo", "Pedro", "João", "Tiago"], answer: "Paulo" },
+{ question: "Qual apóstolo negou Jesus três vezes antes de o galinho cantar?", options: ["Pedro", "João", "Tiago", "André"], answer: "Pedro" },
+{ question: "Quem foi o apóstolo que escreveu o livro de Filipenses?", options: ["Paulo", "Pedro", "João", "Tiago"], answer: "Paulo" },
+{ question: "Em qual livro do Novo Testamento está o 'Hino do Amor'?", options: ["1 Coríntios", "Efésios", "Filipenses", "Colossenses"], answer: "1 Coríntios" },
+{ question: "Qual apóstolo foi o primeiro a ser martirizado?", options: ["Tiago", "Pedro", "João", "Paulo"], answer: "Tiago" },
+{ question: "Quem foi o apóstolo conhecido como 'o apóstolo dos gentios'?", options: ["Paulo", "Pedro", "Tiago", "João"], answer: "Paulo" },
+{ question: "Qual é o nome do discípulo que traçou a 'linha de pensamento' sobre as bem-aventuranças?", options: ["Mateus", "Lucas", "Marcos", "João"], answer: "Mateus" },
+{ question: "O que Jesus disse no sermão da montanha sobre as 'bem-aventuranças'?", options: ["Bem-aventurados os pobres de espírito", "Bem-aventurados os ricos", "Bem-aventurados os que jejuam", "Bem-aventurados os que oram"], answer: "Bem-aventurados os pobres de espírito" },
+{ question: "Quem foi o centurião que teve a fé suficiente para fazer Jesus curar seu servo à distância?", options: ["O centurião de Cafarnaum", "Cornélio", "Zaqueu", "Nicodemos"], answer: "O centurião de Cafarnaum" },
+{ question: "Qual apóstolo escreveu a carta aos Hebreus?", options: ["Paulo", "Pedro", "Tiago", "João"], answer: "Paulo" },
+{ question: "Quem foi o discípulo que negou conhecer Jesus no momento de sua prisão?", options: ["Pedro", "Tomé", "João", "Tiago"], answer: "Pedro" },
+{ question: "Qual foi o título do primeiro livro que Paulo escreveu?", options: ["1 Tessalonicenses", "Romanos", "Filipenses", "1 Coríntios"], answer: "1 Tessalonicenses" },
+{ question: "Onde Jesus fez o milagre da ressurreição de Lázaro?", options: ["Betânia", "Cafarnaum", "Jerusalém", "Nazaré"], answer: "Betânia" },
+
+{ question: "Quem foi o apóstolo que escreveu o livro de Atos dos Apóstolos?", options: ["Lucas", "Mateus", "João", "Paulo"], answer: "Lucas" },
+{ question: "Qual apóstolo era conhecido como o 'discípulo amado'?", options: ["João", "Pedro", "Tiago", "André"], answer: "João" },
+{ question: "Quem foi o homem que ajudou a enterrar Jesus?", options: ["José de Arimateia", "Nicodemos", "Simão Cireneu", "Judas Iscariotes"], answer: "José de Arimateia" },
+{ question: "Quem foi o primeiro homem a pregar o evangelho aos gentios?", options: ["Paulo", "Pedro", "Tiago", "João"], answer: "Pedro" },
+{ question: "Onde Jesus nasceu?", options: ["Belém", "Nazaré", "Cafarnaum", "Jerusalém"], answer: "Belém" },
+{ question: "Quem escreveu o Evangelho de Mateus?", options: ["Mateus", "Marcos", "Lucas", "João"], answer: "Mateus" },
+{ question: "Qual apóstolo escreveu a carta aos Efésios?", options: ["Paulo", "Pedro", "João", "Tiago"], answer: "Paulo" },
+{ question: "Qual discípulo escreveu a Epístola de Judas?", options: ["Judas", "Tiago", "Paulo", "Pedro"], answer: "Judas" },
+{ question: "Quem foi o apóstolo que negou Jesus três vezes antes do galo cantar?", options: ["Pedro", "João", "Tiago", "André"], answer: "Pedro" },
+{ question: "Quem foi o apóstolo que escreveu a carta aos Colossenses?", options: ["Paulo", "Tiago", "João", "Pedro"], answer: "Paulo" },
+{ question: "Onde Paulo escreveu a maioria de suas epístolas?", options: ["Prisão", "Éfeso", "Antioquia", "Corinto"], answer: "Prisão" },
+{ question: "Qual livro do Novo Testamento fala sobre o Apocalipse?", options: ["Apocalipse", "Judas", "Atos dos Apóstolos", "Tiago"], answer: "Apocalipse" },
+{ question: "Quem escreveu o Evangelho de Lucas?", options: ["Lucas", "Mateus", "João", "Marcos"], answer: "Lucas" },
+{ question: "Quem foi o responsável por escrever as cartas às igrejas na Ásia Menor?", options: ["Paulo", "Pedro", "Tiago", "João"], answer: "Paulo" },
+{ question: "Qual apóstolo escreveu a carta aos Gálatas?", options: ["Paulo", "Pedro", "João", "Tiago"], answer: "Paulo" },
+{ question: "Quem foi o apóstolo que escreveu a carta aos Tessalonicenses?", options: ["Paulo", "Pedro", "Tiago", "João"], answer: "Paulo" },
+{ question: "O que aconteceu quando Jesus foi batizado por João Batista?", options: ["O Espírito Santo desceu como uma pomba", "Jesus foi transfigurado", "Ele começou a pregar", "Ele foi levado ao deserto"], answer: "O Espírito Santo desceu como uma pomba" },
+{ question: "Qual foi o primeiro milagre de Jesus registrado no Evangelho?", options: ["Transformar água em vinho", "Curar um cego", "Curar um paralítico", "Ressuscitar Lázaro"], answer: "Transformar água em vinho" },
+{ question: "Quem foi o apóstolo que escreveu a carta aos Romanos?", options: ["Paulo", "Pedro", "Tiago", "João"], answer: "Paulo" },
+
+{ question: "Quem eram os dois apóstolos irmãos chamados 'filhos do trovão'?", options: ["Tiago e João", "Pedro e André", "Mateus e Tomé", "Felipe e Bartolomeu"], answer: "Tiago e João" },
+{ question: "O que Jesus fez após a última ceia com seus discípulos?", options: ["Foi ao Jardim do Getsêmani", "Subiu ao monte", "Foi ao templo", "Curou enfermos"], answer: "Foi ao Jardim do Getsêmani" },
+{ question: "Qual foi o discípulo que escreveu o Evangelho de João?", options: ["João", "Mateus", "Marcos", "Lucas"], answer: "João" },
+{ question: "Quem foi o apóstolo que ajudou a fundar a Igreja em Corinto?", options: ["Paulo", "Pedro", "Tiago", "João"], answer: "Paulo" },
+{ question: "Quem foi o apóstolo que negou Jesus antes de ser crucificado?", options: ["Pedro", "João", "Tiago", "André"], answer: "Pedro" },
+{ question: "Em qual cidade Jesus curou um cego ao passar e lhe tocar os olhos?", options: ["Jerusalém", "Cafarnaum", "Betânia", "Jericó"], answer: "Jericó" },
+{ question: "Quem foi o apóstolo que traiu Jesus?", options: ["Judas Iscariotes", "Pedro", "Tomé", "Simão"], answer: "Judas Iscariotes" },
+{ question: "Qual é o último versículo do Evangelho de Mateus?", options: ["E eis que eu estou convosco todos os dias, até a consumação dos séculos.", "Vão e preguem o evangelho a todas as nações.", "O Senhor é a minha luz e a minha salvação.", "Eu sou o pão da vida."], answer: "E eis que eu estou convosco todos os dias, até a consumação dos séculos." },
+{ question: "Qual apóstolo escreveu a carta aos Efésios?", options: ["Paulo", "Pedro", "João", "Tiago"], answer: "Paulo" },
+{ question: "Em qual livro do Novo Testamento encontramos as 'bem-aventuranças'?", options: ["Evangelho de Mateus", "Evangelho de Lucas", "Evangelho de Marcos", "Atos dos Apóstolos"], answer: "Evangelho de Mateus" },
+{ question: "Onde Jesus foi crucificado?", options: ["Gólgota", "Monte Sinai", "Monte das Oliveiras", "Jerusalém"], answer: "Gólgota" },
+{ question: "Quem foram os dois ladrões crucificados ao lado de Jesus?", options: ["Dimas e Gestas", "Felipe e Bartolomeu", "André e Tiago", "Simão e Judas"], answer: "Dimas e Gestas" },
+{ question: "Quem era o discípulo que, antes de seguir Jesus, estava coletando impostos?", options: ["Mateus", "Lucas", "João", "Tiago"], answer: "Mateus" },
+{ question: "Quem escreveu a carta a Tito?", options: ["Paulo", "Pedro", "Tiago", "João"], answer: "Paulo" },
+{ question: "Em qual livro da Bíblia está registrada a oração do Pai Nosso?", options: ["Evangelho de Mateus", "Evangelho de Lucas", "Evangelho de João", "Evangelho de Marcos"], answer: "Evangelho de Mateus" },
+{ question: "Em que cidade Paulo fundou uma das primeiras igrejas cristãs?", options: ["Filipos", "Corinto", "Éfeso", "Antióquia"], answer: "Filipos" },
+{ question: "Qual apóstolo escreveu a carta aos Filipenses?", options: ["Paulo", "Pedro", "Tiago", "João"], answer: "Paulo" },
+
+{ question: "Qual apóstolo foi conhecido por ser o 'apóstolo dos gentios'?", options: ["Paulo", "Pedro", "Tiago", "João"], answer: "Paulo" },
+{ question: "Quem foi o primeiro cristão a ser martirizado?", options: ["Estêvão", "Tiago", "Pedro", "João"], answer: "Estêvão" },
+{ question: "Onde Paulo foi preso por pregar o evangelho?", options: ["Roma", "Corinto", "Éfeso", "Filipos"], answer: "Roma" },
+{ question: "Em qual cidade Paulo teve sua visão de Cristo no caminho para Damasco?", options: ["Damasco", "Jerusalém", "Éfeso", "Antióquia"], answer: "Damasco" },
+{ question: "Qual apóstolo escreveu a carta aos Hebreus?", options: ["Paulo", "Lucas", "Pedro", "João"], answer: "Paulo" },
+{ question: "Quem foi o discípulo que escreveu o livro de Apocalipse?", options: ["João", "Pedro", "Tiago", "Mateus"], answer: "João" },
+{ question: "Qual foi a primeira cidade que Paulo visitou em sua primeira viagem missionária?", options: ["Antioquia", "Salamina", "Listra", "Derbe"], answer: "Antioquia" },
+{ question: "Quem ajudou Paulo a escapar de um cesto durante uma perseguição em Damasco?", options: ["Barnabé", "Silas", "Ananias", "Lucas"], answer: "Barnabé" },
+{ question: "Em qual livro do Novo Testamento está o 'Fruto do Espírito' mencionado?", options: ["Gálatas", "Efésios", "Romanos", "Filipenses"], answer: "Gálatas" },
+{ question: "Qual foi o nome do discípulo que substituiu Judas Iscariotes como apóstolo?", options: ["Matias", "Barnabé", "Paulo", "Tiago"], answer: "Matias" },
+{ question: "O que Paulo disse ser o salário do pecado?", options: ["Morte", "Pobreza", "Dor", "Perdição"], answer: "Morte" },
+{ question: "Quem foi o apóstolo que escreveu a carta de 1 João?", options: ["João", "Pedro", "Tiago", "Paulo"], answer: "João" },
+{ question: "Em que cidade Paulo foi apedrejado e deixado por morto?", options: ["Listra", "Antioquia", "Éfeso", "Corinto"], answer: "Listra" },
+{ question: "Onde Jesus foi crucificado?", options: ["Gólgota", "Monte das Oliveiras", "Jerusalém", "Cafarnaum"], answer: "Gólgota" },
+{ question: "Quem foi o apóstolo que escreveu a carta aos Filipenses?", options: ["Paulo", "Pedro", "Tiago", "João"], answer: "Paulo" },
+{ question: "Quem foi o discípulo que traiu Jesus?", options: ["Judas Iscariotes", "Pedro", "Tiago", "João"], answer: "Judas Iscariotes" },
+{ question: "Qual apóstolo fundou a igreja em Roma?", options: ["Pedro", "Paulo", "Tiago", "João"], answer: "Pedro" },
+{ question: "Quem foi o primeiro a ser batizado por Paulo?", options: ["Lídia", "Saulo", "Timóteo", "Apolo"], answer: "Lídia" },
+
+{ question: "Qual foi o nome do rei que prendeu Pedro na prisão?", options: ["Herodes Agripa", "César", "Felipe", "Pilatos"], answer: "Herodes Agripa" },
+{ question: "O que Paulo falava ser a 'armadura de Deus'?", options: ["A fé", "A oração", "A palavra de Deus", "A justiça"], answer: "A fé" },
+{ question: "Qual apóstolo escreveu a carta aos Gálatas?", options: ["Paulo", "Pedro", "João", "Tiago"], answer: "Paulo" },
+{ question: "Quem foi o apóstolo que estava preso junto com Paulo quando houve um terremoto?", options: ["Silas", "Barnabé", "Lucas", "Tiago"], answer: "Silas" },
+{ question: "Quem era o discípulo que foi um médico e companheiro de Paulo?", options: ["Lucas", "Barnabé", "Timóteo", "Tito"], answer: "Lucas" },
+{ question: "Onde Paulo se encontrou com os presbíteros da igreja de Éfeso?", options: ["Mileto", "Filipos", "Corinto", "Tessalônica"], answer: "Mileto" },
+{ question: "Qual era o nome do governante romano que condenou Jesus à crucificação?", options: ["Pôncio Pilatos", "Herodes", "César", "Felipe"], answer: "Pôncio Pilatos" },
+{ question: "Quem foi o primeiro discípulo a ser martirizado?", options: ["Tiago", "Pedro", "Paulo", "Estêvão"], answer: "Tiago" },
+{ question: "Qual apóstolo escreveu a carta a Filemom?", options: ["Paulo", "Pedro", "João", "Tiago"], answer: "Paulo" },
+{ question: "Onde estava Paulo quando escreveu a carta aos Filipenses?", options: ["Na prisão", "Em Roma", "Em Antioquia", "Em Corinto"], answer: "Na prisão" },
+{ question: "Em qual cidade Paulo realizou seu famoso discurso no Areópago?", options: ["Atenas", "Corinto", "Éfeso", "Roma"], answer: "Atenas" },
+{ question: "Quem foi o apóstolo que teve uma visão de Cristo no Monte da Transfiguração?", options: ["Pedro", "Tiago", "João", "André"], answer: "Pedro" },
+{ question: "Quem foi o apóstolo que pregou o evangelho na Índia?", options: ["Tomé", "Tiago", "Paulo", "Pedro"], answer: "Tomé" },
+{ question: "Qual foi a cidade onde os seguidores de Jesus foram chamados pela primeira vez de 'cristãos'?", options: ["Antioquia", "Jerusalém", "Éfeso", "Corinto"], answer: "Antioquia" },
+{ question: "O que Paulo escreveu sobre a ressurreição em 1 Coríntios 15?", options: ["É o fundamento da nossa fé", "É uma alegoria", "É uma esperança futura", "Não acontece de fato"], answer: "É o fundamento da nossa fé" },
+{ question: "Quem foi o apóstolo que curou o coxo à porta do templo?", options: ["Pedro", "Tiago", "João", "Paulo"], answer: "Pedro" },
+{ question: "Em qual cidade Paulo foi preso e enfrentou julgamento diante de Félix?", options: ["Césaréia", "Antioquia", "Roma", "Jerusalém"], answer: "Césaréia" },
+{ question: "O que Jesus disse sobre o amor em João 13:34?", options: ["Amai-vos uns aos outros como eu vos amei", "Amarás a Deus de todo o coração", "Ama o teu próximo como a ti mesmo", "O amor é a chave para o Reino de Deus"], answer: "Amai-vos uns aos outros como eu vos amei" },
+{ question: "Qual apóstolo escreveu a carta a Tito?", options: ["Paulo", "Pedro", "Tiago", "João"], answer: "Paulo" },
+   
+   
+   
+{ question: "Quem construiu a arca para escapar do dilúvio?", options: ["Moisés", "Abraão", "Noé", "Davi"], answer: "Noé" },
+{ question: "Qual o primeiro livro da Bíblia?", options: ["Êxodo", "Gênesis", "Levítico", "Números"], answer: "Gênesis" },
+{ question: "Quem foi lançado na cova dos leões?", options: ["Elias", "Daniel", "José", "Jonas"], answer: "Daniel" },
+{ question: "Qual rei foi conhecido por sua sabedoria?", options: ["Davi", "Salomão", "Saul", "Ezequias"], answer: "Salomão" },
+{ question: "Qual profeta enfrentou os profetas de Baal no Monte Carmelo?", options: ["Elias", "Isaías", "Jeremias", "Ezequiel"], answer: "Elias" },
+{ question: "Quem foi vendido por seus irmãos e levado ao Egito?", options: ["Moisés", "José", "Abraão", "Isaque"], answer: "José" },
+{ question: "Qual era o nome da esposa de Abraão?", options: ["Rebeca", "Raquel", "Sara", "Miriã"], answer: "Sara" },
+{ question: "Quem recebeu as Tábuas da Lei no Monte Sinai?", options: ["Josué", "Arão", "Moisés", "Elias"], answer: "Moisés" },
+{ question: "Em que cidade os muros caíram após a marcha dos israelitas?", options: ["Jerusalém", "Jericó", "Betel", "Hebrom"], answer: "Jericó" },
+{ question: "Quem matou Golias com uma pedra?", options: ["Saul", "Davi", "Eliabe", "Natã"], answer: "Davi" },
+
+{ question: "Quem foi o primeiro rei de Israel?", options: ["Saul", "Davi", "Salomão", "Samuel"], answer: "Saul" },
+{ question: "Qual o nome do profeta que foi engolido por um grande peixe?", options: ["Isaías", "Jeremias", "Jonas", "Ezequiel"], answer: "Jonas" },
+{ question: "Quem foi o líder que sucedeu Moisés e levou os israelitas à Terra Prometida?", options: ["Davi", "Josué", "Saul", "Elias"], answer: "Josué" },
+{ question: "Quem traiu Jesus por 30 peças de prata?", options: ["Pedro", "Judas", "Tiago", "João"], answer: "Judas" },
+{ question: "Quem foi o profeta que desafiou o rei Acabe e a rainha Jezabel?", options: ["Isaías", "Elias", "Jeremias", "Amós"], answer: "Elias" },
+{ question: "Quem foi o líder militar que derrotou os midianitas com apenas 300 homens?", options: ["Sansão", "Gideão", "Davi", "Josué"], answer: "Gideão" },
+{ question: "Qual o nome do filho de Abraão com Agar?", options: ["Isaque", "Ismael", "Jacó", "Esaú"], answer: "Ismael" },
+{ question: "Quem foi o profeta que viu a visão de ossos secos?", options: ["Ezequiel", "Daniel", "Isaías", "Amós"], answer: "Ezequiel" },
+{ question: "Quem foi o patriarca que teve 12 filhos que deram origem às 12 tribos de Israel?", options: ["Abraão", "Jacó", "Isaque", "Moisés"], answer: "Jacó" },
+{ question: "Qual o nome da esposa de Jacó, que era irmã de Lia?", options: ["Raquel", "Sara", "Rebeca", "Miriã"], answer: "Raquel" },
+{ question: "Qual o nome do livro que descreve a criação do mundo?", options: ["Êxodo", "Gênesis", "Levítico", "Números"], answer: "Gênesis" },
+{ question: "Quem teve os 10 mandamentos revelados no Monte Sinai?", options: ["Moisés", "Elias", "Josué", "Salomão"], answer: "Moisés" },
+{ question: "Quem derrotou o gigante Golias?", options: ["Moisés", "Josué", "Davi", "Saul"], answer: "Davi" },
+{ question: "Qual o nome do primeiro assassino da Bíblia?", options: ["Caim", "Abel", "Ismael", "Davi"], answer: "Caim" },
+{ question: "Quem foi o profeta que casou com Gomer, uma prostituta?", options: ["Amós", "Oséias", "Isaías", "Jeremias"], answer: "Oséias" },
+{ question: "Quem desafiou os falsos profetas de Baal no Monte Carmelo?", options: ["Elias", "Eliseu", "Isaías", "Moisés"], answer: "Elias" },
+
+{ question: "Quem foi lançado na fornalha ardente?", options: ["Daniel", "Sadraque", "Misaque", "Abednego"], answer: "Sadraque, Misaque e Abednego" },
+{ question: "Qual o nome do livro que fala sobre a sabedoria de Salomão?", options: ["Provérbios", "Eclesiastes", "Cânticos", "Salmos"], answer: "Provérbios" },
+{ question: "Qual o nome da mãe de Samuel?", options: ["Ana", "Elisabete", "Raquel", "Miriã"], answer: "Ana" },
+{ question: "Quem interpretou o sonho do faraó do Egito?", options: ["José", "Daniel", "Moisés", "Salomão"], answer: "José" },
+{ question: "Em que livro da Bíblia encontramos a história de Noé e a arca?", options: ["Êxodo", "Gênesis", "Levítico", "Deuteronômio"], answer: "Gênesis" },
+{ question: "Quem escreveu o livro de Lamentações?", options: ["Isaías", "Jeremias", "Ezequiel", "Amós"], answer: "Jeremias" },
+{ question: "Quem foi o último juiz de Israel?", options: ["Samuel", "Davi", "Saul", "Gideão"], answer: "Samuel" },
+{ question: "Quem foi o profeta que desafiou o rei Acabe e venceu com a ajuda de Deus?", options: ["Moisés", "Elias", "Isaías", "Ezequiel"], answer: "Elias" },
+{ question: "Quem foi a primeira mulher mencionada na Bíblia?", options: ["Sara", "Eva", "Raquel", "Rebeca"], answer: "Eva" },
+{ question: "Qual o nome do livro que relata a história de Rute?", options: ["Rute", "Gênesis", "Juízes", "Êxodo"], answer: "Rute" },
+{ question: "Quem destruiu as muralhas de Jericó?", options: ["Josué", "Davi", "Moisés", "Gideão"], answer: "Josué" },
+{ question: "Quem foi o rei que construiu o templo de Jerusalém?", options: ["Salomão", "Davi", "Ezequias", "Josias"], answer: "Salomão" },
+{ question: "Qual é o nome do livro que conta a história de Ester?", options: ["Ester", "Esdras", "Neemias", "Levítico"], answer: "Ester" },
+{ question: "Quem foi o profeta que confrontou o rei Davi sobre seu pecado com Bate-Seba?", options: ["Elias", "Natã", "Isaías", "Jeremias"], answer: "Natã" },
+{ question: "Qual o nome do rei que foi curado de uma doença por oração?", options: ["Ezequias", "Saul", "Salomão", "Davi"], answer: "Ezequias" },
+{ question: "Quem foi o homem que foi levado ao céu num redemoinho?", options: ["Moisés", "Elias", "Isaías", "Jeremias"], answer: "Elias" },
+{ question: "Quem foi o líder que libertou os israelitas da escravidão no Egito?", options: ["Moisés", "Josué", "Davi", "Gideão"], answer: "Moisés" },
+{ question: "Quem foi o profeta que teve uma visão do vale de ossos secos?", options: ["Ezequiel", "Amós", "Isaías", "Jeremias"], answer: "Ezequiel" },
+{ question: "Em qual livro da Bíblia é encontrada a história de Jó?", options: ["Salmos", "Provérbios", "Jó", "Eclesiastes"], answer: "Jó" },
+{ question: "Qual o nome do profeta que teve uma visão de uma roda dentro de uma roda?", options: ["Ezequiel", "Isaías", "Daniel", "Amós"], answer: "Ezequiel" },
+{ question: "Quem matou o gigante Golias com uma pedra?", options: ["Davi", "Moisés", "Saul", "Josué"], answer: "Davi" },
+
+{ question: "Quem foi o pai de Moisés?", options: ["Amram", "Isaque", "Davi", "Abraão"], answer: "Amram" },
+{ question: "Qual o nome da irmã de Moisés?", options: ["Miriã", "Raquel", "Lia", "Sara"], answer: "Miriã" },
+{ question: "Em que livro da Bíblia é descrito o êxodo dos israelitas do Egito?", options: ["Êxodo", "Levítico", "Números", "Deuteronômio"], answer: "Êxodo" },
+{ question: "Qual o nome do irmão de Moisés que foi sacerdote?", options: ["Arão", "Davi", "Josué", "Salomão"], answer: "Arão" },
+{ question: "Quem foi o profeta que teve a visão do trono de Deus em um carro de fogo?", options: ["Isaías", "Ezequiel", "Daniel", "Elias"], answer: "Ezequiel" },
+{ question: "Quem foi a esposa de Isaac?", options: ["Raquel", "Rebeca", "Sara", "Miriã"], answer: "Rebeca" },
+{ question: "Quem foi o primeiro sacerdote de Israel?", options: ["Arão", "Eli", "Zadoque", "Moisés"], answer: "Arão" },
+{ question: "Quem ajudou os espiões de Israel em Jericó?", options: ["Raquel", "Rute", "Débora", "Raabe"], answer: "Raabe" },
+{ question: "Quem foi o profeta que desafiou Acabe e Jezabel em Israel?", options: ["Elias", "Eliseu", "Amós", "Jonas"], answer: "Elias" },
+{ question: "Quem foi o rei de Judá que foi curado por Deus após orar?", options: ["Ezequias", "Josias", "Davi", "Salomão"], answer: "Ezequias" },
+{ question: "Qual profeta teve a visão do 'vale de ossos secos'?", options: ["Ezequiel", "Amós", "Isaías", "Daniel"], answer: "Ezequiel" },
+{ question: "Quem foi o homem que escreveu os provérbios?", options: ["Salomão", "Davi", "Isaías", "Ezequiel"], answer: "Salomão" },
+{ question: "Qual o nome da esposa de Davi que teve um filho chamado Salomão?", options: ["Bate-Seba", "Raquel", "Miriã", "Rebeca"], answer: "Bate-Seba" },
+{ question: "Quem foi o profeta que anunciou o nascimento de Jesus em Belém?", options: ["Isaías", "Jeremias", "Ezequiel", "Miquéias"], answer: "Miquéias" },
+{ question: "Qual o nome do livro que conta a história da libertação dos israelitas do Egito?", options: ["Êxodo", "Levítico", "Gênesis", "Deuteronômio"], answer: "Êxodo" },
+{ question: "Quem escreveu o livro de Salmos?", options: ["Salomão", "Davi", "Isaías", "Moisés"], answer: "Davi" },
+{ question: "Quem foi o profeta que desafiou os falsos profetas de Baal?", options: ["Elias", "Isaías", "Jeremias", "Ezequiel"], answer: "Elias" },
+{ question: "Quem foi o profeta que passou 40 dias e 40 noites sem comer?", options: ["Moisés", "Elias", "Jonas", "Davi"], answer: "Moisés" },
+
+{ question: "Qual é o nome do livro que descreve a sabedoria de Salomão?", options: ["Provérbios", "Eclesiastes", "Cânticos", "Salmos"], answer: "Provérbios" },
+{ question: "Qual foi o profeta que viu a glória de Deus e descreveu como um carro de fogo?", options: ["Ezequiel", "Isaías", "Daniel", "Elias"], answer: "Ezequiel" },
+{ question: "Quem foi o patriarca que teve 12 filhos, que deram origem às 12 tribos de Israel?", options: ["Abraão", "Isaac", "Jacó", "Moisés"], answer: "Jacó" },
+{ question: "Qual o nome do livro que conta a história de Ester?", options: ["Ester", "Rute", "Esdras", "Neemias"], answer: "Ester" },
+{ question: "Quem foi o profeta que viveu no exílio e viu a visão de um trono de fogo?", options: ["Isaías", "Ezequiel", "Amós", "Daniel"], answer: "Ezequiel" },
+{ question: "Qual é o nome do livro que descreve a viagem dos israelitas pelo deserto?", options: ["Êxodo", "Levítico", "Números", "Deuteronômio"], answer: "Números" },
+{ question: "Quem foi o profeta que escreveu o livro de Lamentações?", options: ["Isaías", "Jeremias", "Ezequiel", "Amós"], answer: "Jeremias" },
+{ question: "Quem foi o último juiz de Israel?", options: ["Eli", "Samuel", "Davi", "Saul"], answer: "Samuel" },
+{ question: "Qual o nome do rei de Israel que construiu o templo em Jerusalém?", options: ["Salomão", "Davi", "Ezequias", "Saul"], answer: "Salomão" },
+{ question: "Quem desafiou os falsos profetas de Baal no Monte Carmelo?", options: ["Elias", "Daniel", "Ezequiel", "Moisés"], answer: "Elias" },
+{ question: "Quem foi o profeta que falou sobre a vinda do Messias?", options: ["Isaías", "Miquéias", "Amós", "Joel"], answer: "Isaías" },
+{ question: "Quem foi o profeta que foi levado por um carro de fogo aos céus?", options: ["Elias", "Isaías", "Jeremias", "Daniel"], answer: "Elias" },
+{ question: "Qual foi o nome do povo que foi liberto da escravidão no Egito?", options: ["Egípcios", "Filisteus", "Amalequitas", "Israelitas"], answer: "Israelitas" },
+{ question: "Quem foi o profeta que teve uma visão das quatro bestas?", options: ["Isaías", "Daniel", "Jeremias", "Ezequiel"], answer: "Daniel" },
+{ question: "Quem foi o homem que interpretou os sonhos do faraó?", options: ["José", "Daniel", "Moisés", "Salomão"], answer: "José" },
+{ question: "Quem foi o líder que liderou a conquista da Terra Prometida?", options: ["Davi", "Moisés", "Josué", "Salomão"], answer: "Josué" },
+{ question: "Quem foi o homem que teve um encontro com Deus numa sarça ardente?", options: ["Abraão", "Moisés", "Elias", "Daniel"], answer: "Moisés" },
+{ question: "Quem foi o rei de Judá que restaurou o templo?", options: ["Josias", "Ezequias", "Davi", "Salomão"], answer: "Josias" },
+{ question: "Quem foi o líder que desceu do monte Sinai com as tábuas da lei?", options: ["Moisés", "Josué", "Davi", "Ezequias"], answer: "Moisés" },
+{ question: "Quem era o profeta conhecido por sua coragem em defender o nome de Deus?", options: ["Elias", "Isaías", "Daniel", "Jeremias"], answer: "Elias" },
+{ question: "Quem foi o homem que fugiu de Nínive após pregar o arrependimento?", options: ["Jonas", "Isaías", "Amós", "Jeremias"], answer: "Jonas" },
+
+{ question: "Quem foi o profeta que desafiou o rei Acabe e os 450 profetas de Baal no Monte Carmelo?", options: ["Elias", "Isaías", "Ezequiel", "Amós"], answer: "Elias" },
+{ question: "Qual foi a última praga que Deus enviou sobre o Egito antes da libertação dos israelitas?", options: ["Morte dos primogênitos", "Invasão de rãs", "Trevas", "Gafanhotos"], answer: "Morte dos primogênitos" },
+{ question: "Quem foi o profeta que profetizou a queda de Nínive?", options: ["Jonas", "Amós", "Miquéias", "Ezequiel"], answer: "Jonas" },
+{ question: "Qual rei de Israel foi o primeiro a construir um templo para Deus?", options: ["Salomão", "Davi", "Ezequias", "Saul"], answer: "Salomão" },
+{ question: "Qual dos filhos de Jacó recebeu a bênção de liderança sobre seus irmãos?", options: ["Judá", "José", "Rúben", "Levi"], answer: "Judá" },
+{ question: "Quem foi o juiz que matou 600 homens com uma espada", options: ["Sãcar", "Jefté", "Sansão", "Débora"], answer: "Sansão" },
+{ question: "Quem interpretou os sonhos do faraó e se tornou um alto oficial no Egito?", options: ["José", "Moisés", "Daniel", "Ezequiel"], answer: "José" },
+{ question: "Quem foi o profeta que escreveu o livro de Lamentações?", options: ["Jeremias", "Isaías", "Daniel", "Amós"], answer: "Jeremias" },
+{ question: "Em qual cidade Davi foi ungido como rei de Judá?", options: ["Hebrom", "Jerusalém", "Samaria", "Betel"], answer: "Hebrom" },
+{ question: "Qual foi a mãe de Samuel?", options: ["Ana", "Raquel", "Miriã", "Débora"], answer: "Ana" },
+{ question: "Qual é o nome do livro que conta a história de Rute?", options: ["Rute", "Ester", "Juízes", "Gênesis"], answer: "Rute" },
+
+{ question: "Quem foi o rei que desobedeceu a Deus e foi rejeitado como rei?", options: ["Saul", "Davi", "Salomão", "Ezequias"], answer: "Saul" },
+{ question: "Quem foi o profeta que teve uma visão do vale de ossos secos?", options: ["Ezequiel", "Isaías", "Daniel", "Amós"], answer: "Ezequiel" },
+{ question: "Quem foi o rei que fez um acordo com os filisteus e colocou um altar para Dagon?", options: ["Saul", "Davi", "Salomão", "Acabe"], answer: "Saul" },
+{ question: "Quem foi o profeta que profetizou que o Messias viria de Belém?", options: ["Miquéias", "Isaías", "Amós", "Daniel"], answer: "Miquéias" },
+{ question: "Qual livro da Bíblia descreve a sabedoria de Salomão?", options: ["Provérbios", "Eclesiastes", "Cânticos", "Salmos"], answer: "Provérbios" },
+{ question: "Quem foi o profeta que foi levado por um carro de fogo aos céus?", options: ["Elias", "Isaías", "Jeremias", "Daniel"], answer: "Elias" },
+{ question: "Quem foi o rei de Judá que começou a reinar com 8 anos?", options: ["Josias", "Ezequias", "Davi", "Saul"], answer: "Josias" },
+{ question: "Qual é o nome do livro que descreve a queda de Jerusalém e o exílio dos judeus?", options: ["Lamentações", "Jeremias", "Ezequiel", "Daniel"], answer: "Lamentações" },
+{ question: "Qual foi o nome do homem que teve 12 filhos que se tornaram as 12 tribos de Israel?", options: ["Jacó", "Abraão", "Isaac", "Moisés"], answer: "Jacó" },
+{ question: "Qual era o nome de Davi antes de ser rei?", options: ["Davi", "Gideão", "Salomão", "Jonatas"], answer: "Davi" },
+{ question: "Qual o nome do rei de Judá que fez uma reforma religiosa e destruiu os ídolos?", options: ["Josias", "Ezequias", "Salomão", "Davi"], answer: "Josias" },
+{ question: "Qual era o nome do profeta que foi chamado para ir até Nínive para pregar o arrependimento?", options: ["Jonas", "Daniel", "Isaías", "Amós"], answer: "Jonas" },
+
+{ question: "Em qual livro da Bíblia está a história da torre de Babel?", options: ["Gênesis", "Êxodo", "Levítico", "Números"], answer: "Gênesis" },
+{ question: "Qual foi o rei que escreveu o livro de Eclesiastes?", options: ["Salomão", "Davi", "Josias", "Ezequias"], answer: "Salomão" },
+{ question: "Quem foi o profeta que teve a visão das quatro bestas no livro de Daniel?", options: ["Daniel", "Isaías", "Jeremias", "Ezequiel"], answer: "Daniel" },
+{ question: "Quem foi o profeta que falou sobre a vinda de um novo pacto em Jeremias 31?", options: ["Jeremias", "Isaías", "Ezequiel", "Amós"], answer: "Jeremias" },
+{ question: "Quem foi o profeta que alertou o povo de Israel sobre a destruição de Jerusalém?", options: ["Jeremias", "Daniel", "Ezequiel", "Amós"], answer: "Jeremias" },
+{ question: "Quem foi o profeta que previu que o Messias seria nascido de uma virgem?", options: ["Isaías", "Miquéias", "Amós", "Ezequiel"], answer: "Isaías" },
+{ question: "Qual o nome do livro que descreve a conquista da Terra Prometida por Josué?", options: ["Josué", "Juízes", "1 Samuel", "2 Samuel"], answer: "Josué" },
+{ question: "Qual foi o rei de Israel que escreveu muitos Salmos?", options: ["Davi", "Salomão", "Ezequias", "Saul"], answer: "Davi" },
+{ question: "Quem foi o profeta que teve a visão do trono de Deus em um carro de fogo?", options: ["Ezequiel", "Isaías", "Amós", "Daniel"], answer: "Ezequiel" },
+{ question: "Qual profeta escreveu o livro que contém uma oração de arrependimento por parte de Israel?", options: ["Daniel", "Ezequiel", "Amós", "Neemias"], answer: "Daniel" },
+{ question: "Qual rei de Israel reconstruiu o templo de Jerusalém após o exílio?", options: ["Zorobabel", "Salomão", "Ezequias", "Josias"], answer: "Zorobabel" },
+{ question: "Quem foi o homem que herdou o trono após a morte de Moisés e levou o povo à Terra Prometida?", options: ["Josué", "Davi", "Saul", "Ezequias"], answer: "Josué" },
+{ question: "Em que livro da Bíblia é relatada a história de uma batalha onde o sol se deteve?", options: ["Josué", "Juízes", "1 Samuel", "Gênesis"], answer: "Josué" },
+{ question: "Quem foi o profeta que teve visões de quatro cavaleiros representando juízos futuros?", options: ["Zacarias", "Daniel", "Amós", "Isaías"], answer: "Zacarias" },
+{ question: "Qual livro da Bíblia fala sobre o arrependimento de Israel durante o período dos juízes?", options: ["Juízes", "1 Samuel", "2 Samuel", "Rute"], answer: "Juízes" },
+
+{ question: "Quem foi o profeta que teve uma visão de uma árvore de amendoeira e uma panela fervente?", options: ["Amós", "Ezequiel", "Jeremias", "Isaías"], answer: "Amós" },
+{ question: "Quem foi o patriarca que Deus ordenou que sacrificasse seu filho Isaac?", options: ["Abraão", "Isaac", "Jacó", "Moisés"], answer: "Abraão" },
+{ question: "Quem foi o profeta que viveu durante o exílio na Babilônia e interpretou os sonhos do rei Nabucodonosor?", options: ["Daniel", "Ezequiel", "Isaías", "Jeremias"], answer: "Daniel" },
+{ question: "Quem foi o profeta que aconselhou o rei Davi a não fazer o censo em Israel?", options: ["Gade", "Natã", "Eliseu", "Amós"], answer: "Gade" },
+{ question: "Qual o nome do rei de Judá que mandou destruir os ídolos e restaurar o templo?", options: ["Josias", "Ezequias", "Salomão", "Davi"], answer: "Josias" },
+{ question: "Quem foi o profeta que teve a visão das sete igrejas e das futuras revelações em Apocalipse?", options: ["Ezequiel", "Isaías", "Daniel", "João"], answer: "Daniel" },
+{ question: "Em que livro da Bíblia estão as leis de sacrifícios e purificação?", options: ["Levítico", "Êxodo", "Deuteronômio", "Números"], answer: "Levítico" },
+{ question: "Quem foi o último juiz de Israel?", options: ["Samuel", "Davi", "Saul", "Josué"], answer: "Samuel" },
+{ question: "Quem foi o profeta que teve a visão de um rolo com uma palavra de juízo contra o templo?", options: ["Ezequiel", "Amós", "Isaías", "Jeremias"], answer: "Ezequiel" },
+
+{ question: "Quem foi o profeta que desafiou o rei Acabe e os 450 profetas de Baal no Monte Carmelo?", options: ["Elias", "Isaías", "Ezequiel", "Amós"], answer: "Elias" },
+{ question: "Qual foi o nome do profeta que foi chamado para pregar em Nínive?", options: ["Jonas", "Miquéias", "Jeremias", "Amós"], answer: "Jonas" },
+{ question: "Quem foi o profeta que teve a visão das quatro bestas no livro de Daniel?", options: ["Daniel", "Isaías", "Ezequiel", "Amós"], answer: "Daniel" },
+{ question: "Quem foi o primeiro rei de Israel?", options: ["Saul", "Davi", "Salomão", "Ezequias"], answer: "Saul" },
+{ question: "Quem foi o rei que escreveu muitos dos Salmos?", options: ["Davi", "Salomão", "Ezequias", "Josias"], answer: "Davi" },
+{ question: "Quem foi o patriarca que teve 12 filhos que se tornaram as 12 tribos de Israel?", options: ["Jacó", "Isaac", "Abraão", "Moisés"], answer: "Jacó" },
+{ question: "Qual era o nome de Moisés antes de se tornar líder dos israelitas?", options: ["Moisés", "Ezequias", "Saul", "Davi"], answer: "Moisés" },
+{ question: "Qual foi a última praga enviada sobre o Egito antes da libertação dos israelitas?", options: ["Morte dos primogênitos", "Gafanhotos", "Rãs", "Sangue"], answer: "Morte dos primogênitos" },
+{ question: "Quem foi o profeta que teve uma visão do vale de ossos secos?", options: ["Ezequiel", "Isaías", "Amós", "Miquéias"], answer: "Ezequiel" },
+{ question: "Em qual cidade Davi foi ungido como rei de Judá?", options: ["Hebrom", "Jerusalém", "Samaria", "Betel"], answer: "Hebrom" },
+{ question: "Quem foi o profeta que recebeu a visão de um novo céu e uma nova terra?", options: ["Isaías", "Daniel", "Ezequiel", "Apocalipse"], answer: "Isaías" },
+{ question: "Quem foi o juiz que derrotou os midianitas com apenas 300 homens?", options: ["Gideão", "Jefté", "Sansão", "Davi"], answer: "Gideão" },
+{ question: "Qual livro da Bíblia descreve a história de Ester e a salvação do povo judeu?", options: ["Ester", "Rute", "Juízes", "Neemias"], answer: "Ester" },
+{ question: "Quem foi o rei de Judá que restaurou o templo e as práticas religiosas?", options: ["Josias", "Ezequias", "Davi", "Salomão"], answer: "Josias" },
+{ question: "Qual foi o nome do homem que teve um sonho onde 12 estrelas representavam os 12 filhos de Israel?", options: ["José", "Jacó", "Davi", "Moisés"], answer: "José" },
+{ question: "Quem foi o profeta que escreveu o livro de Lamentações?", options: ["Jeremias", "Isaías", "Daniel", "Ezequiel"], answer: "Jeremias" },
+{ question: "Qual livro da Bíblia relata a destruição de Jerusalém e o cativeiro babilônico?", options: ["Jeremias", "Lamentações", "Daniel", "Amós"], answer: "Jeremias" },
+{ question: "Quem foi o rei de Israel que construiu o templo de Jerusalém?", options: ["Salomão", "Davi", "Ezequias", "Saul"], answer: "Salomão" },
+{ question: "Quem foi o profeta que previu o nascimento de Jesus e falou sobre o servo sofredor?", options: ["Isaías", "Amós", "Ezequiel", "Jeremias"], answer: "Isaías" },
+{ question: "Quem foi o profeta que teve uma visão do trono de Deus em um carro de fogo?", options: ["Ezequiel", "Isaías", "Amós", "Daniel"], answer: "Ezequiel" },
+{ question: "Qual rei de Judá fez uma reforma religiosa e destruiu os altares de Baal?", options: ["Josias", "Ezequias", "Salomão", "Davi"], answer: "Josias" },
+{ question: "Quem foi o profeta que alertou o povo de Israel sobre a destruição de Jerusalém?", options: ["Jeremias", "Daniel", "Ezequiel", "Amós"], answer: "Jeremias" },
+
+ ],
+ 
+
+};
+
+
+let currentQuiz = [];
+let currentQuestionIndex = 0;
+let score = 0;
+
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+function startQuiz(topic) {
+  currentQuiz = [...quizzes[topic]];
+  shuffle(currentQuiz);
+  currentQuestionIndex = 0;
+  score = 0;
+  document.getElementById('quiz').style.display = 'block';
+  document.getElementById('result').style.display = 'none';
+  showQuestion();
+}
+
+function showQuestion() {
+  if (currentQuestionIndex < currentQuiz.length) {
+    const q = currentQuiz[currentQuestionIndex];
+    document.getElementById('question').textContent = q.question;
+    const optionsDiv = document.getElementById('options');
+    optionsDiv.innerHTML = '';
+    const shuffledOptions = [...q.options];
+    shuffle(shuffledOptions);
+    shuffledOptions.forEach(option => {
+      const button = document.createElement('button');
+      button.textContent = option;
+      button.className = 'option';
+      button.onclick = () => selectOption(button, option);
+      optionsDiv.appendChild(button);
+    });
+  }
+}
+
+function selectOption(button, selected) {
+  const correct = currentQuiz[currentQuestionIndex].answer;
+  const buttons = document.querySelectorAll('.option');
+  buttons.forEach(btn => btn.disabled = true);
+  if (selected === correct) {
+    button.classList.add('correct');
+    score++;
+  } else {
+    button.classList.add('wrong');
+  }
+  setTimeout(nextQuestion, 1000);
+}
+
+function nextQuestion() {
+  currentQuestionIndex++;
+  if (currentQuestionIndex < currentQuiz.length) {
+    showQuestion();
+  } else {
+    showResult();
+  }
+}
+
+function finalizarQuiz() {
+  // Finaliza o quiz e mostra o resultado, mesmo que nem todas as questões tenham sido respondidas
+  showResult();
+}
+
+function showResult() {
+  document.getElementById('quiz').style.display = 'none';
+  document.getElementById('result').style.display = 'block';
+  document.getElementById('result').textContent = `Você acertou ${score} de ${currentQuestionIndex} questões!`;
+}
+
+document.addEventListener("contextmenu", e => e.preventDefault());
+document.onkeydown = function(e) {
+  if (e.key === "F12" || (e.ctrlKey && e.shiftKey && e.key === "I")) {
+    return false;
+  }
+};
+
+
+
+
+</script>
+
+<p style="color: blue;">2 Coríntios 5:7 🕊️ "Vivemos por fé, e não pelo que vemos."!!!</p>
+</body>
+</html>
