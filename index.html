@@ -1,25 +1,179 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#e3f2fd" />
-  <title>QuizBíblia</title>
+  <meta charset="UTF-8">
+	
+  <link rel="icon" type="image/png" href="https://img.icons8.com/?size=100&id=jAc6FZyLm06C&format=png&color=000000" />
+	
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PenseQuiz - Bíblia</title>
   <link rel="icon" type="image/png" href="https://img.icons8.com/?size=100&id=jAc6FZyLm06C&format=png&color=000000" />
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/react@18.2.0/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.20.15/babel.min.js"></script>
+  <style>
+    body {
+      background: linear-gradient(to bottom, #1e3a8a, #dbeafe);
+      min-height: 100vh;
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      overflow: hidden; /* Impede rolagem indesejada */
+    }
+    .pulse {
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    .progress-bar {
+      transition: width 0.1s linear;
+    }
+    .heart {
+      color: #dc2626;
+      font-size: 1.5rem;
+    }
+    .shake {
+      animation: shake 0.5s;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+    .parchment-bg {
+      background: url('https://www.transparenttextures.com/patterns/paper.png'), #f5e8c7;
+    }
+    .fade-in {
+      animation: fadeIn 1s;
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    .error-boundary {
+      color: red;
+      padding: 20px;
+      text-align: center;
+    }
+    .option {
+      display: block;
+      margin: 10px auto;
+      padding: 12px 25px;
+      background-color: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      width: 80%;
+      max-width: 300px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      box-shadow: 0 3px 5px rgba(0,0,0,0.2);
+    }
+    .option:hover {
+      background-color: #1565c0;
+    }
+    .correct {
+      background-color: #4CAF50 !important;
+    }
+    .wrong {
+      background-color: #f44336 !important;
+    }
+    .game-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      width: 100%;
+      position: relative;
+    }
+  </style>
 </head>
-<body class="bg-gradient-to-b from-blue-100 to-blue-200 text-gray-900 flex items-center justify-center min-h-screen p-4 font-sans">
+<body>
   <div id="root"></div>
-  <div id="error" class="hidden text-red-500 text-center"></div>
-
+  <div id="error" className="hidden text-red-500 text-center"></div>
   <script type="text/babel">
-    // Amostra reduzida de perguntas (adicione a lista completa conforme necessário)
-const quizzes = {
+    // Lista de livros do Antigo Testamento com versículo representativo
+    const oldTestamentBooks = [
+      { name: "Gênesis", abbrev: "gn", verse: { reference: "Gênesis 1:1", text: "No princípio, Deus criou os céus e a terra." } },
+      { name: "Êxodo", abbrev: "ex", verse: { reference: "Êxodo 20:2", text: "Eu sou o Senhor, teu Deus, que te tirou da terra do Egito, da casa da servidão." } },
+      { name: "Levítico", abbrev: "lv", verse: { reference: "Levítico 19:2", text: "Sereis santos, porque eu, o Senhor, vosso Deus, sou santo." } },
+      { name: "Números", abbrev: "nm", verse: { reference: "Números 6:24", text: "O Senhor te abençoe e te guarde." } },
+      { name: "Deuteronômio", abbrev: "dt", verse: { reference: "Deuteronômio 6:4", text: "Ouve, Israel, o Senhor, nosso Deus, é o único Senhor." } },
+      { name: "Josué", abbrev: "js", verse: { reference: "Josué 1:9", text: "Não to mandei eu? Sê forte e corajoso; não temas." } },
+      { name: "Juízes", abbrev: "jz", verse: { reference: "Juízes 2:18", text: "O Senhor levantava juízes, que os livravam da mão dos que os oprimiam." } },
+      { name: "Rute", abbrev: "rt", verse: { reference: "Rute 1:16", text: "Onde quer que fores, irei eu; onde quer que pousares, ali pousarei eu." } },
+      { name: "1 Samuel", abbrev: "1sm", verse: { reference: "1 Samuel 16:7", text: "O Senhor não vê como vê o homem; o homem vê o exterior, mas o Senhor vê o coração." } },
+      { name: "2 Samuel", abbrev: "2sm", verse: { reference: "2 Samuel 7:22", text: "Tu és grande, Senhor Deus; não há outro como tu." } },
+      { name: "1 Reis", abbrev: "1rs", verse: { reference: "1 Reis 8:23", text: "Senhor, Deus de Israel, não há Deus como tu, em cima nos céus nem embaixo na terra." } },
+      { name: "2 Reis", abbrev: "2rs", verse: { reference: "2 Reis 19:15", text: "Tu és o Deus, o único Deus, sobre todos os reinos da terra." } },
+      { name: "1 Crônicas", abbrev: "1cr", verse: { reference: "1 Crônicas 16:8", text: "Rendei graças ao Senhor, invocai o seu nome." } },
+      { name: "2 Crônicas", abbrev: "2cr", verse: { reference: "2 Crônicas 7:14", text: "Se o meu povo, que se chama pelo meu nome, se humilhar e orar, eu o ouvirei." } },
+      { name: "Esdras", abbrev: "ed", verse: { reference: "Esdras 7:10", text: "Esdras tinha disposto o coração para buscar a Lei do Senhor." } },
+      { name: "Neemias", abbrev: "ne", verse: { reference: "Neemias 1:5", text: "Ó Senhor, Deus dos céus, grande e temível, que guardas a aliança." } },
+      { name: "Ester", abbrev: "et", verse: { reference: "Ester 4:14", text: "Quem sabe se não foi para um momento como este que foste elevada a rainha?" } },
+      { name: "Jó", abbrev: "jó", verse: { reference: "Jó 1:21", text: "O Senhor o deu, o Senhor o tomou; bendito seja o nome do Senhor." } },
+      { name: "Salmos", abbrev: "sl", verse: { reference: "Salmos 23:1", text: "O Senhor é o meu pastor; de nada terei falta." } },
+      { name: "Provérbios", abbrev: "pv", verse: { reference: "Provérbios 3:5", text: "Confia no Senhor de todo o teu coração." } },
+      { name: "Eclesiastes", abbrev: "ec", verse: { reference: "Eclesiastes 1:2", text: "Vaidade de vaidades, tudo é vaidade." } },
+      { name: "Cânticos", abbrev: "ct", verse: { reference: "Cânticos 8:6", text: "O amor é forte como a morte." } },
+      { name: "Isaías", abbrev: "is", verse: { reference: "Isaías 40:31", text: "Os que esperam no Senhor renovarão as suas forças." } },
+      { name: "Jeremias", abbrev: "jr", verse: { reference: "Jeremias 29:11", text: "Eu sei os planos que tenho para vós, diz o Senhor." } },
+      { name: "Lamentações", abbrev: "lm", verse: { reference: "Lamentações 3:22", text: "As misericórdias do Senhor são a causa de não sermos consumidos." } },
+      { name: "Ezequiel", abbrev: "ez", verse: { reference: "Ezequiel 36:26", text: "Dar-vos-ei um coração novo e porei dentro de vós um espírito novo." } },
+      { name: "Daniel", abbrev: "dn", verse: { reference: "Daniel 6:10", text: "Daniel orava e dava graças diante do seu Deus." } },
+      { name: "Oseias", abbrev: "os", verse: { reference: "Oseias 6:6", text: "Quero misericórdia e não sacrifício." } },
+      { name: "Joel", abbrev: "jl", verse: { reference: "Joel 2:28", text: "Derramarei o meu Espírito sobre toda a carne." } },
+      { name: "Amós", abbrev: "am", verse: { reference: "Amós 5:24", text: "Corra a justiça como um rio perene." } },
+      { name: "Obadias", abbrev: "ob", verse: { reference: "Obadias 1:15", text: "O dia do Senhor está perto, sobre todas as nações." } },
+      { name: "Jonas", abbrev: "jn", verse: { reference: "Jonas 2:2", text: "Na minha angústia clamei ao Senhor, e ele me respondeu." } },
+      { name: "Miqueias", abbrev: "mq", verse: { reference: "Miqueias 6:8", text: "Fazer justiça, amar a misericórdia e andar humildemente com o teu Deus." } },
+      { name: "Naum", abbrev: "na", verse: { reference: "Naum 1:7", text: "O Senhor é bom, uma fortaleza no dia da angústia." } },
+      { name: "Habacuque", abbrev: "hc", verse: { reference: "Habacuque 3:17-18", text: "Ainda que a figueira não floresça, eu me alegrarei no Senhor." } },
+      { name: "Sofonias", abbrev: "sf", verse: { reference: "Sofonias 3:17", text: "O Senhor, teu Deus, está no meio de ti, poderoso para salvar." } },
+      { name: "Ageu", abbrev: "ag", verse: { reference: "Ageu 1:7", text: "Considerai os vossos caminhos, diz o Senhor." } },
+      { name: "Zacarias", abbrev: "zc", verse: { reference: "Zacarias 9:9", text: "Eis que vem o teu Rei, justo e Salvador." } },
+      { name: "Malaquias", abbrev: "ml", verse: { reference: "Malaquias 3:10", text: "Trazei todos os dízimos à casa do tesouro." } },
+    ];
+
+    // Lista de livros do Novo Testamento com versículo representativo
+    const newTestamentBooks = [
+      { name: "Mateus", abbrev: "mt", verse: { reference: "Mateus 5:3", text: "Bem-aventurados os humildes de espírito, porque deles é o reino dos céus." } },
+      { name: "Marcos", abbrev: "mc", verse: { reference: "Marcos 10:45", text: "O Filho do Homem não veio para ser servido, mas para servir." } },
+      { name: "Lucas", abbrev: "lc", verse: { reference: "Lucas 2:11", text: "Nasceu-vos hoje, na cidade de Davi, o Salvador, que é Cristo, o Senhor." } },
+      { name: "João", abbrev: "jo", verse: { reference: "João 3:16", text: "Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito." } },
+      { name: "Atos", abbrev: "at", verse: { reference: "Atos 1:8", text: "Recebereis poder, ao descer sobre vós o Espírito Santo." } },
+      { name: "Romanos", abbrev: "rm", verse: { reference: "Romanos 8:28", text: "Sabemos que todas as coisas cooperam para o bem daqueles que amam a Deus." } },
+      { name: "1 Coríntios", abbrev: "1co", verse: { reference: "1 Coríntios 13:4", text: "O amor é paciente, o amor é bondoso." } },
+      { name: "2 Coríntios", abbrev: "2co", verse: { reference: "2 Coríntios 5:17", text: "Se alguém está em Cristo, é nova criatura." } },
+      { name: "Gálatas", abbrev: "gl", verse: { reference: "Gálatas 5:22", text: "O fruto do Espírito é: amor, alegria, paz." } },
+      { name: "Efésios", abbrev: "ef", verse: { reference: "Efésios 2:8", text: "Pela graça sois salvos, por meio da fé." } },
+      { name: "Filipenses", abbrev: "fp", verse: { reference: "Filipenses 4:13", text: "Tudo posso naquele que me fortalece." } },
+      { name: "Colossenses", abbrev: "cl", verse: { reference: "Colossenses 3:23", text: "Tudo quanto fizerdes, fazei-o de coração, como para o Senhor." } },
+      { name: "1 Tessalonicenses", abbrev: "1ts", verse: { reference: "1 Tessalonicenses 5:16-18", text: "Regozijai-vos sempre. Orai sem cessar." } },
+      { name: "2 Tessalonicenses", abbrev: "2ts", verse: { reference: "2 Tessalonicenses 3:3", text: "O Senhor é fiel; ele vos confirmará e guardará do maligno." } },
+      { name: "1 Timóteo", abbrev: "1tm", verse: { reference: "1 Timóteo 4:12", text: "Ninguém despreze a tua mocidade, mas sê exemplo." } },
+      { name: "2 Timóteo", abbrev: "2tm", verse: { reference: "2 Timóteo 3:16", text: "Toda Escritura é inspirada por Deus." } },
+      { name: "Tito", abbrev: "tt", verse: { reference: "Tito 2:11", text: "A graça de Deus se manifestou, trazendo salvação a todos." } },
+      { name: "Filemom", abbrev: "fm", verse: { reference: "Filemom 1:6", text: "Oro para que a comunhão da tua fé seja eficaz." } },
+      { name: "Hebreus", abbrev: "hb", verse: { reference: "Hebreus 11:1", text: "A fé é a certeza de coisas que se esperam." } },
+      { name: "Tiago", abbrev: "tg", verse: { reference: "Tiago 1:22", text: "Tornai-vos praticantes da palavra, e não somente ouvintes." } },
+      { name: "1 Pedro", abbrev: "1pe", verse: { reference: "1 Pedro 5:7", text: "Lançai sobre ele toda a vossa ansiedade, porque ele tem cuidado de vós." } },
+      { name: "2 Pedro", abbrev: "2pe", verse: { reference: "2 Pedro 1:21", text: "A profecia nunca foi produzida por vontade de homem, mas pelo Espírito Santo." } },
+      { root: true },
+      { name: "1 João", abbrev: "1jo", verse: { reference: "1 João 4:8", text: "Quem não ama não conhece a Deus, pois Deus é amor." } },
+      { name: "2 João", abbrev: "2jo", verse: { reference: "2 João 1:6", text: "O amor é que andemos segundo os seus mandamentos." } },
+      { name: "3 João", abbrev: "3jo", verse: { reference: "3 João 1:4", text: "Não tenho maior alegria do que ouvir que meus filhos andam na verdade." } },
+      { name: "Judas", abbrev: "jd", verse: { reference: "Judas 1:20", text: "Edificai-vos sobre a vossa santíssima fé, orando no Espírito Santo." } },
+      { name: "Apocalipse", abbrev: "ap", verse: { reference: "Apocalipse 21:4", text: "Deus enxugará dos olhos toda lágrima." } },
+    ];
+
+    // Amostra reduzida de perguntas do quiz
+    const quizzes = {
       ANTIGO: [
-        { question: "Quem construiu a arca para escapar do dilúvio?", options: ["Moisés", "Abraão", "Noé", "Davi"], answer: "Noé", verse: "Gênesis 6:14" },
+         { question: "Quem construiu a arca para escapar do dilúvio?", options: ["Moisés", "Abraão", "Noé", "Davi"], answer: "Noé", verse: "Gênesis 6:14" },
         { question: "Qual o primeiro livro da Bíblia?", options: ["Êxodo", "Gênesis", "Levítico", "Números"], answer: "Gênesis", verse: "Gênesis 1:1" },
         { question: "Quem foi lançado na cova dos leões?", options: ["Elias", "Daniel", "José", "Jonas"], answer: "Daniel", verse: "Daniel 6:16" },
         { question: "Qual rei foi conhecido por sua sabedoria?", options: ["Davi", "Salomão", "Saul", "Ezequias"], answer: "Salomão", verse: "1 Reis 4:29" },
@@ -235,11 +389,8 @@ const quizzes = {
   { question: "Quem foi o pai de todas as nações segundo a promessa de Deus?", options: ["Abraão", "Isaque", "Jacó", "José"], answer: "Abraão", verse: "Gênesis 17:5" },
 
 
-
       ],
-     
-
-	 NOVO: [
+      NOVO: [
         { question: "Quem foi o primeiro apóstolo a ser chamado por Jesus?", options: ["Pedro", "João", "Tiago", "André"], answer: "André", verse: "João 1:40-42" },
         { question: "Quem foi o médico que escreveu o Evangelho de Lucas?", options: ["Lucas", "Marcos", "Mateus", "João"], answer: "Lucas", verse: "Colossenses 4:14" },
         { question: "Qual evangelho é considerado o mais teológico e profundo?", options: ["João", "Mateus", "Marcos", "Lucas"], answer: "João", verse: "João 1:1" },
@@ -450,14 +601,9 @@ const quizzes = {
   { question: "Quantos pães e peixes Jesus usou para alimentar cinco mil pessoas?", options: ["5 pães e 2 peixes", "7 pães e 3 peixes", "2 pães e 5 peixes", "10 pães e 2 peixes"], answer: "5 pães e 2 peixes", verse: "Mateus 14:17-21" },
   { question: "Qual foi o primeiro milagre realizado pelos apóstolos após Pentecostes?", options: ["Cura do coxo", "Multiplicação de pães", "Libertação de demônio", "Ressurreição de Dorcas"], answer: "Cura do coxo", verse: "Atos 3:1-8" },
 
-
-
       ],
-     
-	 MISTO: [
-      
-	  
-	   { question: "Quem foi o primeiro apóstolo a ser chamado por Jesus?", options: ["Pedro", "João", "Tiago", "André"], answer: "André", verse: "João 1:40-42" },
+      MISTO: [
+        { question: "Quem foi o primeiro apóstolo a ser chamado por Jesus?", options: ["Pedro", "João", "Tiago", "André"], answer: "André", verse: "João 1:40-42" },
         { question: "Quem foi o médico que escreveu o Evangelho de Lucas?", options: ["Lucas", "Marcos", "Mateus", "João"], answer: "Lucas", verse: "Colossenses 4:14" },
         { question: "Qual evangelho é considerado o mais teológico e profundo?", options: ["João", "Mateus", "Marcos", "Lucas"], answer: "João", verse: "João 1:1" },
         { question: "Quem batizou Jesus no rio Jordão?", options: ["João Batista", "Pedro", "Tiago", "André"], answer: "João Batista", verse: "Mateus 3:13-17" },
@@ -884,14 +1030,525 @@ const quizzes = {
   { question: "Quem foi a única mulher juíza de Israel?", options: ["Débora", "Ester", "Rute", "Ana"], answer: "Débora", verse: "Juízes 4:4" },
   { question: "Quem foi o pai de todas as nações segundo a promessa de Deus?", options: ["Abraão", "Isaque", "Jacó", "José"], answer: "Abraão", verse: "Gênesis 17:5" }
 
-
-	  
       ],
     };
 
+    // Lista de 20 perguntas de enigmas (mistas: Antigo e Novo Testamento)
+    const riddleQuestions = [
+      { question: "Este livro contém o versículo: 'No princípio, Deus criou os céus e a terra.' Qual é o livro?", options: ["Gênesis", "Êxodo", "Mateus", "Salmos"], answer: "Gênesis", verse: "Gênesis 1:1" },
+      { question: "Este livro contém o versículo: 'Eu sou o Senhor, teu Deus.' Qual é o livro?", options: ["Êxodo", "Levítico", "Números", "Josué"], answer: "Êxodo", verse: "Êxodo 20:2" },
+      { question: "Este livro contém o versículo: 'O Senhor é o meu pastor.' Qual é o livro?", options: ["Salmos", "Provérbios", "Isaías", "Jeremias"], answer: "Salmos", verse: "Salmos 23:1" },
+      { question: "Este livro contém o versículo: 'Confia no Senhor de todo o teu coração.' Qual é o livro?", options: ["Provérbios", "Eclesiastes", "Salmos", "Isaías"], answer: "Provérbios", verse: "Provérbios 3:5" },
+      { question: "Este livro contém o versículo: 'Os que esperam no Senhor renovarão as suas forças.' Qual é o livro?", options: ["Isaías", "Jeremias", "Ezequiel", "Daniel"], answer: "Isaías", verse: "Isaías 40:31" },
+      { question: "Este livro contém o versículo: 'Eu sei os planos que tenho para vós.' Qual é o livro?", options: ["Jeremias", "Isaías", "Lamentações", "Ezequiel"], answer: "Jeremias", verse: "Jeremias 29:11" },
+      { question: "Este livro contém o versículo: 'Dar-vos-ei um coração novo.' Qual é o livro?", options: ["Ezequiel", "Daniel", "Oseias", "Joel"], answer: "Ezequiel", verse: "Ezequiel 36:26" },
+      { question: "Este livro contém o versículo: 'Fazer justiça, amar a misericórdia.' Qual é o livro?", options: ["Miqueias", "Amós", "Jonas", "Naum"], answer: "Miqueias", verse: "Miqueias 6:8" },
+      { question: "Este livro contém o versículo: 'O Senhor é bom, uma fortaleza.' Qual é o livro?", options: ["Naum", "Habacuque", "Sofonias", "Ageu"], answer: "Naum", verse: "Naum 1:7" },
+      { question: "Este livro contém o versículo: 'Trazei todos os dízimos.' Qual é o livro?", options: ["Malaquias", "Zacarias", "Ageu", "Sofonias"], answered: "Malaquias", verse: "Malaquias 3:10" },
+      { question: "Este livro contém o versículo: 'Bem-aventurados os humildes.' Qual é o livro?", options: ["Mateus", "Marcos", "Lucas", "João"], answer: "Mateus", verse: "Mateus 5:3" },
+      { question: "Este livro contém o versículo: 'O Filho do Homem veio para servir.' Qual é o livro?", options: ["Marcos", "Mateus", "Lucas", "João"], answer: "Marcos", verse: "Marcos 10:45" },
+      { question: "Este livro contém o versículo: 'Nasceu-vos hoje o Salvador.' Qual é o livro?", options: ["Lucas", "Mateus", "Marcos", "João"], answer: "Lucas", verse: "Lucas 2:11" },
+      { question: "Este livro contém o versículo: 'Deus amou o mundo de tal maneira.' Qual é o livro?", options: ["João", "Lucas", "Atos", "Romanos"], answer: "João", verse: "João 3:16" },
+      { question: "Este livro contém o versículo: 'Recebereis poder, ao descer o Espírito.' Qual é o livro?", options: ["Atos", "Romanos", "1 Coríntios", "Efésios"], answer: "Atos", verse: "Atos 1:8" },
+      { question: "Este livro contém o versículo: 'Todas as coisas cooperam para o bem.' Qual é o livro?", options: ["Romanos", "1 Coríntios", "Efésios", "Filipenses"], answer: "Romanos", verse: "Romanos 8:28" },
+      { question: "Este livro contém o versículo: 'O amor é paciente, o amor é bondoso.' Qual é o livro?", options: ["1 Coríntios", "2 Coríntios", "Gálatas", "Efésios"], answer: "1 Coríntios", verse: "1 Coríntios 13:4" },
+      { question: "Este livro contém o versículo: 'Pela graça sois salvos.' Qual é o livro?", options: ["Efésios", "Gálatas", "Filipenses", "Colossenses"], answer: "Efésios", verse: "Efésios 2:8" },
+      { question: "Este livro contém o versículo: 'Tudo posso naquele que me fortalece.' Qual é o livro?", options: ["Filipenses", "Colossenses", "1 Tessalonicenses", "Hebreus"], answer: "Filipenses", verse: "Filipenses 4:13" },
+      { question: "Este livro contém o versículo: 'A fé é a certeza de coisas que se esperam.' Qual é o livro?", options: ["Hebreus", "Tiago", "1 Pedro", "1 João"], answer: "Hebreus", verse: "Hebreus 11:1" },
+   { question: "Este livro contém o versículo: 'No princípio, Deus criou os céus e a terra.' Qual é o livro?", options: ["Gênesis", "Êxodo", "Mateus", "Salmos"], answer: "Gênesis", verse: "Gênesis 1:1" },
+  { question: "Este livro contém o versículo: 'Eu sou o Senhor, teu Deus, que te tirou da terra do Egito.' Qual é o livro?", options: ["Êxodo", "Levítico", "Números", "Josué"], answer: "Êxodo", verse: "Êxodo 20:2" },
+  { question: "Este livro contém o versículo: 'No princípio, Deus criou os céus e a terra.' Qual é o livro?", options: ["Gênesis", "Êxodo", "Mateus", "Salmos"], answer: "Gênesis", verse: "Gênesis 1:1" },
+  { question: "Este livro contém o versículo: 'Eu sou o Senhor, teu Deus, que te tirou da terra do Egito.' Qual é o livro?", options: ["Êxodo", "Levítico", "Números", "Josué"], answer: "Êxodo", verse: "Êxodo 20:2" },
+  { question: "Este livro contém o versículo: 'Sereis santos, porque eu, o Senhor, sou santo.' Qual é o livro?", options: ["Levítico", "Números", "Deuteronômio", "Êxodo"], answer: "Levítico", verse: "Levítico 19:2" },
+  { question: "Este livro contém o versículo: 'O Senhor te abençoe e te guarde.' Qual é o livro?", options: ["Números", "Deuteronômio", "Salmos", "Gênesis"], answer: "Números", verse: "Números 6:24" },
+  { question: "Este livro contém o versículo: 'Ouve, Israel, o Senhor é o único Senhor.' Qual é o livro?", options: ["Deuteronômio", "Êxodo", "Josué", "Juízes"], answer: "Deuteronômio", verse: "Deuteronômio 6:4" },
+  { question: "Este livro contém o versículo: 'Sê forte e corajoso; não temas.' Qual é o livro?", options: ["Josué", "Juízes", "1 Samuel", "Salmos"], answer: "Josué", verse: "Josué 1:9" },
+  { question: "Este livro contém o versículo: 'O Senhor levantava juízes.' Qual é o livro?", options: ["Juízes", "Josué", "Rute", "1 Samuel"], answer: "Juízes", verse: "Juízes 2:18" },
+  { question: "Este livro contém o versículo: 'Onde quer que fores, irei eu.' Qual é o livro?", options: ["Rute", "Ester", "1 Samuel", "Salmos"], answer: "Rute", verse: "Rute 1:16" },
+  { question: "Este livro contém o versículo: 'O Senhor vê o coração.' Qual é o livro?", options: ["1 Samuel", "2 Samuel", "1 Reis", "Provérbios"], answer: "1 Samuel", verse: "1 Samuel 16:7" },
+  { question: "Este livro contém o versículo: 'Tu és grande, Senhor Deus.' Qual é o livro?", options: ["2 Samuel", "1 Samuel", "1 Crônicas", "Salmos"], answer: "2 Samuel", verse: "2 Samuel 7:22" },
+  { question: "Este livro contém o versículo: 'Não há Deus como tu.' Qual é o livro?", options: ["1 Reis", "2 Reis", "1 Crônicas", "Neemias"], answer: "1 Reis", verse: "1 Reis 8:23" },
+  { question: "Este livro contém o versículo: 'Tu és o Deus, o único Deus.' Qual é o livro?", options: ["2 Reis", "1 Reis", "2 Crônicas", "Isaías"], answer: "2 Reis", verse: "2 Reis 19:15" },
+  { question: "Este livro contém o versículo: 'Rendei graças ao Senhor.' Qual é o livro?", options: ["1 Crônicas", "2 Crônicas", "Salmos", "Esdras"], answer: "1 Crônicas", verse: "1 Crônicas 16:8" },
+  { question: "Este livro contém o versículo: 'Se o meu povo se humilhar e orar.' Qual é o livro?", options: ["2 Crônicas", "1 Crônicas", "Neemias", "Esdras"], answer: "2 Crônicas", verse: "2 Crônicas 7:14" },
+  { question: "Este livro contém o versículo: 'Esdras buscava a Lei do Senhor.' Qual é o livro?", options: ["Esdras", "Neemias", "Ester", "Jó"], answer: "Esdras", verse: "Esdras 7:10" },
+  { question: "Este livro contém o versículo: 'Ó Senhor, grande e temível.' Qual é o livro?", options: ["Neemias", "Esdras", "Salmos", "Ester"], answer: "Neemias", verse: "Neemias 1:5" },
+  { question: "Este livro contém o versículo: 'Para um momento como este.' Qual é o livro?", options: ["Ester", "Rute", "Jó", "Salmos"], answer: "Ester", verse: "Ester 4:14" },
+  { question: "Este livro contém o versículo: 'O Senhor o deu, o Senhor o tomou.' Qual é o livro?", options: ["Jó", "Salmos", "Provérbios", "Eclesiastes"], answer: "Jó", verse: "Jó 1:21" },
+  { question: "Este livro contém o versículo: 'O Senhor é o meu pastor.' Qual é o livro?", options: ["Salmos", "Provérbios", "Isaías", "Jeremias"], answer: "Salmos", verse: "Salmos 23:1" },
+  { question: "Este livro contém o versículo: 'Confia no Senhor de todo o coração.' Qual é o livro?", options: ["Provérbios", "Eclesiastes", "Salmos", "Isaías"], answer: "Provérbios", verse: "Provérbios 3:5" },
+  { question: "Este livro contém o versículo: 'Vaidade de vaidades, tudo é vaidade.' Qual é o livro?", options: ["Eclesiastes", "Provérbios", "Salmos", "Cânticos"], answer: "Eclesiastes", verse: "Eclesiastes 1:2" },
+  { question: "Este livro contém o versículo: 'O amor é forte como a morte.' Qual é o livro?", options: ["Cânticos", "Salmos", "Provérbios", "Isaías"], answer: "Cânticos", verse: "Cânticos 8:6" },
+  { question: "Este livro contém o versículo: 'Os que esperam no Senhor renovarão suas forças.' Qual é o livro?", options: ["Isaías", "Jeremias", "Ezequiel", "Daniel"], answer: "Isaías", verse: "Isaías 40:31" },
+  { question: "Este livro contém o versículo: 'Eu sei os planos que tenho para vós.' Qual é o livro?", options: ["Jeremias", "Isaías", "Lamentações", "Ezequiel"], answer: "Jeremias", verse: "Jeremias 29:11" },
+  { question: "Este livro contém o versículo: 'As misericórdias do Senhor não se esgotam.' Qual é o livro?", options: ["Lamentações", "Jeremias", "Ezequiel", "Salmos"], answer: "Lamentações", verse: "Lamentações 3:22" },
+  { question: "Este livro contém o versículo: 'Dar-vos-ei um coração novo.' Qual é o livro?", options: ["Ezequiel", "Daniel", "Oseias", "Joel"], answer: "Ezequiel", verse: "Ezequiel 36:26" },
+  { question: "Este livro contém o versículo: 'Daniel orava e dava graças.' Qual é o livro?", options: ["Daniel", "Ezequiel", "Oseias", "Amós"], answer: "Daniel", verse: "Daniel 6:10" },
+  { question: "Este livro contém o versículo: 'Quero misericórdia e não sacrifício.' Qual é o livro?", options: ["Oseias", "Joel", "Amós", "Miqueias"], answer: "Oseias", verse: "Oseias 6:6" },
+  { question: "Este livro contém o versículo: 'Derramarei o meu Espírito sobre toda a carne.' Qual é o livro?", options: ["Joel", "Oseias", "Amós", "Zacarias"], answer: "Joel", verse: "Joel 2:28" },
+  { question: "Este livro contém o versículo: 'Corra a justiça como um rio.' Qual é o livro?", options: ["Amós", "Miqueias", "Naum", "Habacuque"], answer: "Amós", verse: "Amós 5:24" },
+  { question: "Este livro contém o versículo: 'O dia do Senhor está perto.' Qual é o livro?", options: ["Obadias", "Jonas", "Miqueias", "Sofonias"], answer: "Obadias", verse: "Obadias 1:15" },
+  { question: "Este livro contém o versículo: 'Na minha angústia clamei ao Senhor.' Qual é o livro?", options: ["Jonas", "Obadias", "Naum", "Habacuque"], answer: "Jonas", verse: "Jonas 2:2" },
+  { question: "Este livro contém o versículo: 'Fazer justiça, amar a misericórdia.' Qual é o livro?", options: ["Miqueias", "Amós", "Jonas", "Naum"], answer: "Miqueias", verse: "Miqueias 6:8" },
+  { question: "Este livro contém o versículo: 'O Senhor é bom, uma fortaleza.' Qual é o livro?", options: ["Naum", "Habacuque", "Sofonias", "Ageu"], answer: "Naum", verse: "Naum 1:7" },
+  { question: "Este livro contém o versículo: 'Ainda que a figueira não floresça.' Qual é o livro?", options: ["Habacuque", "Naum", "Sofonias", "Zacarias"], answer: "Habacuque", verse: "Habacuque 3:17-18" },
+  { question: "Este livro contém o versículo: 'O Senhor está no meio de ti.' Qual é o livro?", options: ["Sofonias", "Habacuque", "Ageu", "Malaquias"], answer: "Sofonias", verse: "Sofonias 3:17" },
+  { question: "Este livro contém o versículo: 'Considerai os vossos caminhos.' Qual é o livro?", options: ["Ageu", "Zacarias", "Malaquias", "Sofonias"], answer: "Ageu", verse: "Ageu 1:7" },
+  { question: "Este livro contém o versículo: 'Eis que vem o teu Rei.' Qual é o livro?", options: ["Zacarias", "Malaquias", "Ageu", "Isaías"], answer: "Zacarias", verse: "Zacarias 9:9" },
+  { question: "Este livro contém o versículo: 'Trazei todos os dízimos.' Qual é o livro?", options: ["Malaquias", "Zacarias", "Ageu", "Sofonias"], answer: "Malaquias", verse: "Malaquias 3:10" },
+  { question: "Este livro contém o versículo: 'Bem-aventurados os humildes.' Qual é o livro?", options: ["Mateus", "Marcos", "Lucas", "João"], answer: "Mateus", verse: "Mateus 5:3" },
+  { question: "Este livro contém o versículo: 'O Filho do Homem veio para servir.' Qual é o livro?", options: ["Marcos", "Mateus", "Lucas", "João"], answer: "Marcos", verse: "Marcos 10:45" },
+  { question: "Este livro contém o versículo: 'Nasceu-vos hoje o Salvador.' Qual é o livro?", options: ["Lucas", "Mateus", "Marcos", "João"], answer: "Lucas", verse: "Lucas 2:11" },
+  { question: "Este livro contém o versículo: 'Deus amou o mundo de tal maneira.' Qual é o livro?", options: ["João", "Lucas", "Atos", "Romanos"], answer: "João", verse: "João 3:16" },
+  { question: "Este livro contém o versículo: 'Recebereis poder ao descer o Espírito.' Qual é o livro?", options: ["Atos", "Romanos", "1 Coríntios", "Efésios"], answer: "Atos", verse: "Atos 1:8" },
+  { question: "Este livro contém o versículo: 'Todas as coisas cooperam para o bem.' Qual é o livro?", options: ["Romanos", "1 Coríntios", "Efésios", "Filipenses"], answer: "Romanos", verse: "Romanos 8:28" },
+  { question: "Este livro contém o versículo: 'O amor é paciente, é bondoso.' Qual é o livro?", options: ["1 Coríntios", "2 Coríntios", "Gálatas", "Efésios"], answer: "1 Coríntios", verse: "1 Coríntios 13:4" },
+  { question: "Este livro contém o versículo: 'Se alguém está em Cristo, é nova criatura.' Qual é o livro?", options: ["2 Coríntios", "1 Coríntios", "Gálatas", "Efésios"], answer: "2 Coríntios", verse: "2 Coríntios 5:17" },
+  { question: "Este livro contém o versículo: 'O fruto do Espírito é amor, alegria, paz.' Qual é o livro?", options: ["Gálatas", "Efésios", "Filipenses", "Colossenses"], answer: "Gálatas", verse: "Gálatas 5:22" },
+  { question: "Este livro contém o versículo: 'Pela graça sois salvos, por meio da fé.' Qual é o livro?", options: ["Efésios", "Gálatas", "Filipenses", "Colossenses"], answer: "Efésios", verse: "Efésios 2:8" },
+  { question: "Este livro contém o versículo: 'Tudo posso naquele que me fortalece.' Qual é o livro?", options: ["Filipenses", "Colossenses", "1 Tessalonicenses", "Hebreus"], answer: "Filipenses", verse: "Filipenses 4:13" },
+  { question: "Este livro contém o versículo: 'Tudo quanto fizerdes, fazei-o de coração.' Qual é o livro?", options: ["Colossenses", "Filipenses", "Efésios", "1 Tessalonicenses"], answer: "Colossenses", verse: "Colossenses 3:23" },
+  { question: "Este livro contém o versículo: 'Regozijai-vos sempre. Orai sem cessar.' Qual é o livro?", options: ["1 Tessalonicenses", "2 Tessalonicenses", "Filipenses", "Colossenses"], answer: "1 Tessalonicenses", verse: "1 Tessalonicenses 5:16-18" },
+  { question: "Este livro contém o versículo: 'O Senhor é fiel; ele vos guardará.' Qual é o livro?", options: ["2 Tessalonicenses", "1 Tessalonicenses", "1 Timóteo", "Tito"], answer: "2 Tessalonicenses", verse: "2 Tessalonicenses 3:3" },
+  { question: "Este livro contém o versículo: 'Ninguém despreze a tua mocidade.' Qual é o livro?", options: ["1 Timóteo", "2 Timóteo", "Tito", "Filemom"], answer: "1 Timóteo", verse: "1 Timóteo 4:12" },
+  { question: "Este livro contém o versículo: 'Toda Escritura é inspirada por Deus.' Qual é o livro?", options: ["2 Timóteo", "1 Timóteo", "Tito", "Hebreus"], answer: "2 Timóteo", verse: "2 Timóteo 3:16" },
+  { question: "Este livro contém o versículo: 'A graça de Deus traz salvação.' Qual é o livro?", options: ["Tito", "Filemom", "Hebreus", "Tiago"], answer: "Tito", verse: "Tito 2:11" },
+  { question: "Este livro contém o versículo: 'Oro para que a comunhão da tua fé seja eficaz.' Qual é o livro?", options: ["Filemom", "Tito", "Hebreus", "Tiago"], answer: "Filemom", verse: "Filemom 1:6" },
+  { question: "Este livro contém o versículo: 'A fé é a certeza de coisas que se esperam.' Qual é o livro?", options: ["Hebreus", "Tiago", "1 Pedro", "1 João"], answer: "Hebreus", verse: "Hebreus 11:1" },
+  { question: "Este livro contém o versículo: 'Tornai-vos praticantes da palavra.' Qual é o livro?", options: ["Tiago", "Hebreus", "1 Pedro", "2 Pedro"], answer: "Tiago", verse: "Tiago 1:22" },
+  { question: "Este livro contém o versículo: 'Lançai sobre ele toda a vossa ansiedade.' Qual é o livro?", options: ["1 Pedro", "2 Pedro", "Tiago", "1 João"], answer: "1 Pedro", verse: "1 Pedro 5:7" },
+  { question: "Este livro contém o versículo: 'A profecia veio pelo Espírito Santo.' Qual é o livro?", options: ["2 Pedro", "1 Pedro", "1 João", "Judas"], answer: "2 Pedro", verse: "2 Pedro 1:21" },
+  { question: "Este livro contém o versículo: 'Quem não ama não conhece a Deus.' Qual é o livro?", options: ["1 João", "2 João", "3 João", "Judas"], answer: "1 João", verse: "1 João 4:8" },
+  { question: "Este livro contém o versículo: 'O amor é que andemos segundo os seus mandamentos.' Qual é o livro?", options: ["2 João", "1 João", "3 João", "Judas"], answer: "2 João", verse: "2 João 1:6" },
+  { question: "Este livro contém o versículo: 'Meus filhos andam na verdade.' Qual é o livro?", options: ["3 João", "2 João", "1 João", "Judas"], answer: "3 João", verse: "3 João 1:4" },
+  { question: "Este livro contém o versículo: 'Edificai-vos sobre a vossa fé.' Qual é o livro?", options: ["Judas", "1 João", "2 João", "Hebreus"], answer: "Judas", verse: "Judas 1:20" },
+  { question: "Este livro contém o versículo: 'Deus enxugará dos olhos toda lágrima.' Qual é o livro?", options: ["Apocalipse", "Hebreus", "1 João", "Judas"], answer: "Apocalipse", verse: "Apocalipse 21:4" },
+  { question: "Este livro contém o versículo: 'Não to mandei eu? Esforça-te.' Qual é o livro?", options: ["Josué", "Deuteronômio", "Juízes", "1 Samuel"], answer: "Josué", verse: "Josué 1:9" },
+  { question: "Este livro contém o versículo: 'O Senhor é a minha luz e salvação.' Qual é o livro?", options: ["Salmos", "Isaías", "Provérbios", "Jeremias"], answer: "Salmos", verse: "Salmos 27:1" },
+  { question: "Este livro contém o versículo: 'O temor do Senhor é o princípio da sabedoria.' Qual é o livro?", options: ["Provérbios", "Eclesiastes", "Salmos", "Jó"], answer: "Provérbios", verse: "Provérbios 9:10" },
+  { question: "Este livro contém o versículo: 'Um Salvador nasceu em Belém.' Qual é o livro?", options: ["Miquéias", "Isaías", "Jeremias", "Zacarias"], answer: "Miquéias", verse: "Miquéias 5:2" },
+  { question: "Este livro contém o versículo: 'Eis que estou à porta e bato.' Qual é o livro?", options: ["Apocalipse", "João", "Mateus", "Hebreus"], answer: "Apocalipse", verse: "Apocalipse 3:20" },
+  { question: "Este livro contém o versículo: 'O justo viverá pela fé.' Qual é o livro?", options: ["Habacuque", "Romanos", "Gálatas", "Hebreus"], answer: "Habacuque", verse: "Habacuque 2:4" },
+  { question: "Este livro contém o versículo: 'A tua palavra é lâmpada para os meus pés.' Qual é o livro?", options: ["Salmos", "Provérbios", "Isaías", "Jeremias"], answer: "Salmos", verse: "Salmos 119:105" },
+	{ question: "Este livro contém o versículo: 'Buscai primeiro o reino de Deus.' Qual é o livro?", options: ["Mateus", "Lucas", "Marcos", "João"], answer: "Mateus", verse: "Mateus 6:33" },
+  { question: "Este livro contém o versículo: 'O Senhor é compassivo e misericordioso.' Qual é o livro?", options: ["Salmos", "Êxodo", "Isaías", "Jeremias"], answer: "Salmos", verse: "Salmos 103:8" },
+  { question: "Este livro contém o versículo: 'Eu sou a ressurreição e a vida.' Qual é o livro?", options: ["João", "Mateus", "Lucas", "Marcos"], answer: "João", verse: "João 11:25" },
+  { question: "Este livro contém o versículo: 'Clama a mim, e responder-te-ei.' Qual é o livro?", options: ["Jeremias", "Isaías", "Salmos", "Provérbios"], answer: "Jeremias", verse: "Jeremias 33:3" },
+
+
+  { question: "Este livro contém o versículo: 'Faça-me uma arca de madeira de acácia.' Qual é o livro?", options: ["Êxodo", "Gênesis", "Levítico", "Números"], answer: "Êxodo", verse: "Êxodo 25:10" },
+  { question: "Este livro contém o versículo: 'Amarás o teu próximo como a ti mesmo.' Qual é o livro?", options: ["Levítico", "Deuteronômio", "Êxodo", "Números"], answer: "Levítico", verse: "Levítico 19:18" },
+  { question: "Este livro contém o versículo: 'Não murmureis contra o Senhor.' Qual é o livro?", options: ["Números", "Levítico", "Êxodo", "Deuteronômio"], answer: "Números", verse: "Números 14:27" },
+  { question: "Este livro contém o versículo: 'Amarás o Senhor com todo o coração.' Qual é o livro?", options: ["Deuteronômio", "Êxodo", "Josué", "Levítico"], answer: "Deuteronômio", verse: "Deuteronômio 6:5" },
+  { question: "Este livro contém o versículo: 'O Senhor pelejará por vós.' Qual é o livro?", options: ["Josué", "Juízes", "Deuteronômio", "1 Samuel"], answer: "Josué", verse: "Josué 23:10" },
+  { question: "Este livro contém o versículo: 'Naqueles dias não havia rei em Israel.' Qual é o livro?", options: ["Juízes", "Josué", "Rute", "1 Samuel"], answer: "Juízes", verse: "Juízes 21:25" },
+  { question: "Este livro contém o versículo: 'Teu povo será meu povo.' Qual é o livro?", options: ["Rute", "Ester", "1 Samuel", "Neemias"], answer: "Rute", verse: "Rute 1:16" },
+  { question: "Este livro contém o versículo: 'O Senhor me ungiu rei.' Qual é o livro?", options: ["1 Samuel", "2 Samuel", "1 Reis", "Juízes"], answer: "1 Samuel", verse: "1 Samuel 16:13" },
+  { question: "Este livro contém o versículo: 'O Senhor é minha força.' Qual é o livro?", options: ["2 Samuel", "1 Samuel", "Salmos", "1 Crônicas"], answer: "2 Samuel", verse: "2 Samuel 22:2" },
+  { question: "Este livro contém o versículo: 'Construí um templo ao teu nome.' Qual é o livro?", options: ["1 Reis", "2 Reis", "1 Crônicas", "2 Crônicas"], answer: "1 Reis", verse: "1 Reis 8:20" },
+  { question: "Este livro contém o versículo: 'O Senhor é meu escudo.' Qual é o livro?", options: ["2 Reis", "1 Reis", "Salmos", "Isaías"], answer: "2 Reis", verse: "2 Reis 19:34" },
+  { question: "Este livro contém o versículo: 'Louvai ao Senhor todas as nações.' Qual é o livro?", options: ["1 Crônicas", "2 Crônicas", "Salmos", "Esdras"], answer: "1 Crônicas", verse: "1 Crônicas 16:8" },
+  { question: "Este livro contém o versículo: 'O Senhor ouviu minha oração.' Qual é o livro?", options: ["2 Crônicas", "1 Crônicas", "Neemias", "Esdras"], answer: "2 Crônicas", verse: "2 Crônicas 7:12" },
+  { question: "Este livro contém o versículo: 'Restaurai o templo do Senhor.' Qual é o livro?", options: ["Esdras", "Neemias", "Ester", "2 Crônicas"], answer: "Esdras", verse: "Esdras 1:3" },
+  { question: "Este livro contém o versículo: 'Reconstruí os muros de Jerusalém.' Qual é o livro?", options: ["Neemias", "Esdras", "Ester", "Zacarias"], answer: "Neemias", verse: "Neemias 6:15" },
+  { question: "Este livro contém o versículo: 'O Senhor livrou seu povo.' Qual é o livro?", options: ["Ester", "Rute", "Neemias", "Esdras"], answer: "Ester", verse: "Ester 8:17" },
+  { question: "Este livro contém o versículo: 'Sei que meu Redentor vive.' Qual é o livro?", options: ["Jó", "Salmos", "Provérbios", "Eclesiastes"], answer: "Jó", verse: "Jó 19:25" },
+  { question: "Este livro contém o versículo: 'Bendize, ó minha alma, ao Senhor.' Qual é o livro?", options: ["Salmos", "Provérbios", "Isaías", "Jeremias"], answer: "Salmos", verse: "Salmos 103:1" },
+  { question: "Este livro contém o versículo: 'O temor do Senhor é o princípio do saber.' Qual é o livro?", options: ["Provérbios", "Eclesiastes", "Salmos", "Jó"], answer: "Provérbios", verse: "Provérbios 1:7" },
+  { question: "Este livro contém o versículo: 'Tudo tem o seu tempo determinado.' Qual é o livro?", options: ["Eclesiastes", "Provérbios", "Salmos", "Cânticos"], answer: "Eclesiastes", verse: "Eclesiastes 3:1" },
+  { question: "Este livro contém o versículo: 'Tu és toda formosa, minha amada.' Qual é o livro?", options: ["Cânticos", "Salmos", "Provérbios", "Isaías"], answer: "Cânticos", verse: "Cânticos 4:7" },
+  { question: "Este livro contém o versículo: 'Eis que a virgem conceberá.' Qual é o livro?", options: ["Isaías", "Jeremias", "Ezequiel", "Miquéias"], answer: "Isaías", verse: "Isaías 7:14" },
+  { question: "Este livro contém o versículo: 'Clama a mim, e responder-te-ei.' Qual é o livro?", options: ["Jeremias", "Isaías", "Salmos", "Ezequiel"], answer: "Jeremias", verse: "Jeremias 33:3" },
+  { question: "Este livro contém o versículo: 'Choro pode durar uma noite.' Qual é o livro?", options: ["Salmos", "Jeremias", "Lamentações", "Isaías"], answer: "Salmos", verse: "Salmos 30:5" },
+  { question: "Este livro contém o versículo: 'Porei em vós o meu Espírito.' Qual é o livro?", options: ["Ezequiel", "Isaías", "Joel", "Daniel"], answer: "Ezequiel", verse: "Ezequiel 36:27" },
+  { question: "Este livro contém o versículo: 'Vi um grande trono branco.' Qual é o livro?", options: ["Apocalipse", "Daniel", "Ezequiel", "Isaías"], answer: "Apocalipse", verse: "Apocalipse 20:11" },
+  { question: "Este livro contém o versículo: 'Voltai-vos para mim.' Qual é o livro?", options: ["Oseias", "Joel", "Amós", "Miquéias"], answer: "Oseias", verse: "Oseias 14:1" },
+  { question: "Este livro contém o versículo: 'Voltem ao Senhor, pois ele é misericordioso.' Qual é o livro?", options: ["Joel", "Oseias", "Amós", "Jonas"], answer: "Joel", verse: "Joel 2:13" },
+  { question: "Este livro contém o versículo: 'Preparemo-nos para o dia do Senhor.' Qual é o livro?", options: ["Amós", "Miquéias", "Oseias", "Joel"], answer: "Amós", verse: "Amós 4:12" },
+  { question: "Este livro contém o versículo: 'A soberba precede a ruína.' Qual é o livro?", options: ["Provérbios", "Eclesiastes", "Salmos", "Jó"], answer: "Provérbios", verse: "Provérbios 16:18" },
+  { question: "Este livro contém o versículo: 'Fui lançado no ventre do peixe.' Qual é o livro?", options: ["Jonas", "Obadias", "Miquéias", "Naum"], answer: "Jonas", verse: "Jonas 2:1" },
+  { question: "Este livro contém o versículo: 'O Senhor deseja justiça e verdade.' Qual é o livro?", options: ["Miquéias", "Amós", "Jonas", "Oseias"], answer: "Miquéias", verse: "Miquéias 6:8" },
+  { question: "Este livro contém o versículo: 'O Senhor é tardio em irar-se.' Qual é o livro?", options: ["Naum", "Habacuque", "Sofonias", "Joel"], answer: "Naum", verse: "Naum 1:3" },
+  { question: "Este livro contém o versículo: 'O justo viverá pela sua fé.' Qual é o livro?", options: ["Habacuque", "Romanos", "Sofonias", "Naum"], answer: "Habacuque", verse: "Habacuque 2:4" },
+  { question: "Este livro contém o versículo: 'Buscai o Senhor, vós todos.' Qual é o livro?", options: ["Sofonias", "Habacuque", "Zacarias", "Malaquias"], answer: "Sofonias", verse: "Sofonias 2:3" },
+  { question: "Este livro contém o versículo: 'Sede fortes no trabalho do Senhor.' Qual é o livro?", options: ["Ageu", "Zacarias", "Malaquias", "Sofonias"], answer: "Ageu", verse: "Ageu 2:4" },
+  { question: "Este livro contém o versículo: 'O Senhor enviará seu Messias.' Qual é o livro?", options: ["Zacarias", "Malaquias", "Isaías", "Ageu"], answer: "Zacarias", verse: "Zacarias 9:9" },
+  { question: "Este livro contém o versículo: 'A vós enviarei Elias, o profeta.' Qual é o livro?", options: ["Malaquias", "Zacarias", "Ageu", "Isaías"], answer: "Malaquias", verse: "Malaquias 4:5" },
+  { question: "Este livro contém o versículo: 'Não julgueis para não serdes julgados.' Qual é o livro?", options: ["Mateus", "Lucas", "Marcos", "João"], answer: "Mateus", verse: "Mateus 7:1" },
+  { question: "Este livro contém o versículo: 'Vai e não peques mais.' Qual é o livro?", options: ["João", "Mateus", "Lucas", "Marcos"], answer: "João", verse: "João 8:11" },
+  { question: "Este livro contém o versículo: 'O Filho do Homem será traído.' Qual é o livro?", options: ["Marcos", "Mateus", "Lucas", "João"], answer: "Marcos", verse: "Marcos 14:21" },
+  { question: "Este livro contém o versículo: 'Meu Pai, se possível, passe de mim este cálice.' Qual é o livro?", options: ["Mateus", "Marcos", "Lucas", "João"], answer: "Mateus", verse: "Mateus 26:39" },
+  { question: "Este livro contém o versículo: 'Eis o Cordeiro de Deus.' Qual é o livro?", options: ["João", "Mateus", "Lucas", "Atos"], answer: "João", verse: "João 1:29" },
+  { question: "Este livro contém o versículo: 'O Espírito desceu como pomba.' Qual é o livro?", options: ["Lucas", "Mateus", "Marcos", "João"], answer: "Lucas", verse: "Lucas 3:22" },
+  { question: "Este livro contém o versículo: 'Cumpriu-se a Escritura.' Qual é o livro?", options: ["Atos", "Romanos", "João", "Mateus"], answer: "Atos", verse: "Atos 1:16" },
+  { question: "Este livro contém o versículo: 'Não há justo, nem um sequer.' Qual é o livro?", options: ["Romanos", "1 Coríntios", "Gálatas", "Efésios"], answer: "Romanos", verse: "Romanos 3:10" },
+  { question: "Este livro contém o versículo: 'Fomos reconciliados com Deus.' Qual é o livro?", options: ["2 Coríntios", "1 Coríntios", "Romanos", "Efésios"], answer: "2 Coríntios", verse: "2 Coríntios 5:18" },
+  { question: "Este livro contém o versículo: 'Andai pelo Espírito.' Qual é o livro?", options: ["Gálatas", "Efésios", "Filipenses", "Romanos"], answer: "Gálatas", verse: "Gálatas 5:16" },
+  { question: "Este livro contém o versículo: 'Somos membros do corpo de Cristo.' Qual é o livro?", options: ["Efésios", "Gálatas", "Colossenses", "1 Coríntios"], answer: "Efésios", verse: "Efésios 5:30" },
+  { question: "Este livro contém o versículo: 'Alegrai-vos na esperança.' Qual é o livro?", options: ["Filipenses", "Colossenses", "1 Tessalonicenses", "Romanos"], answer: "Filipenses", verse: "Filipenses 1:20" },
+  { question: "Este livro contém o versículo: 'Cristo é o cabeça da igreja.' Qual é o livro?", options: ["Colossenses", "Efésios", "Filipenses", "1 Coríntios"], answer: "Colossenses", verse: "Colossenses 1:18" },
+  { question: "Este livro contém o versículo: 'Deus é o nosso refúgio.' Qual é o livro?", options: ["Salmos", "Isaías", "Jeremias", "Provérbios"], answer: "Salmos", verse: "Salmos 46:1" },
+  { question: "Este livro contém o versículo: 'Vigiai e orai.' Qual é o livro?", options: ["Marcos", "Mateus", "Lucas", "João"], answer: "Marcos", verse: "Marcos 13:33" },
+  { question: "Este livro contém o versículo: 'Eu sou a videira verdadeira.' Qual é o livro?", options: ["João", "Mateus", "Lucas", "Marcos"], answer: "João", verse: "João 15:1" },
+  { question: "Este livro contém o versículo: 'O Senhor está perto dos que o invocam.' Qual é o livro?", options: ["Salmos", "Provérbios", "Isaías", "Jeremias"], answer: "Salmos", verse: "Salmos 145:18" },
+  { question: "Este livro contém o versículo: 'A palavra de Deus é viva e eficaz.' Qual é o livro?", options: ["Hebreus", "2 Timóteo", "Tiago", "1 Pedro"], answer: "Hebreus", verse: "Hebreus 4:12" },
+  { question: "Este livro contém o versículo: 'Seja-vos toda a amargura afastada.' Qual é o livro?", options: ["Efésios", "Gálatas", "Colossenses", "Filipenses"], answer: "Efésios", verse: "Efésios 4:31" },
+  { question: "Este livro contém o versículo: 'Guarda a tua língua do mal.' Qual é o livro?", options: ["Salmos", "Provérbios", "Tiago", "1 Pedro"], answer: "Salmos", verse: "Salmos 34:13" },
+  { question: "Este livro contém o versículo: 'O Senhor é minha rocha.' Qual é o livro?", options: ["Salmos", "Isaías", "Jeremias", "Provérbios"], answer: "Salmos", verse: "Salmos 18:2" },
+  { question: "Este livro contém o versículo: 'Eu sou o pão da vida.' Qual é o livro?", options: ["João", "Mateus", "Lucas", "Marcos"], answer: "João", verse: "João 6:35" },
+  { question: "Este livro contém o versículo: 'A vós foi dado conhecer os mistérios.' Qual é o livro?", options: ["Mateus", "Marcos", "Lucas", "João"], answer: "Mateus", verse: "Mateus 13:11" },
+  { question: "Este livro contém o versículo: 'O Senhor é meu ajudador.' Qual é o livro?", options: ["Hebreus", "Salmos", "Isaías", "Jeremias"], answer: "Hebreus", verse: "Hebreus 13:6" },
+  { question: "Este livro contém o versículo: 'Confessai os vossos pecados uns aos outros.' Qual é o livro?", options: ["Tiago", "1 João", "1 Pedro", "Hebreus"], answer: "Tiago", verse: "Tiago 5:16" },
+  { question: "Este livro contém o versículo: 'Nascemos de novo pela palavra.' Qual é o livro?", options: ["1 Pedro", "Tiago", "1 João", "2 Pedro"], answer: "1 Pedro", verse: "1 Pedro 1:23" },
+  { question: "Este livro contém o versículo: 'Guarda-nos para a vinda do Senhor.' Qual é o livro?", options: ["2 Pedro", "1 Pedro", "1 João", "Judas"], answer: "2 Pedro", verse: "2 Pedro 3:14" },
+  { question: "Este livro contém o versículo: 'Deus é luz, e nele não há trevas.' Qual é o livro?", options: ["1 João", "2 João", "Tiago", "Judas"], answer: "1 João", verse: "1 João 1:5" },
+  { question: "Este livro contém o versículo: 'Andai na verdade.' Qual é o livro?", options: ["2 João", "1 João", "3 João", "Judas"], answer: "2 João", verse: "2 João 1:4" },
+  { question: "Este livro contém o versículo: 'Colaboradores da verdade.' Qual é o livro?", options: ["3 João", "2 João", "1 João", "Judas"], answer: "3 João", verse: "3 João 1:8" },
+  { question: "Este livro contém o versículo: 'Guardai-vos na fé.' Qual é o livro?", options: ["Judas", "1 João", "2 João", "Tiago"], answer: "Judas", verse: "Judas 1:21" },
+  { question: "Este livro contém o versículo: 'Eis que venho sem demora.' Qual é o livro?", options: ["Apocalipse", "Hebreus", "1 João", "Judas"], answer: "Apocalipse", verse: "Apocalipse 22:12" },
+  { question: "Este livro contém o versículo: 'O Senhor é minha fortaleza.' Qual é o livro?", options: ["Salmos", "Isaías", "Jeremias", "Provérbios"], answer: "Salmos", verse: "Salmos 28:7" },
+  { question: "Este livro contém o versículo: 'O Senhor é meu pastor.' Qual é o livro?", options: ["Salmos", "Isaías", "Jeremias", "Ezequiel"], answer: "Salmos", verse: "Salmos 23:1" },
+  { question: "Este livro contém o versículo: 'Alegra-te, jovem, na tua mocidade.' Qual é o livro?", options: ["Eclesiastes", "Provérbios", "Salmos", "Cânticos"], answer: "Eclesiastes", verse: "Eclesiastes 11:9" },
+  { question: "Este livro contém o versículo: 'O Senhor é clemente e misericordioso.' Qual é o livro?", options: ["Salmos", "Êxodo", "Isaías", "Jeremias"], answer: "Salmos", verse: "Salmos 111:4" },
+  { question: "Este livro contém o versículo: 'Eu sou a luz do mundo.' Qual é o livro?", options: ["João", "Mateus", "Lucas", "Marcos"], answer: "João", verse: "João 8:12" },
+  { question: "Este livro contém o versículo: 'O Senhor é minha bandeira.' Qual é o livro?", options: ["Êxodo", "Salmos", "Números", "Josué"], answer: "Êxodo", verse: "Êxodo 17:15" },
+  { question: "Este livro contém o versículo: 'O Senhor é meu libertador.' Qual é o livro?", options: ["Salmos", "Isaías", "Jeremias", "2 Samuel"], answer: "Salmos", verse: "Salmos 18:2" },
+  { question: "Este livro contém o versículo: 'Tudo é possível ao que crê.' Qual é o livro?", options: ["Marcos", "Mateus", "Lucas", "João"], answer: "Marcos", verse: "Marcos 9:23" },
+  { question: "Este livro contém o versículo: 'O Senhor é meu socorro.' Qual é o livro?", options: ["Salmos", "Isaías", "Jeremias", "Hebreus"], answer: "Salmos", verse: "Salmos 121:2" },
+  { question: "Este livro contém o versículo: 'Buscai-me e vivereis.' Qual é o livro?", options: ["Amós", "Oseias", "Miquéias", "Joel"], answer: "Amós", verse: "Amós 5:4" },
+  { question: "Este livro contém o versículo: 'O Senhor é minha porção.' Qual é o livro?", options: ["Salmos", "Lamentações", "Jeremias", "Isaías"], answer: "Salmos", verse: "Salmos 119:57" },
+  { question: "Este livro contém o versículo: 'Eu sou a porta das ovelhas.' Qual é o livro?", options: ["João", "Mateus", "Lucas", "Marcos"], answer: "João", verse: "João 10:7" },
+  { question: "Este livro contém o versículo: 'O Senhor é meu juiz.' Qual é o livro?", options: ["Isaías", "Salmos", "Jeremias", "Daniel"], answer: "Isaías", verse: "Isaías 33:22" },
+  { question: "Este livro contém o versículo: 'O Senhor é meu rei.' Qual é o livro?", options: ["Salmos", "Isaías", "Jeremias", "Zacarias"], answer: "Salmos", verse: "Salmos 10:16" },
+  { question: "Este livro contém o versículo: 'O Senhor é meu Salvador.' Qual é o livro?", options: ["Isaías", "Salmos", "Jeremias", "Zacarias"], answer: "Isaías", verse: "Isaías 12:2" },
+
+  { question: "Este livro contém o versículo: 'Guardai-vos de fazer a vossa justiça diante dos homens.' Qual é o livro?", options: ["Mateus", "Lucas", "Marcos", "João"], answer: "Mateus", verse: "Mateus 6:1" },
+  { question: "Este livro contém o versículo: 'O reino de Deus está dentro de vós.' Qual é o livro?", options: ["Lucas", "João", "Mateus", "Marcos"], answer: "Lucas", verse: "Lucas 17:21" },
+  { question: "Este livro contém o versículo: 'Eu sou a ressurreição e a vida.' Qual é o livro?", options: ["João", "Mateus", "Lucas", "Marcos"], answer: "João", verse: "João 11:25" },
+  { question: "Este livro contém o versículo: 'Arrependei-vos, pois está próximo o reino dos céus.' Qual é o livro?", options: ["Marcos", "Mateus", "Lucas", "João"], answer: "Marcos", verse: "Marcos 1:15" },
+  { question: "Este livro contém o versículo: 'O Senhor é minha luz e salvação.' Qual é o livro?", options: ["Salmos", "Isaías", "Provérbios", "Jeremias"], answer: "Salmos", verse: "Salmos 27:1" },
+  { question: "Este livro contém o versículo: 'O Senhor é grande em Sião.' Qual é o livro?", options: ["Salmos", "Isaías", "Zacarias", "Jeremias"], answer: "Salmos", verse: "Salmos 99:2" },
+  { question: "Este livro contém o versículo: 'O caminho do justo é reto.' Qual é o livro?", options: ["Isaías", "Provérbios", "Salmos", "Jeremias"], answer: "Isaías", verse: "Isaías 26:7" },
+  { question: "Este livro contém o versículo: 'O Senhor é minha herança.' Qual é o livro?", options: ["Lamentações", "Salmos", "Jeremias", "Ezequiel"], answer: "Lamentações", verse: "Lamentações 3:24" },
+  { question: "Este livro contém o versículo: 'Vós sois o sal da terra.' Qual é o livro?", options: ["Mateus", "Marcos", "Lucas", "João"], answer: "Mateus", verse: "Mateus 5:13" },
+  { question: "Este livro contém o versículo: 'O Espírito do Senhor está sobre mim.' Qual é o livro?", options: ["Lucas", "Mateus", "Marcos", "Atos"], answer: "Lucas", verse: "Lucas 4:18" },
+  { question: "Este livro contém o versículo: 'Eu sou o bom pastor.' Qual é o livro?", options: ["João", "Mateus", "Lucas", "Marcos"], answer: "João", verse: "João 10:11" },
+  { question: "Este livro contém o versículo: 'Quem crer em mim terá a vida eterna.' Qual é o livro?", options: ["João", "Mateus", "Lucas", "Atos"], answer: "João", verse: "João 6:47" },
+  { question: "Este livro contém o versículo: 'A fé sem obras é morta.' Qual é o livro?", options: ["Tiago", "Hebreus", "1 Pedro", "1 João"], answer: "Tiago", verse: "Tiago 2:26" },
+  { question: "Este livro contém o versículo: 'Sede santos, porque eu sou santo.' Qual é o livro?", options: ["1 Pedro", "Hebreus", "Tiago", "1 João"], answer: "1 Pedro", verse: "1 Pedro 1:16" },
+  { question: "Este livro contém o versículo: 'O Senhor é longânimo e grande em misericórdia.' Qual é o livro?", options: ["Salmos", "Êxodo", "Números", "Deuteronômio"], answer: "Números", verse: "Números 14:18" },
+  { question: "Este livro contém o versículo: 'Escolhei hoje a quem servireis.' Qual é o livro?", options: ["Josué", "Juízes", "Deuteronômio", "1 Samuel"], answer: "Josué", verse: "Josué 24:15" },
+  { question: "Este livro contém o versículo: 'O Senhor é minha bandeira.' Qual é o livro?", options: ["Êxodo", "Números", "Salmos", "Josué"], answer: "Êxodo", verse: "Êxodo 17:15" },
+  { question: "Este livro contém o versículo: 'A palavra do Senhor permanece para sempre.' Qual é o livro?", options: ["1 Pedro", "Hebreus", "Tiago", "1 João"], answer: "1 Pedro", verse: "1 Pedro 1:25" },
+  { question: "Este livro contém o versículo: 'O Senhor é meu cântico.' Qual é o livro?", options: ["Salmos", "Êxodo", "Isaías", "Jeremias"], answer: "Êxodo", verse: "Êxodo 15:2" },
+  { question: "Este livro contém o versículo: 'O Senhor é minha confiança.' Qual é o livro?", options: ["Salmos", "Provérbios", "Isaías", "Jeremias"], answer: "Salmos", verse: "Salmos 71:5" },
+
+
+
+
+   ];
+
+    // Dados para o Jogo da Memória
+    const cardsData = [
+      { id: 1, content: "Davi", match: "Golias" },
+      { id: 2, content: "Golias", match: "Davi" },
+      { id: 3, content: "Moisés", match: "Cajado" },
+      { id: 4, content: "Cajado", match: "Moisés" },
+      { id: 5, content: "Noé", match: "Arca" },
+      { id: 6, content: "Arca", match: "Noé" },
+      { id: 7, content: "Jesus", match: "Cruz" },
+      { id: 8, content: "Cruz", match: "Jesus" },
+      { id: 9, content: "Abraão", match: "Isaque" },
+      { id: 10, content: "Isaque", match: "Abraão" },
+      { id: 11, content: "José", match: "Sonhos" },
+      { id: 12, content: "Sonhos", match: "José" },
+      { id: 13, content: "Pão", match: "Peixe" },
+      { id: 14, content: "Peixe", match: "Pão" },
+      { id: 15, content: "Daniel", match: "Leões" },
+      { id: 16, content: "Leões", match: "Daniel" },
+    ];
+
+    // Dados para o Jogo Tap the Bible Items
+    const itemTypes = [
+      { name: 'Pergaminho', color: '#8b4513', emoji: '📜', desc: 'Escrituras' },
+      { name: 'Arca', color: '#a0522d', emoji: '🛶', desc: 'Noé' },
+      { name: 'Cruz', color: '#4b0082', emoji: '✝️', desc: 'Jesus' },
+      { name: 'Harpa', color: '#ffd700', emoji: '🎻', desc: 'Davi' },
+      { name: 'Estrela', color: '#ffeb3b', emoji: '⭐', desc: 'Belém' },
+      { name: 'Pomba', color: '#e0ffff', emoji: '🕊️', desc: 'Espírito Santo' },
+      { name: 'Coroa', color: '#b8860b', emoji: '👑', desc: 'Rei dos Reis' },
+      { name: 'Lâmpada', color: '#ff4500', emoji: '💡', desc: 'Palavra de Deus' },
+    ];
+
     const shuffleArray = (array) => [...array].sort(() => Math.random() - 0.5);
 
-    const QuizApp = () => {
+    // Componente para o Jogo de Enigmas Bíblicos
+    const RiddleGame = ({ onBack }) => {
+      const [riddles, setRiddles] = React.useState(() => {
+        const saved = localStorage.getItem('riddleRiddles');
+        return saved ? JSON.parse(saved) : [];
+      });
+      const [currentRiddleIndex, setCurrentRiddleIndex] = React.useState(() => parseInt(localStorage.getItem('riddleIndex')) || 0);
+      const [correctAnswers, setCorrectAnswers] = React.useState(() => parseInt(localStorage.getItem('riddleCorrect')) || 0);
+      const [gameState, setGameState] = React.useState('playing');
+      const [timeLeft, setTimeLeft] = React.useState(30);
+      const [answers, setAnswers] = React.useState(() => {
+        const saved = localStorage.getItem('riddleAnswers');
+        return saved ? JSON.parse(saved) : [];
+      });
+      const [feedback, setFeedback] = React.useState(null);
+      const [error, setError] = React.useState(null);
+      const gameRef = React.useRef(null);
+
+      React.useEffect(() => {
+        try {
+          localStorage.setItem('riddleIndex', currentRiddleIndex);
+          localStorage.setItem('riddleCorrect', correctAnswers);
+          localStorage.setItem('riddleRiddles', JSON.stringify(riddles));
+          localStorage.setItem('riddleAnswers', JSON.stringify(answers));
+        } catch (err) {
+          setError('Erro ao salvar progresso: ' + err.message);
+        }
+      }, [currentRiddleIndex, correctAnswers, riddles, answers]);
+
+      const generateRiddles = () => {
+        return shuffleArray(riddleQuestions);
+      };
+
+      React.useEffect(() => {
+        if (riddles.length === 0) {
+          try {
+            const newRiddles = generateRiddles();
+            setRiddles(newRiddles);
+          } catch (err) {
+            setError("Erro ao gerar enigmas: " + err.message);
+          }
+        }
+      }, []);
+
+      React.useEffect(() => {
+        if (gameState !== 'playing') return;
+        const timer = setInterval(() => {
+          setTimeLeft((prev) => {
+            if (prev <= 1) {
+              clearInterval(timer);
+              setGameState('gameOver');
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+        return () => clearInterval(timer);
+      }, [currentRiddleIndex, gameState]);
+
+      React.useEffect(() => {
+        if (gameState === 'gameOver' && gameRef.current) {
+          gameRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, [gameState]);
+
+      const handleAnswer = (option) => {
+        try {
+          const currentRiddle = riddles[currentRiddleIndex];
+          const isCorrect = option === currentRiddle.answer;
+          const newAnswer = {
+            question: currentRiddle.question,
+            selected: option,
+            correct: currentRiddle.answer,
+            verse: currentRiddle.verse,
+            isCorrect
+          };
+          setAnswers([...answers, newAnswer]);
+
+          setFeedback({
+            selectedOption: option,
+            correctOption: currentRiddle.answer,
+            isCorrect
+          });
+
+          if (isCorrect) {
+            setCorrectAnswers(correctAnswers + 1);
+            setTimeout(() => {
+              if (currentRiddleIndex + 1 >= riddles.length) {
+                setGameState('gameOver');
+              } else {
+                setCurrentRiddleIndex(currentRiddleIndex + 1);
+                setTimeLeft(30);
+                setFeedback(null);
+              }
+            }, 1000);
+          } else {
+            setTimeout(() => {
+              setGameState('gameOver');
+            }, 1000);
+          }
+        } catch (err) {
+          setError('Erro ao processar resposta: ' + err.message);
+        }
+      };
+
+      const resetGame = () => {
+        try {
+          setRiddles(generateRiddles());
+          setCurrentRiddleIndex(0);
+          setCorrectAnswers(0);
+          setGameState('playing');
+          setTimeLeft(30);
+          setAnswers([]);
+          setFeedback(null);
+          localStorage.removeItem('riddleIndex');
+          localStorage.removeItem('riddleCorrect');
+          localStorage.removeItem('riddleRiddles');
+          localStorage.removeItem('riddleAnswers');
+        } catch (err) {
+          setError('Erro ao reiniciar jogo: ' + err.message);
+        }
+      };
+
+      const enterReviewMode = () => {
+        setGameState('review');
+      };
+
+      if (error) {
+        return (
+          <div className="max-w-2xl w-full parchment-bg p-6 rounded-lg shadow-lg text-center">
+            <h1 className="text-3xl font-bold mb-4 text-blue-900">Erro</h1>
+            <p className="text-red-500">{error}</p>
+            <button
+              onClick={resetGame}
+              className="mt-4 w-full bg-yellow-500 hover:bg-yellow-600 text-blue-900 py-2 rounded transition duration-300"
+            >
+              Tentar Novamente
+            </button>
+          </div>
+        );
+      }
+
+      if (riddles.length === 0) {
+        return (
+          <div className="max-w-2xl w-full parchment-bg p-6 rounded-lg shadow-lg text-center">
+            <h1 className="text-3xl font-bold mb-4 text-blue-900">Carregando...</h1>
+          </div>
+        );
+      }
+
+      if (gameState === 'review') {
+        return (
+          <div className="max-w-2xl w-full parchment-bg p-6 rounded-lg shadow-lg">
+            <h1 className="text-3xl font-bold mb-4 text-blue-900">Revisão das Respostas</h1>
+            {answers.map((ans, idx) => (
+              <div key={idx} className="mb-4 p-4 bg-gray-100 rounded">
+                <p className="text-lg text-blue-900">{ans.question}</p>
+                <p className={ans.isCorrect ? 'text-green-600' : 'text-red-600'}>
+                  Sua resposta: {ans.selected}
+                </p>
+                <p className="text-green-600">Resposta correta: {ans.correct} ({ans.verse})</p>
+              </div>
+            ))}
+            <button
+              onClick={resetGame}
+              className="mt-4 w-full bg-yellow-500 hover:bg-yellow-600 text-blue-900 py-2 rounded transition duration-300"
+            >
+              Voltar ao Início
+            </button>
+          </div>
+        );
+      }
+
+      if (gameState === 'gameOver') {
+        return (
+          <div ref={gameRef} className="max-w-2xl w-full parchment-bg p-6 rounded-lg shadow-lg text-center">
+            <h1 className="text-3xl font-bold mb-4 text-blue-900 shake">Fim do Jogo!</h1>
+            <p className="text-xl mb-4">
+              Você acertou {correctAnswers} de {riddles.length} enigmas!
+            </p>
+            <div className="flex space-x-4">
+              <button
+                onClick={resetGame}
+                className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-blue-900 py-2 rounded transition duration-300"
+              >
+                Voltar ao Início
+              </button>
+              <button
+                onClick={enterReviewMode}
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded transition duration-300"
+              >
+                Revisar Respostas
+              </button>
+            </div>
+            <button
+              onClick={onBack}
+              className="mt-4 w-full bg-yellow-500 hover:bg-yellow-600 text-blue-900 py-2 rounded transition duration-300"
+            >
+              Voltar ao Menu
+            </button>
+            <p className="text-blue-900 mt-4">2 Coríntios 5:7 🕊️ "Vivemos por fé, e não pelo que vemos."</p>
+          </div>
+        );
+      }
+
+      const currentRiddle = riddles[currentRiddleIndex];
+      const progress = ((currentRiddleIndex + 1) / riddles.length) * 100;
+      const timeProgress = (timeLeft / 30) * 100;
+
+      return (
+        <div className="game-container">
+          <div ref={gameRef} className="max-w-2xl w-full parchment-bg p-6 rounded-lg shadow-lg">
+            <h1 className="text-3xl font-bold mb-4 text-center text-blue-900 fade-in">Jogo de Enigmas Bíblicos</h1>
+            <div className="mb-4">
+              <div className="w-full bg-gray-200 rounded-full h-2.5">
+                <div
+                  className="bg-yellow-500 h-2.5 rounded-full progress-bar"
+                  style={{ width: `${progress}%` }}
+                ></div>
+              </div>
+              <p className="text-sm text-gray-500 mt-1">
+                Enigma {currentRiddleIndex + 1} de {riddles.length}
+              </p>
+            </div>
+            <div className="flex justify-between items-center mb-4">
+              <p className="text-lg font-semibold text-blue-900">Tempo restante: {Math.ceil(timeLeft)}s</p>
+              <p className="text-lg text-blue-900">Acertos: {correctAnswers}</p>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+              <div
+                className="bg-red-500 h-2.5 rounded-full progress-bar"
+                style={{ width: `${timeProgress}%` }}
+              ></div>
+            </div>
+            <p className="text-xl mb-6 text-blue-900 fade-in">{currentRiddle.question}</p>
+            <div className="space-y-3">
+              {currentRiddle.options.map((option) => (
+                <button
+                  key={option}
+                  onClick={() => handleAnswer(option)}
+                  className={`w-full py-3 rounded transition duration-300 option ${
+                    feedback && feedback.isCorrect && option === feedback.correctOption
+                      ? 'correct'
+                      : feedback && !feedback.isCorrect && option === feedback.selectedOption
+                      ? 'wrong'
+                      : 'bg-blue-500 hover:bg-blue-600 text-white'
+                  } disabled:bg-gray-400 disabled:cursor-not-allowed`}
+                  disabled={feedback}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => setGameState('gameOver')}
+              className="mt-4 w-full bg-orange-500 hover:bg-orange-600 text-white py-2 rounded transition duration-300"
+            >
+              Finalizar Jogo
+            </button>
+            <p className="text-blue-900 mt-4">2 Coríntios 5:7 🕊️ "Vivemos por fé, e não pelo que vemos."</p>
+          </div>
+        </div>
+      );
+    };
+
+    // Componente do Quiz
+    const QuizApp = ({ onBack }) => {
       const [topic, setTopic] = React.useState(null);
       const [currentIndex, setCurrentIndex] = React.useState(() => parseInt(localStorage.getItem('quizIndex')) || 0);
       const [correctAnswers, setCorrectAnswers] = React.useState(() => parseInt(localStorage.getItem('quizCorrect')) || 0);
@@ -900,7 +1557,7 @@ const quizzes = {
         if (saved) return JSON.parse(saved);
         return [];
       });
-      const [gameState, setGameState] = React.useState('select'); // select, playing, gameOver, review
+      const [gameState, setGameState] = React.useState('select');
       const [timeLeft, setTimeLeft] = React.useState(30);
       const [answers, setAnswers] = React.useState(() => {
         const saved = localStorage.getItem('quizAnswers');
@@ -908,6 +1565,7 @@ const quizzes = {
       });
       const [error, setError] = React.useState(null);
       const [feedback, setFeedback] = React.useState(null);
+      const gameRef = React.useRef(null);
 
       React.useEffect(() => {
         try {
@@ -934,6 +1592,12 @@ const quizzes = {
         }, 1000);
         return () => clearInterval(timer);
       }, [currentIndex, gameState]);
+
+      React.useEffect(() => {
+        if (gameState === 'gameOver' && gameRef.current) {
+          gameRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, [gameState]);
 
       const startQuiz = (selectedTopic) => {
         try {
@@ -1023,12 +1687,12 @@ const quizzes = {
 
       if (error) {
         return (
-          <div className="max-w-2xl w-full bg-white p-6 rounded-lg shadow-lg text-center">
+          <div className="max-w-2xl w-full parchment-bg p-6 rounded-lg shadow-lg text-center">
             <h1 className="text-3xl font-bold mb-4 text-blue-900">Erro</h1>
             <p className="text-red-500">{error}</p>
             <button
               onClick={resetGame}
-              className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded transition duration-300"
+              className="mt-4 w-full bg-yellow-500 hover:bg-yellow-600 text-blue-900 py-2 rounded transition duration-300"
             >
               Tentar Novamente
             </button>
@@ -1038,172 +1702,548 @@ const quizzes = {
 
       if (gameState === 'select') {
         return (
-          <div className="max-w-2xl w-full bg-white p-6 rounded-lg shadow-lg text-center">
-            <h1 className="text-3xl font-bold mb-4 text-blue-900">QuizBíblia</h1>
-            <p className="text-blue-600 mb-4">Estudar a Bíblia é conhecer o autor da vida!!!</p>
-            <div className="flex flex-wrap justify-center gap-4">
+          <div className="game-container">
+            <div className="max-w-2xl w-full parchment-bg p-6 rounded-lg shadow-lg text-center">
+              <h1 className="text-3xl font-bold mb-4 text-blue-900 pulse">QuizBíblia</h1>
+              <p className="text-blue-900 mb-4">Estudar a Bíblia é conhecer o autor da vida!!!</p>
+              <div className="flex flex-wrap justify-center gap-4">
+                <button
+                  onClick={() => startQuiz('ANTIGO')}
+                  className="flex-1 min-w-[150px] bg-yellow-500 hover:bg-yellow-600 text-blue-900 py-3 rounded-lg shadow-md transition duration-300 pulse"
+                >
+                  Antigo Testamento
+                </button>
+                <button
+                  onClick={() => startQuiz('NOVO')}
+                  className="flex-1 min-w-[150px] bg-yellow-500 hover:bg-yellow-600 text-blue-900 py-3 rounded-lg shadow-md transition duration-300 pulse"
+                >
+                  Novo Testamento
+                </button>
+                <button
+                  onClick={() => startQuiz('MISTO')}
+                  className="flex-1 min-w-[150px] bg-yellow-500 hover:bg-yellow-600 text-blue-900 py-3 rounded-lg shadow-md transition duration-300 pulse"
+                >
+                  Antigo/Novo
+                </button>
+              </div>
               <button
-                onClick={() => startQuiz('ANTIGO')}
-                className="flex-1 min-w-[150px] bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg shadow-md transition duration-300"
+                onClick={onBack}
+                className="mt-4 w-full bg-yellow-500 hover:bg-yellow-600 text-blue-900 py-2 rounded transition duration-300"
               >
-                Antigo Testamento
+                Voltar ao Menu
               </button>
-              <button
-                onClick={() => startQuiz('NOVO')}
-                className="flex-1 min-w-[150px] bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg shadow-md transition duration-300"
-              >
-                Novo Testamento
-              </button>
-              <button
-                onClick={() => startQuiz('MISTO')}
-                className="flex-1 min-w-[150px] bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg shadow-md transition duration-300"
-              >
-                Antigo/Novo
-              </button>
+              <p className="text-blue-900 mt-4">2 Coríntios 5:7 🕊️ "Vivemos por fé, e não pelo que vemos."</p>
             </div>
-            <p className="text-blue-600 mt-4">2 Coríntios 5:7 🕊️ "Vivemos por fé, e não pelo que vemos."</p>
           </div>
         );
       }
 
       if (gameState === 'review') {
         return (
-          <div className="max-w-2xl w-full bg-white p-6 rounded-lg shadow-lg">
-            <h1 className="text-3xl font-bold mb-4 text-blue-900">Revisão das Respostas</h1>
-            {answers.map((ans, idx) => (
-              <div key={idx} className="mb-4 p-4 bg-gray-100 rounded">
-                <p className="text-lg text-blue-900">{ans.question}</p>
-                <p className={ans.isCorrect ? 'text-green-600' : 'text-red-600'}>
-                  Sua resposta: {ans.selected}
-                </p>
-                <p className="text-green-600">Resposta correta: {ans.correct} ({ans.verse})</p>
-              </div>
-            ))}
-            <button
-              onClick={resetGame}
-              className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded transition duration-300"
-            >
-              Voltar ao Início
-            </button>
+          <div className="game-container">
+            <div className="max-w-2xl w-full parchment-bg p-6 rounded-lg shadow-lg">
+              <h1 className="text-3xl font-bold mb-4 text-blue-900">Revisão das Respostas</h1>
+              {answers.map((ans, idx) => (
+                <div key={idx} className="mb-4 p-4 bg-gray-100 rounded">
+                  <p className="text-lg text-blue-900">{ans.question}</p>
+                  <p className={ans.isCorrect ? 'text-green-600' : 'text-red-600'}>
+                    Sua resposta: {ans.selected}
+                  </p>
+                  <p className="text-green-600">Resposta correta: {ans.correct} ({ans.verse})</p>
+                </div>
+              ))}
+              <button
+                onClick={resetGame}
+                className="mt-4 w-full bg-yellow-500 hover:bg-yellow-600 text-blue-900 py-2 rounded transition duration-300"
+              >
+                Voltar ao Início
+              </button>
+            </div>
           </div>
         );
       }
 
       if (gameState === 'gameOver') {
         return (
-          <div className="max-w-2xl w-full bg-white p-6 rounded-lg shadow-lg text-center">
-            <h1 className="text-3xl font-bold mb-4 text-blue-900">Fim do Jogo!</h1>
-            <p className="text-xl mb-4">
-              Você acertou {correctAnswers} de {shuffledQuiz.length} questões!
-            </p>
-            <div className="flex space-x-4">
+          <div className="game-container">
+            <div ref={gameRef} className="max-w-2xl w-full parchment-bg p-6 rounded-lg shadow-lg text-center">
+              <h1 className="text-3xl font-bold mb-4 text-blue-900 shake">Fim do Jogo!</h1>
+              <p className="text-xl mb-4">
+                Você acertou {correctAnswers} de {shuffledQuiz.length} questões!
+              </p>
+              <div className="flex space-x-4">
+                <button
+                  onClick={resetGame}
+                  className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-blue-900 py-2 rounded transition duration-300"
+                >
+                  Voltar ao Início
+                </button>
+                <button
+                  onClick={enterReviewMode}
+                  className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded transition duration-300"
+                >
+                  Revisar Respostas
+                </button>
+              </div>
               <button
-                onClick={resetGame}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded transition duration-300"
+                onClick={onBack}
+                className="mt-4 w-full bg-yellow-500 hover:bg-yellow-600 text-blue-900 py-2 rounded transition duration-300"
               >
-                Voltar ao Início
+                Voltar ao Menu
               </button>
-              <button
-                onClick={enterReviewMode}
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded transition duration-300"
-              >
-                Revisar Respostas
-              </button>
+              <p className="text-blue-900 mt-4">2 Coríntios 5:7 🕊️ "Vivemos por fé, e não pelo que vemos."</p>
             </div>
-            <p className="text-blue-600 mt-4">2 Coríntios 5:7 🕊️ "Vivemos por fé, e não pelo que vemos."</p>
           </div>
         );
       }
 
       const currentQuestion = shuffledQuiz[currentIndex];
       const progress = ((currentIndex + 1) / shuffledQuiz.length) * 100;
+      const timeProgress = (timeLeft / 30) * 100;
 
       return (
-        <div className="max-w-2xl w-full bg-white p-6 rounded-lg shadow-lg">
-          <h1 className="text-3xl font-bold mb-4 text-center text-blue-900">QuizBíblia</h1>
-          <div className="mb-4">
-            <div className="w-full bg-gray-200 rounded-full h-2.5">
+        <div className="game-container">
+          <div ref={gameRef} className="max-w-2xl w-full parchment-bg p-6 rounded-lg shadow-lg">
+            <h1 className="text-3xl font-bold mb-4 text-center text-blue-900 fade-in">QuizBíblia</h1>
+            <div className="mb-4">
+              <div className="w-full bg-gray-200 rounded-full h-2.5">
+                <div
+                  className="bg-yellow-500 h-2.5 rounded-full progress-bar"
+                  style={{ width: `${progress}%` }}
+                ></div>
+              </div>
+              <p className="text-sm text-gray-500 mt-1">
+                Pergunta {currentIndex + 1} de {shuffledQuiz.length}
+              </p>
+            </div>
+            <div className="flex justify-between items-center mb-4">
+              <p className="text-lg font-semibold text-blue-900">Tempo restante: {Math.ceil(timeLeft)}s</p>
+              <p className="text-lg text-blue-900">Acertos: {correctAnswers}</p>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
               <div
-                className="bg-blue-600 h-2.5 rounded-full transition-all duration-500"
-                style={{ width: `${progress}%` }}
+                className="bg-red-500 h-2.5 rounded-full progress-bar"
+                style={{ width: `${timeProgress}%` }}
               ></div>
             </div>
-            <p className="text-sm text-gray-500 mt-1">
-              Pergunta {currentIndex + 1} de {shuffledQuiz.length}
-            </p>
+            <p className="text-xl mb-6 text-blue-900 fade-in">{currentQuestion.question}</p>
+            <div className="space-y-3">
+              {currentQuestion.options.map((option) => (
+                <button
+                  key={option}
+                  onClick={() => handleAnswer(option)}
+                  className={`w-full py-3 rounded transition duration-300 option ${
+                    feedback && feedback.isCorrect && option === feedback.correctOption
+                      ? 'correct'
+                      : feedback && !feedback.isCorrect && option === feedback.selectedOption
+                      ? 'wrong'
+                      : 'bg-blue-500 hover:bg-blue-600 text-white'
+                  } disabled:bg-gray-400 disabled:cursor-not-allowed`}
+                  disabled={feedback}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => setGameState('gameOver')}
+              className="mt-4 w-full bg-orange-500 hover:bg-orange-600 text-white py-2 rounded transition duration-300"
+            >
+              Finalizar Quiz
+            </button>
+            <p className="text-blue-900 mt-4">2 Coríntios 5:7 🕊️ "Vivemos por fé, e não pelo que vemos."</p>
           </div>
-          <div className="flex justify-between items-center mb-4">
-            <p className="text-lg font-semibold text-blue-900">Tempo restante: {timeLeft}s</p>
-            <p className="text-lg text-blue-900">Acertos: {correctAnswers}</p>
-          </div>
-          <p className="text-xl mb-6 text-blue-900 animate-fade-in">{currentQuestion.question}</p>
-          <div className="space-y-3">
-            {currentQuestion.options.map((option) => (
-              <button
-                key={option}
-                onClick={() => handleAnswer(option)}
-                className={`w-full py-3 rounded transition duration-300 option ${
-                  feedback && feedback.isCorrect && option === feedback.correctOption
-                    ? 'correct'
-                    : feedback && !feedback.isCorrect && option === feedback.selectedOption
-                    ? 'wrong'
-                    : 'bg-blue-500 hover:bg-blue-600 text-white'
-                } disabled:bg-gray-400 disabled:cursor-not-allowed`}
-                disabled={feedback}
-              >
-                {option}
-              </button>
-            ))}
-          </div>
-          <button
-            onClick={() => setGameState('gameOver')}
-            className="mt-4 w-full bg-orange-500 hover:bg-orange-600 text-white py-2 rounded transition duration-300"
-          >
-            Finalizar Quiz
-          </button>
-          <p className="text-blue-600 mt-4">2 Coríntios 5:7 🕊️ "Vivemos por fé, e não pelo que vemos."</p>
         </div>
       );
     };
 
+    // Componente para o Jogo da Memória Bíblica
+    const MemoryGame = ({ onBack }) => {
+      const [cards, setCards] = React.useState(() => shuffleArray(cardsData));
+      const [flipped, setFlipped] = React.useState([]);
+      const [matched, setMatched] = React.useState([]);
+      const [moves, setMoves] = React.useState(0);
+      const [gameState, setGameState] = React.useState('playing');
+      const gameRef = React.useRef(null);
+
+      React.useEffect(() => {
+        if (flipped.length === 2) {
+          const [first, second] = flipped;
+          if (cards[first].content === cards[second].match || cards[first].match === cards[second].content) {
+            setMatched([...matched, first, second]);
+          }
+          setTimeout(() => {
+            setFlipped([]);
+          }, 1000);
+          setMoves(moves + 1);
+        }
+      }, [flipped]);
+
+      React.useEffect(() => {
+        if (matched.length === cards.length && cards.length > 0) {
+          setGameState('victory');
+        }
+      }, [matched]);
+
+      React.useEffect(() => {
+        if (gameState === 'victory' && gameRef.current) {
+          gameRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, [gameState]);
+
+      const flipCard = (index) => {
+        if (flipped.length < 2 && !flipped.includes(index) && !matched.includes(index)) {
+          setFlipped([...flipped, index]);
+        }
+      };
+
+      const resetGame = () => {
+        setCards(shuffleArray(cardsData));
+        setFlipped([]);
+        setMatched([]);
+        setMoves(0);
+        setGameState('playing');
+      };
+
+      if (gameState === 'victory') {
+        return (
+          <div className="game-container">
+            <div ref={gameRef} className="max-w-2xl w-full parchment-bg p-6 rounded-lg shadow-lg text-center">
+              <h1 className="text-3xl font-bold mb-4 text-blue-900 shake">Parabéns!</h1>
+              <p className="text-lg mb-4 text-blue-900">Você encontrou todos os pares em {moves} jogadas!</p>
+              <button
+                onClick={resetGame}
+                className="w-full bg-yellow-500 hover:bg-yellow-600 text-blue-900 py-2 rounded transition duration-300"
+              >
+                Jogar Novamente
+              </button>
+              <button
+                onClick={onBack}
+                className="mt-4 w-full bg-yellow-500 hover:bg-yellow-600 text-blue-900 py-2 rounded transition duration-300"
+              >
+                Voltar ao Menu
+              </button>
+              <p className="text-blue-900 mt-4">2 Coríntios 5:7 🕊️ "Vivemos por fé, e não pelo que vemos."</p>
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div className="game-container">
+          <div ref={gameRef} className="max-w-2xl w-full parchment-bg p-6 rounded-lg shadow-lg">
+            <h1 className="text-3xl font-bold mb-4 text-blue-900 text-center fade-in">Jogo da Memória Bíblica</h1>
+            <p className="text-lg mb-4 text-blue-900 text-center">Jogadas: {moves}</p>
+            <div className="grid grid-cols-4 gap-4">
+              {cards.map((card, index) => (
+                <div
+                  key={card.id}
+                  className={`w-20 h-20 flex items-center justify-center text-lg font-bold cursor-pointer rounded-lg transition-transform duration-300 ${
+                    flipped.includes(index) || matched.includes(index)
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-300 text-gray-300'
+                  }`}
+                  onClick={() => flipCard(index)}
+                  style={{ transform: flipped.includes(index) || matched.includes(index) ? 'rotateY(0deg)' : 'rotateY(180deg)' }}
+                >
+                  {flipped.includes(index) || matched.includes(index) ? card.content : '?'}
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={resetGame}
+              className="mt-6 w-full bg-yellow-500 hover:bg-yellow-600 text-blue-900 py-2 rounded transition duration-300"
+            >
+              Reiniciar Jogo
+            </button>
+            <button
+              onClick={onBack}
+              className="mt-4 w-full bg-yellow-500 hover:bg-yellow-600 text-blue-900 py-2 rounded transition duration-300"
+            >
+              Voltar ao Menu
+            </button>
+            <p className="text-blue-900 mt-4">2 Coríntios 5:7 🕊️ "Vivemos por fé, e não pelo que vemos."</p>
+          </div>
+        </div>
+      );
+    };
+
+    // Componente para o Jogo Tap the Bible Items
+    const TapBibleItems = ({ onBack }) => {
+      const canvasRef = React.useRef(null);
+      const [score, setScore] = React.useState(0);
+      const [items, setItems] = React.useState([]);
+      const [gameRunning, setGameRunning] = React.useState(false);
+      const [fallSpeed, setFallSpeed] = React.useState(2);
+      const requestRef = React.useRef();
+      const gameRef = React.useRef(null);
+      const canvasWidth = 400;
+      const canvasHeight = 500;
+
+      // Função para criar um novo item
+      const createItem = () => {
+        const itemType = itemTypes[Math.floor(Math.random() * itemTypes.length)];
+        return {
+          x: Math.random() * (canvasWidth - 40) + 20,
+          y: -40,
+          radius: 20,
+          type: itemType,
+          speed: fallSpeed,
+        };
+      };
+
+      // Função para desenhar um item
+      const drawItem = (ctx, item) => {
+        ctx.beginPath();
+        ctx.arc(item.x, item.y, item.radius, 0, Math.PI * 2);
+        ctx.fillStyle = item.type.color;
+        ctx.fill();
+        ctx.closePath();
+        ctx.font = '20px Arial';
+        ctx.fillStyle = '#fff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(item.type.emoji, item.x, item.y);
+      };
+
+      // Função para desenhar o canvas
+      const draw = (ctx) => {
+        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+        items.forEach(item => drawItem(ctx, item));
+
+        if (!gameRunning) {
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+          ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+          ctx.font = '30px Arial';
+          ctx.fillStyle = '#fff';
+          ctx.textAlign = 'center';
+          ctx.fillText('Fim de Jogo! Você perdeu!', canvasWidth / 2, canvasHeight / 2 - 30);
+          ctx.font = '20px Arial';
+          ctx.fillText(`Pontos: ${score}`, canvasWidth / 2, canvasHeight / 2 + 10);
+          ctx.fillText('Clique em Reiniciar', canvasWidth / 2, canvasHeight / 2 + 40);
+        }
+      };
+
+      // Função para atualizar o estado do jogo
+      const update = () => {
+        if (!gameRunning) return;
+
+        setItems(prevItems => {
+          const newItems = prevItems.map(item => ({
+            ...item,
+            y: item.y + item.speed
+          })).filter(item => item.y < canvasHeight + item.radius);
+
+          if (Math.random() < 0.02) {
+            newItems.push(createItem());
+          }
+
+          const missed = prevItems.some(item => item.y >= canvasHeight + item.radius);
+          if (missed) {
+            setGameRunning(false);
+          }
+
+          return newItems;
+        });
+
+        setFallSpeed(prev => prev + 0.001);
+      };
+
+      // Configurar o canvas e animação
+      React.useEffect(() => {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+
+        const animate = () => {
+          update();
+          draw(ctx);
+          requestRef.current = requestAnimationFrame(animate);
+        };
+
+        if (gameRunning) {
+          requestRef.current = requestAnimationFrame(animate);
+        }
+
+        return () => cancelAnimationFrame(requestRef.current);
+      }, [gameRunning, items, score]);
+
+      // Configurar eventos de clique e toque
+      React.useEffect(() => {
+        const canvas = canvasRef.current;
+
+        const handleInteraction = (e) => {
+          if (!gameRunning) return;
+
+          e.preventDefault();
+          const rect = canvas.getBoundingClientRect();
+          const scaleX = canvasWidth / rect.width;
+          const scaleY = canvasHeight / rect.height;
+          const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+          const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+
+          if (!clientX || !clientY) return;
+
+          const clickX = (clientX - rect.left) * scaleX;
+          const clickY = (clientY - rect.top) * scaleY;
+
+          setItems(prevItems => {
+            const newItems = prevItems.filter(item => {
+              const dx = clickX - item.x;
+              const dy = clickY - item.y;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+              if (distance < item.radius) {
+                setScore(prev => prev + 10);
+                return false;
+              }
+              return true;
+            });
+            return newItems;
+          });
+        };
+
+        canvas.addEventListener('click', handleInteraction);
+        canvas.addEventListener('touchstart', handleInteraction, { passive: false });
+
+        return () => {
+          canvas.removeEventListener('click', handleInteraction);
+          canvas.removeEventListener('touchstart', handleInteraction);
+        };
+      }, [gameRunning]);
+
+      // Iniciar ou reiniciar o jogo
+      const startGame = () => {
+        setScore(0);
+        setItems([]);
+        setFallSpeed(2);
+        setGameRunning(true);
+        if (gameRef.current) {
+          gameRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      };
+
+      React.useEffect(() => {
+        if (!gameRunning && gameRef.current) {
+          gameRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, [gameRunning]);
+
+      return (
+        <div className="game-container">
+          <div ref={gameRef} className="max-w-md w-full parchment-bg p-6 rounded-lg shadow-lg text-center">
+            <h1 className="text-3xl font-bold mb-4 text-blue-900 fade-in">Tap the Bible Items</h1>
+            <p className="text-blue-900 mb-4">Toque nos itens bíblicos para pontuar! Não deixe nenhum passar!</p>
+            <div className="text-lg font-semibold text-blue-900 mb-4">Pontos: {score}</div>
+            <canvas
+              ref={canvasRef}
+              width={canvasWidth}
+              height={canvasHeight}
+              className="w-full h-96 bg-blue-50 rounded-lg shadow-inner"
+            ></canvas>
+            <button
+              onClick={startGame}
+              className="mt-4 w-full bg-yellow-500 hover:bg-yellow-600 text-blue-900 py-2 rounded transition duration-300"
+            >
+              {gameRunning ? 'Reiniciar Jogo' : 'Iniciar Jogo'}
+            </button>
+            <button
+              onClick={onBack}
+              className="mt-4 w-full bg-yellow-500 hover:bg-yellow-600 text-blue-900 py-2 rounded transition duration-300"
+            >
+              Voltar ao Menu
+            </button>
+            <p className="text-blue-900 mt-4">2 Timóteo 3:16 🕊️ "Toda Escritura é inspirada por Deus."</p>
+          </div>
+        </div>
+      );
+    };
+
+    // Componente de Error Boundary
+    class ErrorBoundary extends React.Component {
+      state = { hasError: false, error: null };
+      static getDerivedStateFromError(error) {
+        return { hasError: true, error };
+      }
+      render() {
+        if (this.state.hasError) {
+          return (
+            <div className="error-boundary">
+              <h1>Algo deu errado!</h1>
+              <p>{this.state.error?.message || 'Erro desconhecido'}</p>
+              <button
+                className="bg-yellow-500 hover:bg-yellow-600 text-blue-900 font-bold py-3 px-6 rounded-lg"
+                onClick={() => window.location.reload()}
+              >
+                Recarregar
+              </button>
+            </div>
+          );
+        }
+        return this.props.children;
+      }
+    }
+
+    // Componente Principal
+    const App = () => {
+      const [currentSection, setCurrentSection] = React.useState('menu');
+
+      const renderSection = () => {
+        switch (currentSection) {
+          case 'quiz':
+            return <QuizApp onBack={() => setCurrentSection('menu')} />;
+          case 'riddle':
+            return <RiddleGame onBack={() => setCurrentSection('menu')} />;
+          case 'memory':
+            return <MemoryGame onBack={() => setCurrentSection('menu')} />;
+          case 'tap':
+            return <TapBibleItems onBack={() => setCurrentSection('menu')} />;
+          default:
+            return (
+              <div className="game-container">
+                <div className="max-w-2xl w-full parchment-bg p-6 rounded-lg shadow-lg text-center">
+                  <h1 className="text-3xl font-bold mb-4 text-blue-900 pulse">QuizBíblia</h1>
+                  <p className="text-blue-900 mb-4">Estudar a Bíblia é conhecer o autor da vida!!!</p>
+                  <div className="flex flex-wrap justify-center gap-4">
+                    <button
+                      onClick={() => setCurrentSection('quiz')}
+                      className="flex-1 min-w-[150px] bg-yellow-500 hover:bg-yellow-600 text-blue-900 py-3 rounded-lg shadow-md transition duration-300 pulse"
+                    >
+                      Quiz Bíblico
+                    </button>
+                    <button
+                      onClick={() => setCurrentSection('riddle')}
+                      className="flex-1 min-w-[150px] bg-yellow-500 hover:bg-yellow-600 text-blue-900 py-3 rounded-lg shadow-md transition duration-300 pulse"
+                    >
+                      Enigmas Bíblicos
+                    </button>
+                    <button
+                      onClick={() => setCurrentSection('memory')}
+                      className="flex-1 min-w-[150px] bg-yellow-500 hover:bg-yellow-600 text-blue-900 py-3 rounded-lg shadow-md transition duration-300 pulse"
+                    >
+                      Jogo da Memória
+                    </button>
+                    <button
+                      onClick={() => setCurrentSection('tap')}
+                      className="flex-1 min-w-[150px] bg-yellow-500 hover:bg-yellow-600 text-blue-900 py-3 rounded-lg shadow-md transition duration-300 pulse"
+                    >
+                      Pega Intens 
+                    </button>
+                  </div>
+                  <p className="text-blue-900 mt-4">2 Coríntios 5:7 🕊️ "Vivemos por fé, e não pelo que vemos."</p>
+                </div>
+              </div>
+            );
+        }
+      };
+
+      return <ErrorBoundary>{renderSection()}</ErrorBoundary>;
+    };
+
     try {
-      ReactDOM.render(<QuizApp />, document.getElementById('root'));
+      ReactDOM.render(<App />, document.getElementById('root'));
     } catch (err) {
       document.getElementById('error').classList.remove('hidden');
-      document.getElementById('error').innerText = 'Erro ao carregar o quiz: ' + err.message;
+      document.getElementById('error').innerText = 'Erro ao carregar o aplicativo: ' + err.message;
     }
   </script>
-  <style>
-    @keyframes fade-in {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .animate-fade-in {
-      animation: fade-in 0.5s ease-out;
-    }
-    .option {
-      display: block;
-      margin: 10px auto;
-      padding: 12px 25px;
-      background-color: #1976d2;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      width: 80%;
-      max-width: 300px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-      box-shadow: 0 3px 5px rgba(0,0,0,0.2);
-    }
-    .option:hover {
-      background-color: #1565c0;
-    }
-    .correct {
-      background-color: #4CAF50 !important;
-    }
-    .wrong {
-      background-color: #f44336 !important;
-    }
-  </style>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'939b9bc3b8704577',t:'MTc0NjIzMTc5My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
