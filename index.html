@@ -15,7 +15,7 @@
       min-height: 100vh;
       font-family: 'Arial', sans-serif;
       margin: 0;
-      overflow: hidden; /* Impede rolagem indesejada */
+      overflow: hidden;
     }
     .pulse {
       animation: pulse 1.5s infinite;
@@ -86,14 +86,53 @@
       width: 100%;
       position: relative;
     }
+    .score-bar {
+      display: flex;
+      justify-content: space-between;
+      margin: 10px 0;
+      background-color: #e0e0e0;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .score-bar-segment {
+      padding: 5px 10px;
+      color: white;
+      text-align: center;
+      font-weight: bold;
+    }
+    .correct-segment {
+      background-color: #4CAF50;
+    }
+    .wrong-segment {
+      background-color: #f44336;
+    }
+    /* Estilo para a barra de rolagem na revisão */
+    .review-container {
+      max-height: 400px;
+      overflow-y: auto;
+      padding-right: 10px;
+      margin-bottom: 20px;
+    }
+    .review-container::-webkit-scrollbar {
+      width: 8px;
+    }
+    .review-container::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    .review-container::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 10px;
+    }
+    .review-container::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
   </style>
 </head>
 <body>
-
   <div id="root"></div>
   <div id="error" className="hidden text-red-500 text-center"></div>
   <script type="text/babel">
-    // Lista de livros do Antigo Testamento com versículo representativo
     const oldTestamentBooks = [
       { name: "Gênesis", abbrev: "gn", verse: { reference: "Gênesis 1:1", text: "No princípio, Deus criou os céus e a terra." } },
       { name: "Êxodo", abbrev: "ex", verse: { reference: "Êxodo 20:2", text: "Eu sou o Senhor, teu Deus, que te tirou da terra do Egito, da casa da servidão." } },
@@ -136,7 +175,6 @@
       { name: "Malaquias", abbrev: "ml", verse: { reference: "Malaquias 3:10", text: "Trazei todos os dízimos à casa do tesouro." } },
     ];
 
-    // Lista de livros do Novo Testamento com versículo representativo
     const newTestamentBooks = [
       { name: "Mateus", abbrev: "mt", verse: { reference: "Mateus 5:3", text: "Bem-aventurados os humildes de espírito, porque deles é o reino dos céus." } },
       { name: "Marcos", abbrev: "mc", verse: { reference: "Marcos 10:45", text: "O Filho do Homem não veio para ser servido, mas para servir." } },
@@ -168,10 +206,9 @@
       { name: "Apocalipse", abbrev: "ap", verse: { reference: "Apocalipse 21:4", text: "Deus enxugará dos olhos toda lágrima." } },
     ];
 
-    // Amostra reduzida de perguntas do quiz
     const quizzes = {
       ANTIGO: [
-         { question: "Quem construiu a arca para escapar do dilúvio?", options: ["Moisés", "Abraão", "Noé", "Davi"], answer: "Noé", verse: "Gênesis 6:14" },
+        { question: "Quem construiu a arca para escapar do dilúvio?", options: ["Moisés", "Abraão", "Noé", "Davi"], answer: "Noé", verse: "Gênesis 6:14" },
         { question: "Qual o primeiro livro da Bíblia?", options: ["Êxodo", "Gênesis", "Levítico", "Números"], answer: "Gênesis", verse: "Gênesis 1:1" },
         { question: "Quem foi lançado na cova dos leões?", options: ["Elias", "Daniel", "José", "Jonas"], answer: "Daniel", verse: "Daniel 6:16" },
         { question: "Qual rei foi conhecido por sua sabedoria?", options: ["Davi", "Salomão", "Saul", "Ezequias"], answer: "Salomão", verse: "1 Reis 4:29" },
@@ -386,10 +423,9 @@
   { question: "Quem foi a única mulher juíza de Israel?", options: ["Débora", "Ester", "Rute", "Ana"], answer: "Débora", verse: "Juízes 4:4" },
   { question: "Quem foi o pai de todas as nações segundo a promessa de Deus?", options: ["Abraão", "Isaque", "Jacó", "José"], answer: "Abraão", verse: "Gênesis 17:5" },
 
-
       ],
       NOVO: [
-        { question: "Quem foi o primeiro apóstolo a ser chamado por Jesus?", options: ["Pedro", "João", "Tiago", "André"], answer: "André", verse: "João 1:40-42" },
+         { question: "Quem foi o primeiro apóstolo a ser chamado por Jesus?", options: ["Pedro", "João", "Tiago", "André"], answer: "André", verse: "João 1:40-42" },
         { question: "Quem foi o médico que escreveu o Evangelho de Lucas?", options: ["Lucas", "Marcos", "Mateus", "João"], answer: "Lucas", verse: "Colossenses 4:14" },
         { question: "Qual evangelho é considerado o mais teológico e profundo?", options: ["João", "Mateus", "Marcos", "Lucas"], answer: "João", verse: "João 1:1" },
         { question: "Quem batizou Jesus no rio Jordão?", options: ["João Batista", "Pedro", "Tiago", "André"], answer: "João Batista", verse: "Mateus 3:13-17" },
@@ -601,7 +637,7 @@
 
       ],
       MISTO: [
-        { question: "Quem foi o primeiro apóstolo a ser chamado por Jesus?", options: ["Pedro", "João", "Tiago", "André"], answer: "André", verse: "João 1:40-42" },
+         { question: "Quem foi o primeiro apóstolo a ser chamado por Jesus?", options: ["Pedro", "João", "Tiago", "André"], answer: "André", verse: "João 1:40-42" },
         { question: "Quem foi o médico que escreveu o Evangelho de Lucas?", options: ["Lucas", "Marcos", "Mateus", "João"], answer: "Lucas", verse: "Colossenses 4:14" },
         { question: "Qual evangelho é considerado o mais teológico e profundo?", options: ["João", "Mateus", "Marcos", "Lucas"], answer: "João", verse: "João 1:1" },
         { question: "Quem batizou Jesus no rio Jordão?", options: ["João Batista", "Pedro", "Tiago", "André"], answer: "João Batista", verse: "Mateus 3:13-17" },
@@ -1027,198 +1063,173 @@
   { question: "Qual foi o homem mais paciente do Antigo Testamento?", options: ["Jó", "Abraão", "Moisés", "Noé"], answer: "Jó", verse: "Jó 1:21-22" },
   { question: "Quem foi a única mulher juíza de Israel?", options: ["Débora", "Ester", "Rute", "Ana"], answer: "Débora", verse: "Juízes 4:4" },
   { question: "Quem foi o pai de todas as nações segundo a promessa de Deus?", options: ["Abraão", "Isaque", "Jacó", "José"], answer: "Abraão", verse: "Gênesis 17:5" }
-
       ],
     };
 
-    // Lista de 20 perguntas de enigmas (mistas: Antigo e Novo Testamento)
     const riddleQuestions = [
-      { question: "Este livro contém o versículo: 'No princípio, Deus criou os céus e a terra.' Qual é o livro?", options: ["Gênesis", "Êxodo", "Mateus", "Salmos"], answer: "Gênesis", verse: "Gênesis 1:1" },
-      { question: "Este livro contém o versículo: 'Eu sou o Senhor, teu Deus.' Qual é o livro?", options: ["Êxodo", "Levítico", "Números", "Josué"], answer: "Êxodo", verse: "Êxodo 20:2" },
-      { question: "Este livro contém o versículo: 'O Senhor é o meu pastor.' Qual é o livro?", options: ["Salmos", "Provérbios", "Isaías", "Jeremias"], answer: "Salmos", verse: "Salmos 23:1" },
-      { question: "Este livro contém o versículo: 'Confia no Senhor de todo o teu coração.' Qual é o livro?", options: ["Provérbios", "Eclesiastes", "Salmos", "Isaías"], answer: "Provérbios", verse: "Provérbios 3:5" },
-      { question: "Este livro contém o versículo: 'Os que esperam no Senhor renovarão as suas forças.' Qual é o livro?", options: ["Isaías", "Jeremias", "Ezequiel", "Daniel"], answer: "Isaías", verse: "Isaías 40:31" },
-      { question: "Este livro contém o versículo: 'Eu sei os planos que tenho para vós.' Qual é o livro?", options: ["Jeremias", "Isaías", "Lamentações", "Ezequiel"], answer: "Jeremias", verse: "Jeremias 29:11" },
+     { question: "Este livro contém o versículo: 'No princípio, Deus criou os céus e a terra.' Qual é o livro?", options: ["Êxodo","Mateus","Salmos","Gênesis"], answer: "Gênesis", verse: "Gênesis 1:1" },
+      { question: "Este livro contém o versículo: 'Eu sou o Senhor, teu Deus.' Qual é o livro?", options: ["Levítico","Êxodo","Números","Josué"], answer: "Êxodo", verse: "Êxodo 20:2" },
+      { question: "Este livro contém o versículo: 'O Senhor é o meu pastor.' Qual é o livro?", options: ["Provérbios","Isaías","Salmos","Jeremias"], answer: "Salmos", verse: "Salmos 23:1" },
+      { question: "Este livro contém o versículo: 'Confia no Senhor de todo o teu coração.' Qual é o livro?", options: ["Eclesiastes", "Salmos", "Isaías","Provérbios"], answer: "Provérbios", verse: "Provérbios 3:5" },
+      { question: "Este livro contém o versículo: 'Os que esperam no Senhor renovarão as suas forças.' Qual é o livro?", options: ["Jeremias", "Ezequiel","Isaías","Daniel"], answer: "Isaías", verse: "Isaías 40:31" },
+      { question: "Este livro contém o versículo: 'Eu sei os planos que tenho para vós.' Qual é o livro?", options: ["Isaías","Jeremias","Lamentações", "Ezequiel"], answer: "Jeremias", verse: "Jeremias 29:11" },
       { question: "Este livro contém o versículo: 'Dar-vos-ei um coração novo.' Qual é o livro?", options: ["Ezequiel", "Daniel", "Oseias", "Joel"], answer: "Ezequiel", verse: "Ezequiel 36:26" },
-      { question: "Este livro contém o versículo: 'Fazer justiça, amar a misericórdia.' Qual é o livro?", options: ["Miqueias", "Amós", "Jonas", "Naum"], answer: "Miqueias", verse: "Miqueias 6:8" },
-      { question: "Este livro contém o versículo: 'O Senhor é bom, uma fortaleza.' Qual é o livro?", options: ["Naum", "Habacuque", "Sofonias", "Ageu"], answer: "Naum", verse: "Naum 1:7" },
-      { question: "Este livro contém o versículo: 'Trazei todos os dízimos.' Qual é o livro?", options: ["Malaquias", "Zacarias", "Ageu", "Sofonias"], answered: "Malaquias", verse: "Malaquias 3:10" },
-      { question: "Este livro contém o versículo: 'Bem-aventurados os humildes.' Qual é o livro?", options: ["Mateus", "Marcos", "Lucas", "João"], answer: "Mateus", verse: "Mateus 5:3" },
-      { question: "Este livro contém o versículo: 'O Filho do Homem veio para servir.' Qual é o livro?", options: ["Marcos", "Mateus", "Lucas", "João"], answer: "Marcos", verse: "Marcos 10:45" },
-      { question: "Este livro contém o versículo: 'Nasceu-vos hoje o Salvador.' Qual é o livro?", options: ["Lucas", "Mateus", "Marcos", "João"], answer: "Lucas", verse: "Lucas 2:11" },
-      { question: "Este livro contém o versículo: 'Deus amou o mundo de tal maneira.' Qual é o livro?", options: ["João", "Lucas", "Atos", "Romanos"], answer: "João", verse: "João 3:16" },
-      { question: "Este livro contém o versículo: 'Recebereis poder, ao descer o Espírito.' Qual é o livro?", options: ["Atos", "Romanos", "1 Coríntios", "Efésios"], answer: "Atos", verse: "Atos 1:8" },
-      { question: "Este livro contém o versículo: 'Todas as coisas cooperam para o bem.' Qual é o livro?", options: ["Romanos", "1 Coríntios", "Efésios", "Filipenses"], answer: "Romanos", verse: "Romanos 8:28" },
-      { question: "Este livro contém o versículo: 'O amor é paciente, o amor é bondoso.' Qual é o livro?", options: ["1 Coríntios", "2 Coríntios", "Gálatas", "Efésios"], answer: "1 Coríntios", verse: "1 Coríntios 13:4" },
-      { question: "Este livro contém o versículo: 'Pela graça sois salvos.' Qual é o livro?", options: ["Efésios", "Gálatas", "Filipenses", "Colossenses"], answer: "Efésios", verse: "Efésios 2:8" },
-      { question: "Este livro contém o versículo: 'Tudo posso naquele que me fortalece.' Qual é o livro?", options: ["Filipenses", "Colossenses", "1 Tessalonicenses", "Hebreus"], answer: "Filipenses", verse: "Filipenses 4:13" },
-      { question: "Este livro contém o versículo: 'A fé é a certeza de coisas que se esperam.' Qual é o livro?", options: ["Hebreus", "Tiago", "1 Pedro", "1 João"], answer: "Hebreus", verse: "Hebreus 11:1" },
-   { question: "Este livro contém o versículo: 'No princípio, Deus criou os céus e a terra.' Qual é o livro?", options: ["Gênesis", "Êxodo", "Mateus", "Salmos"], answer: "Gênesis", verse: "Gênesis 1:1" },
-  { question: "Este livro contém o versículo: 'Eu sou o Senhor, teu Deus, que te tirou da terra do Egito.' Qual é o livro?", options: ["Êxodo", "Levítico", "Números", "Josué"], answer: "Êxodo", verse: "Êxodo 20:2" },
-  { question: "Este livro contém o versículo: 'No princípio, Deus criou os céus e a terra.' Qual é o livro?", options: ["Gênesis", "Êxodo", "Mateus", "Salmos"], answer: "Gênesis", verse: "Gênesis 1:1" },
-  { question: "Este livro contém o versículo: 'Eu sou o Senhor, teu Deus, que te tirou da terra do Egito.' Qual é o livro?", options: ["Êxodo", "Levítico", "Números", "Josué"], answer: "Êxodo", verse: "Êxodo 20:2" },
-  { question: "Este livro contém o versículo: 'Sereis santos, porque eu, o Senhor, sou santo.' Qual é o livro?", options: ["Levítico", "Números", "Deuteronômio", "Êxodo"], answer: "Levítico", verse: "Levítico 19:2" },
-  { question: "Este livro contém o versículo: 'O Senhor te abençoe e te guarde.' Qual é o livro?", options: ["Números", "Deuteronômio", "Salmos", "Gênesis"], answer: "Números", verse: "Números 6:24" },
-  { question: "Este livro contém o versículo: 'Ouve, Israel, o Senhor é o único Senhor.' Qual é o livro?", options: ["Deuteronômio", "Êxodo", "Josué", "Juízes"], answer: "Deuteronômio", verse: "Deuteronômio 6:4" },
-  { question: "Este livro contém o versículo: 'Sê forte e corajoso; não temas.' Qual é o livro?", options: ["Josué", "Juízes", "1 Samuel", "Salmos"], answer: "Josué", verse: "Josué 1:9" },
-  { question: "Este livro contém o versículo: 'O Senhor levantava juízes.' Qual é o livro?", options: ["Juízes", "Josué", "Rute", "1 Samuel"], answer: "Juízes", verse: "Juízes 2:18" },
-  { question: "Este livro contém o versículo: 'Onde quer que fores, irei eu.' Qual é o livro?", options: ["Rute", "Ester", "1 Samuel", "Salmos"], answer: "Rute", verse: "Rute 1:16" },
-  { question: "Este livro contém o versículo: 'O Senhor vê o coração.' Qual é o livro?", options: ["1 Samuel", "2 Samuel", "1 Reis", "Provérbios"], answer: "1 Samuel", verse: "1 Samuel 16:7" },
-  { question: "Este livro contém o versículo: 'Tu és grande, Senhor Deus.' Qual é o livro?", options: ["2 Samuel", "1 Samuel", "1 Crônicas", "Salmos"], answer: "2 Samuel", verse: "2 Samuel 7:22" },
-  { question: "Este livro contém o versículo: 'Não há Deus como tu.' Qual é o livro?", options: ["1 Reis", "2 Reis", "1 Crônicas", "Neemias"], answer: "1 Reis", verse: "1 Reis 8:23" },
-  { question: "Este livro contém o versículo: 'Tu és o Deus, o único Deus.' Qual é o livro?", options: ["2 Reis", "1 Reis", "2 Crônicas", "Isaías"], answer: "2 Reis", verse: "2 Reis 19:15" },
-  { question: "Este livro contém o versículo: 'Rendei graças ao Senhor.' Qual é o livro?", options: ["1 Crônicas", "2 Crônicas", "Salmos", "Esdras"], answer: "1 Crônicas", verse: "1 Crônicas 16:8" },
-  { question: "Este livro contém o versículo: 'Se o meu povo se humilhar e orar.' Qual é o livro?", options: ["2 Crônicas", "1 Crônicas", "Neemias", "Esdras"], answer: "2 Crônicas", verse: "2 Crônicas 7:14" },
-  { question: "Este livro contém o versículo: 'Esdras buscava a Lei do Senhor.' Qual é o livro?", options: ["Esdras", "Neemias", "Ester", "Jó"], answer: "Esdras", verse: "Esdras 7:10" },
-  { question: "Este livro contém o versículo: 'Ó Senhor, grande e temível.' Qual é o livro?", options: ["Neemias", "Esdras", "Salmos", "Ester"], answer: "Neemias", verse: "Neemias 1:5" },
-  { question: "Este livro contém o versículo: 'Para um momento como este.' Qual é o livro?", options: ["Ester", "Rute", "Jó", "Salmos"], answer: "Ester", verse: "Ester 4:14" },
-  { question: "Este livro contém o versículo: 'O Senhor o deu, o Senhor o tomou.' Qual é o livro?", options: ["Jó", "Salmos", "Provérbios", "Eclesiastes"], answer: "Jó", verse: "Jó 1:21" },
-  { question: "Este livro contém o versículo: 'O Senhor é o meu pastor.' Qual é o livro?", options: ["Salmos", "Provérbios", "Isaías", "Jeremias"], answer: "Salmos", verse: "Salmos 23:1" },
-  { question: "Este livro contém o versículo: 'Confia no Senhor de todo o coração.' Qual é o livro?", options: ["Provérbios", "Eclesiastes", "Salmos", "Isaías"], answer: "Provérbios", verse: "Provérbios 3:5" },
-  { question: "Este livro contém o versículo: 'Vaidade de vaidades, tudo é vaidade.' Qual é o livro?", options: ["Eclesiastes", "Provérbios", "Salmos", "Cânticos"], answer: "Eclesiastes", verse: "Eclesiastes 1:2" },
-  { question: "Este livro contém o versículo: 'O amor é forte como a morte.' Qual é o livro?", options: ["Cânticos", "Salmos", "Provérbios", "Isaías"], answer: "Cânticos", verse: "Cânticos 8:6" },
-  { question: "Este livro contém o versículo: 'Os que esperam no Senhor renovarão suas forças.' Qual é o livro?", options: ["Isaías", "Jeremias", "Ezequiel", "Daniel"], answer: "Isaías", verse: "Isaías 40:31" },
-  { question: "Este livro contém o versículo: 'Eu sei os planos que tenho para vós.' Qual é o livro?", options: ["Jeremias", "Isaías", "Lamentações", "Ezequiel"], answer: "Jeremias", verse: "Jeremias 29:11" },
-  { question: "Este livro contém o versículo: 'As misericórdias do Senhor não se esgotam.' Qual é o livro?", options: ["Lamentações", "Jeremias", "Ezequiel", "Salmos"], answer: "Lamentações", verse: "Lamentações 3:22" },
-  { question: "Este livro contém o versículo: 'Dar-vos-ei um coração novo.' Qual é o livro?", options: ["Ezequiel", "Daniel", "Oseias", "Joel"], answer: "Ezequiel", verse: "Ezequiel 36:26" },
-  { question: "Este livro contém o versículo: 'Daniel orava e dava graças.' Qual é o livro?", options: ["Daniel", "Ezequiel", "Oseias", "Amós"], answer: "Daniel", verse: "Daniel 6:10" },
-  { question: "Este livro contém o versículo: 'Quero misericórdia e não sacrifício.' Qual é o livro?", options: ["Oseias", "Joel", "Amós", "Miqueias"], answer: "Oseias", verse: "Oseias 6:6" },
-  { question: "Este livro contém o versículo: 'Derramarei o meu Espírito sobre toda a carne.' Qual é o livro?", options: ["Joel", "Oseias", "Amós", "Zacarias"], answer: "Joel", verse: "Joel 2:28" },
-  { question: "Este livro contém o versículo: 'Corra a justiça como um rio.' Qual é o livro?", options: ["Amós", "Miqueias", "Naum", "Habacuque"], answer: "Amós", verse: "Amós 5:24" },
-  { question: "Este livro contém o versículo: 'O dia do Senhor está perto.' Qual é o livro?", options: ["Obadias", "Jonas", "Miqueias", "Sofonias"], answer: "Obadias", verse: "Obadias 1:15" },
-  { question: "Este livro contém o versículo: 'Na minha angústia clamei ao Senhor.' Qual é o livro?", options: ["Jonas", "Obadias", "Naum", "Habacuque"], answer: "Jonas", verse: "Jonas 2:2" },
-  { question: "Este livro contém o versículo: 'Fazer justiça, amar a misericórdia.' Qual é o livro?", options: ["Miqueias", "Amós", "Jonas", "Naum"], answer: "Miqueias", verse: "Miqueias 6:8" },
-  { question: "Este livro contém o versículo: 'O Senhor é bom, uma fortaleza.' Qual é o livro?", options: ["Naum", "Habacuque", "Sofonias", "Ageu"], answer: "Naum", verse: "Naum 1:7" },
-  { question: "Este livro contém o versículo: 'Ainda que a figueira não floresça.' Qual é o livro?", options: ["Habacuque", "Naum", "Sofonias", "Zacarias"], answer: "Habacuque", verse: "Habacuque 3:17-18" },
-  { question: "Este livro contém o versículo: 'O Senhor está no meio de ti.' Qual é o livro?", options: ["Sofonias", "Habacuque", "Ageu", "Malaquias"], answer: "Sofonias", verse: "Sofonias 3:17" },
-  { question: "Este livro contém o versículo: 'Considerai os vossos caminhos.' Qual é o livro?", options: ["Ageu", "Zacarias", "Malaquias", "Sofonias"], answer: "Ageu", verse: "Ageu 1:7" },
-  { question: "Este livro contém o versículo: 'Eis que vem o teu Rei.' Qual é o livro?", options: ["Zacarias", "Malaquias", "Ageu", "Isaías"], answer: "Zacarias", verse: "Zacarias 9:9" },
-  { question: "Este livro contém o versículo: 'Trazei todos os dízimos.' Qual é o livro?", options: ["Malaquias", "Zacarias", "Ageu", "Sofonias"], answer: "Malaquias", verse: "Malaquias 3:10" },
-  { question: "Este livro contém o versículo: 'Bem-aventurados os humildes.' Qual é o livro?", options: ["Mateus", "Marcos", "Lucas", "João"], answer: "Mateus", verse: "Mateus 5:3" },
-  { question: "Este livro contém o versículo: 'O Filho do Homem veio para servir.' Qual é o livro?", options: ["Marcos", "Mateus", "Lucas", "João"], answer: "Marcos", verse: "Marcos 10:45" },
-  { question: "Este livro contém o versículo: 'Nasceu-vos hoje o Salvador.' Qual é o livro?", options: ["Lucas", "Mateus", "Marcos", "João"], answer: "Lucas", verse: "Lucas 2:11" },
-  { question: "Este livro contém o versículo: 'Deus amou o mundo de tal maneira.' Qual é o livro?", options: ["João", "Lucas", "Atos", "Romanos"], answer: "João", verse: "João 3:16" },
-  { question: "Este livro contém o versículo: 'Recebereis poder ao descer o Espírito.' Qual é o livro?", options: ["Atos", "Romanos", "1 Coríntios", "Efésios"], answer: "Atos", verse: "Atos 1:8" },
-  { question: "Este livro contém o versículo: 'Todas as coisas cooperam para o bem.' Qual é o livro?", options: ["Romanos", "1 Coríntios", "Efésios", "Filipenses"], answer: "Romanos", verse: "Romanos 8:28" },
-  { question: "Este livro contém o versículo: 'O amor é paciente, é bondoso.' Qual é o livro?", options: ["1 Coríntios", "2 Coríntios", "Gálatas", "Efésios"], answer: "1 Coríntios", verse: "1 Coríntios 13:4" },
-  { question: "Este livro contém o versículo: 'Se alguém está em Cristo, é nova criatura.' Qual é o livro?", options: ["2 Coríntios", "1 Coríntios", "Gálatas", "Efésios"], answer: "2 Coríntios", verse: "2 Coríntios 5:17" },
-  { question: "Este livro contém o versículo: 'O fruto do Espírito é amor, alegria, paz.' Qual é o livro?", options: ["Gálatas", "Efésios", "Filipenses", "Colossenses"], answer: "Gálatas", verse: "Gálatas 5:22" },
-  { question: "Este livro contém o versículo: 'Pela graça sois salvos, por meio da fé.' Qual é o livro?", options: ["Efésios", "Gálatas", "Filipenses", "Colossenses"], answer: "Efésios", verse: "Efésios 2:8" },
-  { question: "Este livro contém o versículo: 'Tudo posso naquele que me fortalece.' Qual é o livro?", options: ["Filipenses", "Colossenses", "1 Tessalonicenses", "Hebreus"], answer: "Filipenses", verse: "Filipenses 4:13" },
-  { question: "Este livro contém o versículo: 'Tudo quanto fizerdes, fazei-o de coração.' Qual é o livro?", options: ["Colossenses", "Filipenses", "Efésios", "1 Tessalonicenses"], answer: "Colossenses", verse: "Colossenses 3:23" },
-  { question: "Este livro contém o versículo: 'Regozijai-vos sempre. Orai sem cessar.' Qual é o livro?", options: ["1 Tessalonicenses", "2 Tessalonicenses", "Filipenses", "Colossenses"], answer: "1 Tessalonicenses", verse: "1 Tessalonicenses 5:16-18" },
-  { question: "Este livro contém o versículo: 'O Senhor é fiel; ele vos guardará.' Qual é o livro?", options: ["2 Tessalonicenses", "1 Tessalonicenses", "1 Timóteo", "Tito"], answer: "2 Tessalonicenses", verse: "2 Tessalonicenses 3:3" },
-  { question: "Este livro contém o versículo: 'Ninguém despreze a tua mocidade.' Qual é o livro?", options: ["1 Timóteo", "2 Timóteo", "Tito", "Filemom"], answer: "1 Timóteo", verse: "1 Timóteo 4:12" },
-  { question: "Este livro contém o versículo: 'Toda Escritura é inspirada por Deus.' Qual é o livro?", options: ["2 Timóteo", "1 Timóteo", "Tito", "Hebreus"], answer: "2 Timóteo", verse: "2 Timóteo 3:16" },
-  { question: "Este livro contém o versículo: 'A graça de Deus traz salvação.' Qual é o livro?", options: ["Tito", "Filemom", "Hebreus", "Tiago"], answer: "Tito", verse: "Tito 2:11" },
-  { question: "Este livro contém o versículo: 'Oro para que a comunhão da tua fé seja eficaz.' Qual é o livro?", options: ["Filemom", "Tito", "Hebreus", "Tiago"], answer: "Filemom", verse: "Filemom 1:6" },
-  { question: "Este livro contém o versículo: 'A fé é a certeza de coisas que se esperam.' Qual é o livro?", options: ["Hebreus", "Tiago", "1 Pedro", "1 João"], answer: "Hebreus", verse: "Hebreus 11:1" },
-  { question: "Este livro contém o versículo: 'Tornai-vos praticantes da palavra.' Qual é o livro?", options: ["Tiago", "Hebreus", "1 Pedro", "2 Pedro"], answer: "Tiago", verse: "Tiago 1:22" },
-  { question: "Este livro contém o versículo: 'Lançai sobre ele toda a vossa ansiedade.' Qual é o livro?", options: ["1 Pedro", "2 Pedro", "Tiago", "1 João"], answer: "1 Pedro", verse: "1 Pedro 5:7" },
-  { question: "Este livro contém o versículo: 'A profecia veio pelo Espírito Santo.' Qual é o livro?", options: ["2 Pedro", "1 Pedro", "1 João", "Judas"], answer: "2 Pedro", verse: "2 Pedro 1:21" },
-  { question: "Este livro contém o versículo: 'Quem não ama não conhece a Deus.' Qual é o livro?", options: ["1 João", "2 João", "3 João", "Judas"], answer: "1 João", verse: "1 João 4:8" },
-  { question: "Este livro contém o versículo: 'O amor é que andemos segundo os seus mandamentos.' Qual é o livro?", options: ["2 João", "1 João", "3 João", "Judas"], answer: "2 João", verse: "2 João 1:6" },
-  { question: "Este livro contém o versículo: 'Meus filhos andam na verdade.' Qual é o livro?", options: ["3 João", "2 João", "1 João", "Judas"], answer: "3 João", verse: "3 João 1:4" },
-  { question: "Este livro contém o versículo: 'Edificai-vos sobre a vossa fé.' Qual é o livro?", options: ["Judas", "1 João", "2 João", "Hebreus"], answer: "Judas", verse: "Judas 1:20" },
-  { question: "Este livro contém o versículo: 'Deus enxugará dos olhos toda lágrima.' Qual é o livro?", options: ["Apocalipse", "Hebreus", "1 João", "Judas"], answer: "Apocalipse", verse: "Apocalipse 21:4" },
-  { question: "Este livro contém o versículo: 'Não to mandei eu? Esforça-te.' Qual é o livro?", options: ["Josué", "Deuteronômio", "Juízes", "1 Samuel"], answer: "Josué", verse: "Josué 1:9" },
-  { question: "Este livro contém o versículo: 'O Senhor é a minha luz e salvação.' Qual é o livro?", options: ["Salmos", "Isaías", "Provérbios", "Jeremias"], answer: "Salmos", verse: "Salmos 27:1" },
-  { question: "Este livro contém o versículo: 'O temor do Senhor é o princípio da sabedoria.' Qual é o livro?", options: ["Provérbios", "Eclesiastes", "Salmos", "Jó"], answer: "Provérbios", verse: "Provérbios 9:10" },
-  { question: "Este livro contém o versículo: 'Um Salvador nasceu em Belém.' Qual é o livro?", options: ["Miquéias", "Isaías", "Jeremias", "Zacarias"], answer: "Miquéias", verse: "Miquéias 5:2" },
-  { question: "Este livro contém o versículo: 'Eis que estou à porta e bato.' Qual é o livro?", options: ["Apocalipse", "João", "Mateus", "Hebreus"], answer: "Apocalipse", verse: "Apocalipse 3:20" },
-  { question: "Este livro contém o versículo: 'O justo viverá pela fé.' Qual é o livro?", options: ["Habacuque", "Romanos", "Gálatas", "Hebreus"], answer: "Habacuque", verse: "Habacuque 2:4" },
-  { question: "Este livro contém o versículo: 'A tua palavra é lâmpada para os meus pés.' Qual é o livro?", options: ["Salmos", "Provérbios", "Isaías", "Jeremias"], answer: "Salmos", verse: "Salmos 119:105" },
-	{ question: "Este livro contém o versículo: 'Buscai primeiro o reino de Deus.' Qual é o livro?", options: ["Mateus", "Lucas", "Marcos", "João"], answer: "Mateus", verse: "Mateus 6:33" },
-  { question: "Este livro contém o versículo: 'O Senhor é compassivo e misericordioso.' Qual é o livro?", options: ["Salmos", "Êxodo", "Isaías", "Jeremias"], answer: "Salmos", verse: "Salmos 103:8" },
-  { question: "Este livro contém o versículo: 'Eu sou a ressurreição e a vida.' Qual é o livro?", options: ["João", "Mateus", "Lucas", "Marcos"], answer: "João", verse: "João 11:25" },
-  { question: "Este livro contém o versículo: 'Clama a mim, e responder-te-ei.' Qual é o livro?", options: ["Jeremias", "Isaías", "Salmos", "Provérbios"], answer: "Jeremias", verse: "Jeremias 33:3" },
+      { question: "Este livro contém o versículo: 'Fazer justiça, amar a misericórdia.' Qual é o livro?", options: ["Amós","Miqueias","Jonas", "Naum"], answer: "Miqueias", verse: "Miqueias 6:8" },
+      { question: "Este livro contém o versículo: 'O Senhor é bom, uma fortaleza.' Qual é o livro?", options: ["Habacuque", "Sofonias", "Ageu"], answer: "Naum", verse: "Naum 1:7" },
+      { question: "Este livro contém o versículo: 'Trazei todos os dízimos.' Qual é o livro?", options: ["Malaquias", "Zacarias", "Ageu","Naum", "Sofonias"], answered: "Malaquias", verse: "Malaquias 3:10" },
+    
+	 
+	 
+  { question: "Este livro contém o versículo: 'O Senhor é o meu pastor.' Qual é o livro?", options: ["Provérbios", "Isaías", "Jeremias", "Salmos"], answer: "Salmos", verse: "Salmos 23:1" },
+  { question: "Este livro contém o versículo: 'Confia no Senhor de todo o teu coração.' Qual é o livro?", options: ["Eclesiastes", "Salmos", "Isaías", "Provérbios"], answer: "Provérbios", verse: "Provérbios 3:5" },
+  { question: "Este livro contém o versículo: 'Vaidade de vaidades, tudo é vaidade.' Qual é o livro?", options: ["Provérbios", "Cânticos", "Salmos", "Eclesiastes"], answer: "Eclesiastes", verse: "Eclesiastes 1:2" },
+  { question: "Este livro contém o versículo: 'O amor é forte como a morte.' Qual é o livro?", options: ["Salmos", "Provérbios", "Isaías", "Cânticos"], answer: "Cânticos", verse: "Cânticos 8:6" },
+  { question: "Este livro contém o versículo: 'Os que esperam no Senhor renovarão suas forças.' Qual é o livro?", options: ["Jeremias", "Ezequiel", "Daniel", "Isaías"], answer: "Isaías", verse: "Isaías 40:31" },
+  { question: "Este livro contém o versículo: 'Eu sei os planos que tenho para vós.' Qual é o livro?", options: ["Isaías", "Lamentações", "Ezequiel", "Jeremias"], answer: "Jeremias", verse: "Jeremias 29:11" },
+  { question: "Este livro contém o versículo: 'As misericórdias do Senhor não se esgotam.' Qual é o livro?", options: ["Jeremias", "Ezequiel", "Salmos", "Lamentações"], answer: "Lamentações", verse: "Lamentações 3:22" },
+  { question: "Este livro contém o versículo: 'Dar-vos-ei um coração novo.' Qual é o livro?", options: ["Daniel", "Oseias", "Joel", "Ezequiel"], answer: "Ezequiel", verse: "Ezequiel 36:26" },
+  { question: "Este livro contém o versículo: 'Daniel orava e dava graças.' Qual é o livro?", options: ["Ezequiel", "Oseias", "Amós", "Daniel"], answer: "Daniel", verse: "Daniel 6:10" },
+  { question: "Este livro contém o versículo: 'Quero misericórdia e não sacrifício.' Qual é o livro?", options: ["Joel", "Amós", "Miqueias", "Oseias"], answer: "Oseias", verse: "Oseias 6:6" },
+  { question: "Este livro contém o versículo: 'Derramarei o meu Espírito sobre toda a carne.' Qual é o livro?", options: ["Oseias", "Amós", "Zacarias", "Joel"], answer: "Joel", verse: "Joel 2:28" },
+  { question: "Este livro contém o versículo: 'Corra a justiça como um rio.' Qual é o livro?", options: ["Miqueias", "Naum", "Habacuque", "Amós"], answer: "Amós", verse: "Amós 5:24" },
+  { question: "Este livro contém o versículo: 'O dia do Senhor está perto.' Qual é o livro?", options: ["Jonas", "Miqueias", "Sofonias", "Obadias"], answer: "Obadias", verse: "Obadias 1:15" },
+  { question: "Este livro contém o versículo: 'Na minha angústia clamei ao Senhor.' Qual é o livro?", options: ["Obadias", "Naum", "Habacuque", "Jonas"], answer: "Jonas", verse: "Jonas 2:2" },
+  { question: "Este livro contém o versículo: 'Fazer justiça, amar a misericórdia.' Qual é o livro?", options: ["Amós", "Jonas", "Naum", "Miqueias"], answer: "Miqueias", verse: "Miqueias 6:8" },
+  { question: "Este livro contém o versículo: 'O Senhor é bom, uma fortaleza.' Qual é o livro?", options: ["Habacuque", "Sofonias", "Ageu", "Naum"], answer: "Naum", verse: "Naum 1:7" },
+  { question: "Este livro contém o versículo: 'Ainda que a figueira não floresça.' Qual é o livro?", options: ["Naum", "Sofonias", "Zacarias", "Habacuque"], answer: "Habacuque", verse: "Habacuque 3:17-18" },
+  { question: "Este livro contém o versículo: 'O Senhor está no meio de ti.' Qual é o livro?", options: ["Habacuque", "Ageu", "Malaquias", "Sofonias"], answer: "Sofonias", verse: "Sofonias 3:17" },
+  { question: "Este livro contém o versículo: 'Considerai os vossos caminhos.' Qual é o livro?", options: ["Zacarias", "Malaquias", "Sofonias", "Ageu"], answer: "Ageu", verse: "Ageu 1:7" },
+  { question: "Este livro contém o versículo: 'Eis que vem o teu Rei.' Qual é o livro?", options: ["Malaquias", "Ageu", "Isaías", "Zacarias"], answer: "Zacarias", verse: "Zacarias 9:9" },
+  
+  
+
+ { question: "Este livro contém o versículo: 'Trazei todos os dízimos.' Qual é o livro?", options: ["Sofonias", "Ageu", "Zacarias", "Malaquias"], answer: "Malaquias", verse: "Malaquias 3:10" },
+{ question: "Este livro contém o versículo: 'Bem-aventurados os humildes.' Qual é o livro?", options: ["Mateus", "Lucas", "Marcos", "João"], answer: "Mateus", verse: "Mateus 5:3" },
+{ question: "Este livro contém o versículo: 'O Filho do Homem veio para servir.' Qual é o livro?", options: ["Mateus", "Lucas", "João", "Marcos"], answer: "Marcos", verse: "Marcos 10:45" },
+{ question: "Este livro contém o versículo: 'Nasceu-vos hoje o Salvador.' Qual é o livro?", options: ["João", "Lucas", "Mateus", "Marcos"], answer: "Lucas", verse: "Lucas 2:11" },
+{ question: "Este livro contém o versículo: 'Deus amou o mundo de tal maneira.' Qual é o livro?", options: ["Atos", "Romanos", "João", "Lucas"], answer: "João", verse: "João 3:16" },
+{ question: "Este livro contém o versículo: 'Recebereis poder ao descer o Espírito.' Qual é o livro?", options: ["1 Coríntios", "Romanos", "Atos", "Efésios"], answer: "Atos", verse: "Atos 1:8" },
+{ question: "Este livro contém o versículo: 'Todas as coisas cooperam para o bem.' Qual é o livro?", options: ["Filipenses", "1 Coríntios", "Efésios", "Romanos"], answer: "Romanos", verse: "Romanos 8:28" },
+{ question: "Este livro contém o versículo: 'O amor é paciente, é bondoso.' Qual é o livro?", options: ["Efésios", "Gálatas", "2 Coríntios", "1 Coríntios"], answer: "1 Coríntios", verse: "1 Coríntios 13:4" },
+{ question: "Este livro contém o versículo: 'Se alguém está em Cristo, é nova criatura.' Qual é o livro?", options: ["Gálatas", "1 Coríntios", "Efésios", "2 Coríntios"], answer: "2 Coríntios", verse: "2 Coríntios 5:17" },
+{ question: "Este livro contém o versículo: 'O fruto do Espírito é amor, alegria, paz.' Qual é o livro?", options: ["Colossenses", "Gálatas", "Filipenses", "Efésios"], answer: "Gálatas", verse: "Gálatas 5:22" },
+{ question: "Este livro contém o versículo: 'Pela graça sois salvos, por meio da fé.' Qual é o livro?", options: ["Filipenses", "Colossenses", "Gálatas", "Efésios"], answer: "Efésios", verse: "Efésios 2:8" },
+{ question: "Este livro contém o versículo: 'Tudo posso naquele que me fortalece.' Qual é o livro?", options: ["Hebreus", "Filipenses", "1 Tessalonicenses", "Colossenses"], answer: "Filipenses", verse: "Filipenses 4:13" },
+{ question: "Este livro contém o versículo: 'Tudo quanto fizerdes, fazei-o de coração.' Qual é o livro?", options: ["1 Tessalonicenses", "Filipenses", "Efésios", "Colossenses"], answer: "Colossenses", verse: "Colossenses 3:23" },
+{ question: "Este livro contém o versículo: 'Regozijai-vos sempre. Orai sem cessar.' Qual é o livro?", options: ["Filipenses", "Colossenses", "1 Tessalonicenses", "2 Tessalonicenses"], answer: "1 Tessalonicenses", verse: "1 Tessalonicenses 5:16-18" },
+{ question: "Este livro contém o versículo: 'O Senhor é fiel; ele vos guardará.' Qual é o livro?", options: ["Tito", "1 Timóteo", "1 Tessalonicenses", "2 Tessalonicenses"], answer: "2 Tessalonicenses", verse: "2 Tessalonicenses 3:3" },
+{ question: "Este livro contém o versículo: 'Ninguém despreze a tua mocidade.' Qual é o livro?", options: ["2 Timóteo", "Tito", "Filemom", "1 Timóteo"], answer: "1 Timóteo", verse: "1 Timóteo 4:12" },
+{ question: "Este livro contém o versículo: 'Toda Escritura é inspirada por Deus.' Qual é o livro?", options: ["1 Timóteo", "Tito", "Hebreus", "2 Timóteo"], answer: "2 Timóteo", verse: "2 Timóteo 3:16" },
+{ question: "Este livro contém o versículo: 'A graça de Deus traz salvação.' Qual é o livro?", options: ["Hebreus", "Tiago", "Tito", "Filemom"], answer: "Tito", verse: "Tito 2:11" },
+{ question: "Este livro contém o versículo: 'Oro para que a comunhão da tua fé seja eficaz.' Qual é o livro?", options: ["Tiago", "Filemom", "Hebreus", "2 Pedro"], answer: "Filemom", verse: "Filemom 1:6" },
+{ question: "Este livro contém o versículo: 'A fé é a certeza de coisas que se esperam.' Qual é o livro?", options: ["1 João", "Tiago", "2 Pedro", "Hebreus"], answer: "Hebreus", verse: "Hebreus 11:1" },
+{ question: "Este livro contém o versículo: 'Tornai-vos praticantes da palavra.' Qual é o livro?", options: ["2 Pedro", "1 João", "Hebreus", "Tiago"], answer: "Tiago", verse: "Tiago 1:22" },
+{ question: "Este livro contém o versículo: 'Lançai sobre ele toda a vossa ansiedade.' Qual é o livro?", options: ["1 João", "2 Pedro", "Tiago", "1 Pedro"], answer: "1 Pedro", verse: "1 Pedro 5:7" },
+{ question: "Este livro contém o versículo: 'A profecia veio pelo Espírito Santo.' Qual é o livro?", options: ["1 Pedro", "1 João", "Judas", "2 Pedro"], answer: "2 Pedro", verse: "2 Pedro 1:21" },
 
 
-  { question: "Este livro contém o versículo: 'Faça-me uma arca de madeira de acácia.' Qual é o livro?", options: ["Êxodo", "Gênesis", "Levítico", "Números"], answer: "Êxodo", verse: "Êxodo 25:10" },
-  { question: "Este livro contém o versículo: 'Amarás o teu próximo como a ti mesmo.' Qual é o livro?", options: ["Levítico", "Deuteronômio", "Êxodo", "Números"], answer: "Levítico", verse: "Levítico 19:18" },
-  { question: "Este livro contém o versículo: 'Não murmureis contra o Senhor.' Qual é o livro?", options: ["Números", "Levítico", "Êxodo", "Deuteronômio"], answer: "Números", verse: "Números 14:27" },
-  { question: "Este livro contém o versículo: 'Amarás o Senhor com todo o coração.' Qual é o livro?", options: ["Deuteronômio", "Êxodo", "Josué", "Levítico"], answer: "Deuteronômio", verse: "Deuteronômio 6:5" },
-  { question: "Este livro contém o versículo: 'O Senhor pelejará por vós.' Qual é o livro?", options: ["Josué", "Juízes", "Deuteronômio", "1 Samuel"], answer: "Josué", verse: "Josué 23:10" },
-  { question: "Este livro contém o versículo: 'Naqueles dias não havia rei em Israel.' Qual é o livro?", options: ["Juízes", "Josué", "Rute", "1 Samuel"], answer: "Juízes", verse: "Juízes 21:25" },
-  { question: "Este livro contém o versículo: 'Teu povo será meu povo.' Qual é o livro?", options: ["Rute", "Ester", "1 Samuel", "Neemias"], answer: "Rute", verse: "Rute 1:16" },
-  { question: "Este livro contém o versículo: 'O Senhor me ungiu rei.' Qual é o livro?", options: ["1 Samuel", "2 Samuel", "1 Reis", "Juízes"], answer: "1 Samuel", verse: "1 Samuel 16:13" },
-  { question: "Este livro contém o versículo: 'O Senhor é minha força.' Qual é o livro?", options: ["2 Samuel", "1 Samuel", "Salmos", "1 Crônicas"], answer: "2 Samuel", verse: "2 Samuel 22:2" },
-  { question: "Este livro contém o versículo: 'Construí um templo ao teu nome.' Qual é o livro?", options: ["1 Reis", "2 Reis", "1 Crônicas", "2 Crônicas"], answer: "1 Reis", verse: "1 Reis 8:20" },
-  { question: "Este livro contém o versículo: 'O Senhor é meu escudo.' Qual é o livro?", options: ["2 Reis", "1 Reis", "Salmos", "Isaías"], answer: "2 Reis", verse: "2 Reis 19:34" },
-  { question: "Este livro contém o versículo: 'Louvai ao Senhor todas as nações.' Qual é o livro?", options: ["1 Crônicas", "2 Crônicas", "Salmos", "Esdras"], answer: "1 Crônicas", verse: "1 Crônicas 16:8" },
-  { question: "Este livro contém o versículo: 'O Senhor ouviu minha oração.' Qual é o livro?", options: ["2 Crônicas", "1 Crônicas", "Neemias", "Esdras"], answer: "2 Crônicas", verse: "2 Crônicas 7:12" },
-  { question: "Este livro contém o versículo: 'Restaurai o templo do Senhor.' Qual é o livro?", options: ["Esdras", "Neemias", "Ester", "2 Crônicas"], answer: "Esdras", verse: "Esdras 1:3" },
-  { question: "Este livro contém o versículo: 'Reconstruí os muros de Jerusalém.' Qual é o livro?", options: ["Neemias", "Esdras", "Ester", "Zacarias"], answer: "Neemias", verse: "Neemias 6:15" },
-  { question: "Este livro contém o versículo: 'O Senhor livrou seu povo.' Qual é o livro?", options: ["Ester", "Rute", "Neemias", "Esdras"], answer: "Ester", verse: "Ester 8:17" },
-  { question: "Este livro contém o versículo: 'Sei que meu Redentor vive.' Qual é o livro?", options: ["Jó", "Salmos", "Provérbios", "Eclesiastes"], answer: "Jó", verse: "Jó 19:25" },
-  { question: "Este livro contém o versículo: 'Bendize, ó minha alma, ao Senhor.' Qual é o livro?", options: ["Salmos", "Provérbios", "Isaías", "Jeremias"], answer: "Salmos", verse: "Salmos 103:1" },
-  { question: "Este livro contém o versículo: 'O temor do Senhor é o princípio do saber.' Qual é o livro?", options: ["Provérbios", "Eclesiastes", "Salmos", "Jó"], answer: "Provérbios", verse: "Provérbios 1:7" },
-  { question: "Este livro contém o versículo: 'Tudo tem o seu tempo determinado.' Qual é o livro?", options: ["Eclesiastes", "Provérbios", "Salmos", "Cânticos"], answer: "Eclesiastes", verse: "Eclesiastes 3:1" },
-  { question: "Este livro contém o versículo: 'Tu és toda formosa, minha amada.' Qual é o livro?", options: ["Cânticos", "Salmos", "Provérbios", "Isaías"], answer: "Cânticos", verse: "Cânticos 4:7" },
-  { question: "Este livro contém o versículo: 'Eis que a virgem conceberá.' Qual é o livro?", options: ["Isaías", "Jeremias", "Ezequiel", "Miquéias"], answer: "Isaías", verse: "Isaías 7:14" },
-  { question: "Este livro contém o versículo: 'Clama a mim, e responder-te-ei.' Qual é o livro?", options: ["Jeremias", "Isaías", "Salmos", "Ezequiel"], answer: "Jeremias", verse: "Jeremias 33:3" },
-  { question: "Este livro contém o versículo: 'Choro pode durar uma noite.' Qual é o livro?", options: ["Salmos", "Jeremias", "Lamentações", "Isaías"], answer: "Salmos", verse: "Salmos 30:5" },
-  { question: "Este livro contém o versículo: 'Porei em vós o meu Espírito.' Qual é o livro?", options: ["Ezequiel", "Isaías", "Joel", "Daniel"], answer: "Ezequiel", verse: "Ezequiel 36:27" },
-  { question: "Este livro contém o versículo: 'Vi um grande trono branco.' Qual é o livro?", options: ["Apocalipse", "Daniel", "Ezequiel", "Isaías"], answer: "Apocalipse", verse: "Apocalipse 20:11" },
-  { question: "Este livro contém o versículo: 'Voltai-vos para mim.' Qual é o livro?", options: ["Oseias", "Joel", "Amós", "Miquéias"], answer: "Oseias", verse: "Oseias 14:1" },
-  { question: "Este livro contém o versículo: 'Voltem ao Senhor, pois ele é misericordioso.' Qual é o livro?", options: ["Joel", "Oseias", "Amós", "Jonas"], answer: "Joel", verse: "Joel 2:13" },
-  { question: "Este livro contém o versículo: 'Preparemo-nos para o dia do Senhor.' Qual é o livro?", options: ["Amós", "Miquéias", "Oseias", "Joel"], answer: "Amós", verse: "Amós 4:12" },
-  { question: "Este livro contém o versículo: 'A soberba precede a ruína.' Qual é o livro?", options: ["Provérbios", "Eclesiastes", "Salmos", "Jó"], answer: "Provérbios", verse: "Provérbios 16:18" },
-  { question: "Este livro contém o versículo: 'Fui lançado no ventre do peixe.' Qual é o livro?", options: ["Jonas", "Obadias", "Miquéias", "Naum"], answer: "Jonas", verse: "Jonas 2:1" },
-  { question: "Este livro contém o versículo: 'O Senhor deseja justiça e verdade.' Qual é o livro?", options: ["Miquéias", "Amós", "Jonas", "Oseias"], answer: "Miquéias", verse: "Miquéias 6:8" },
-  { question: "Este livro contém o versículo: 'O Senhor é tardio em irar-se.' Qual é o livro?", options: ["Naum", "Habacuque", "Sofonias", "Joel"], answer: "Naum", verse: "Naum 1:3" },
-  { question: "Este livro contém o versículo: 'O justo viverá pela sua fé.' Qual é o livro?", options: ["Habacuque", "Romanos", "Sofonias", "Naum"], answer: "Habacuque", verse: "Habacuque 2:4" },
-  { question: "Este livro contém o versículo: 'Buscai o Senhor, vós todos.' Qual é o livro?", options: ["Sofonias", "Habacuque", "Zacarias", "Malaquias"], answer: "Sofonias", verse: "Sofonias 2:3" },
-  { question: "Este livro contém o versículo: 'Sede fortes no trabalho do Senhor.' Qual é o livro?", options: ["Ageu", "Zacarias", "Malaquias", "Sofonias"], answer: "Ageu", verse: "Ageu 2:4" },
-  { question: "Este livro contém o versículo: 'O Senhor enviará seu Messias.' Qual é o livro?", options: ["Zacarias", "Malaquias", "Isaías", "Ageu"], answer: "Zacarias", verse: "Zacarias 9:9" },
-  { question: "Este livro contém o versículo: 'A vós enviarei Elias, o profeta.' Qual é o livro?", options: ["Malaquias", "Zacarias", "Ageu", "Isaías"], answer: "Malaquias", verse: "Malaquias 4:5" },
-  { question: "Este livro contém o versículo: 'Não julgueis para não serdes julgados.' Qual é o livro?", options: ["Mateus", "Lucas", "Marcos", "João"], answer: "Mateus", verse: "Mateus 7:1" },
-  { question: "Este livro contém o versículo: 'Vai e não peques mais.' Qual é o livro?", options: ["João", "Mateus", "Lucas", "Marcos"], answer: "João", verse: "João 8:11" },
-  { question: "Este livro contém o versículo: 'O Filho do Homem será traído.' Qual é o livro?", options: ["Marcos", "Mateus", "Lucas", "João"], answer: "Marcos", verse: "Marcos 14:21" },
-  { question: "Este livro contém o versículo: 'Meu Pai, se possível, passe de mim este cálice.' Qual é o livro?", options: ["Mateus", "Marcos", "Lucas", "João"], answer: "Mateus", verse: "Mateus 26:39" },
-  { question: "Este livro contém o versículo: 'Eis o Cordeiro de Deus.' Qual é o livro?", options: ["João", "Mateus", "Lucas", "Atos"], answer: "João", verse: "João 1:29" },
-  { question: "Este livro contém o versículo: 'O Espírito desceu como pomba.' Qual é o livro?", options: ["Lucas", "Mateus", "Marcos", "João"], answer: "Lucas", verse: "Lucas 3:22" },
-  { question: "Este livro contém o versículo: 'Cumpriu-se a Escritura.' Qual é o livro?", options: ["Atos", "Romanos", "João", "Mateus"], answer: "Atos", verse: "Atos 1:16" },
-  { question: "Este livro contém o versículo: 'Não há justo, nem um sequer.' Qual é o livro?", options: ["Romanos", "1 Coríntios", "Gálatas", "Efésios"], answer: "Romanos", verse: "Romanos 3:10" },
-  { question: "Este livro contém o versículo: 'Fomos reconciliados com Deus.' Qual é o livro?", options: ["2 Coríntios", "1 Coríntios", "Romanos", "Efésios"], answer: "2 Coríntios", verse: "2 Coríntios 5:18" },
-  { question: "Este livro contém o versículo: 'Andai pelo Espírito.' Qual é o livro?", options: ["Gálatas", "Efésios", "Filipenses", "Romanos"], answer: "Gálatas", verse: "Gálatas 5:16" },
-  { question: "Este livro contém o versículo: 'Somos membros do corpo de Cristo.' Qual é o livro?", options: ["Efésios", "Gálatas", "Colossenses", "1 Coríntios"], answer: "Efésios", verse: "Efésios 5:30" },
-  { question: "Este livro contém o versículo: 'Alegrai-vos na esperança.' Qual é o livro?", options: ["Filipenses", "Colossenses", "1 Tessalonicenses", "Romanos"], answer: "Filipenses", verse: "Filipenses 1:20" },
-  { question: "Este livro contém o versículo: 'Cristo é o cabeça da igreja.' Qual é o livro?", options: ["Colossenses", "Efésios", "Filipenses", "1 Coríntios"], answer: "Colossenses", verse: "Colossenses 1:18" },
-  { question: "Este livro contém o versículo: 'Deus é o nosso refúgio.' Qual é o livro?", options: ["Salmos", "Isaías", "Jeremias", "Provérbios"], answer: "Salmos", verse: "Salmos 46:1" },
-  { question: "Este livro contém o versículo: 'Vigiai e orai.' Qual é o livro?", options: ["Marcos", "Mateus", "Lucas", "João"], answer: "Marcos", verse: "Marcos 13:33" },
-  { question: "Este livro contém o versículo: 'Eu sou a videira verdadeira.' Qual é o livro?", options: ["João", "Mateus", "Lucas", "Marcos"], answer: "João", verse: "João 15:1" },
-  { question: "Este livro contém o versículo: 'O Senhor está perto dos que o invocam.' Qual é o livro?", options: ["Salmos", "Provérbios", "Isaías", "Jeremias"], answer: "Salmos", verse: "Salmos 145:18" },
-  { question: "Este livro contém o versículo: 'A palavra de Deus é viva e eficaz.' Qual é o livro?", options: ["Hebreus", "2 Timóteo", "Tiago", "1 Pedro"], answer: "Hebreus", verse: "Hebreus 4:12" },
-  { question: "Este livro contém o versículo: 'Seja-vos toda a amargura afastada.' Qual é o livro?", options: ["Efésios", "Gálatas", "Colossenses", "Filipenses"], answer: "Efésios", verse: "Efésios 4:31" },
-  { question: "Este livro contém o versículo: 'Guarda a tua língua do mal.' Qual é o livro?", options: ["Salmos", "Provérbios", "Tiago", "1 Pedro"], answer: "Salmos", verse: "Salmos 34:13" },
-  { question: "Este livro contém o versículo: 'O Senhor é minha rocha.' Qual é o livro?", options: ["Salmos", "Isaías", "Jeremias", "Provérbios"], answer: "Salmos", verse: "Salmos 18:2" },
-  { question: "Este livro contém o versículo: 'Eu sou o pão da vida.' Qual é o livro?", options: ["João", "Mateus", "Lucas", "Marcos"], answer: "João", verse: "João 6:35" },
-  { question: "Este livro contém o versículo: 'A vós foi dado conhecer os mistérios.' Qual é o livro?", options: ["Mateus", "Marcos", "Lucas", "João"], answer: "Mateus", verse: "Mateus 13:11" },
-  { question: "Este livro contém o versículo: 'O Senhor é meu ajudador.' Qual é o livro?", options: ["Hebreus", "Salmos", "Isaías", "Jeremias"], answer: "Hebreus", verse: "Hebreus 13:6" },
-  { question: "Este livro contém o versículo: 'Confessai os vossos pecados uns aos outros.' Qual é o livro?", options: ["Tiago", "1 João", "1 Pedro", "Hebreus"], answer: "Tiago", verse: "Tiago 5:16" },
-  { question: "Este livro contém o versículo: 'Nascemos de novo pela palavra.' Qual é o livro?", options: ["1 Pedro", "Tiago", "1 João", "2 Pedro"], answer: "1 Pedro", verse: "1 Pedro 1:23" },
-  { question: "Este livro contém o versículo: 'Guarda-nos para a vinda do Senhor.' Qual é o livro?", options: ["2 Pedro", "1 Pedro", "1 João", "Judas"], answer: "2 Pedro", verse: "2 Pedro 3:14" },
-  { question: "Este livro contém o versículo: 'Deus é luz, e nele não há trevas.' Qual é o livro?", options: ["1 João", "2 João", "Tiago", "Judas"], answer: "1 João", verse: "1 João 1:5" },
-  { question: "Este livro contém o versículo: 'Andai na verdade.' Qual é o livro?", options: ["2 João", "1 João", "3 João", "Judas"], answer: "2 João", verse: "2 João 1:4" },
-  { question: "Este livro contém o versículo: 'Colaboradores da verdade.' Qual é o livro?", options: ["3 João", "2 João", "1 João", "Judas"], answer: "3 João", verse: "3 João 1:8" },
-  { question: "Este livro contém o versículo: 'Guardai-vos na fé.' Qual é o livro?", options: ["Judas", "1 João", "2 João", "Tiago"], answer: "Judas", verse: "Judas 1:21" },
-  { question: "Este livro contém o versículo: 'Eis que venho sem demora.' Qual é o livro?", options: ["Apocalipse", "Hebreus", "1 João", "Judas"], answer: "Apocalipse", verse: "Apocalipse 22:12" },
-  { question: "Este livro contém o versículo: 'O Senhor é minha fortaleza.' Qual é o livro?", options: ["Salmos", "Isaías", "Jeremias", "Provérbios"], answer: "Salmos", verse: "Salmos 28:7" },
-  { question: "Este livro contém o versículo: 'O Senhor é meu pastor.' Qual é o livro?", options: ["Salmos", "Isaías", "Jeremias", "Ezequiel"], answer: "Salmos", verse: "Salmos 23:1" },
-  { question: "Este livro contém o versículo: 'Alegra-te, jovem, na tua mocidade.' Qual é o livro?", options: ["Eclesiastes", "Provérbios", "Salmos", "Cânticos"], answer: "Eclesiastes", verse: "Eclesiastes 11:9" },
-  { question: "Este livro contém o versículo: 'O Senhor é clemente e misericordioso.' Qual é o livro?", options: ["Salmos", "Êxodo", "Isaías", "Jeremias"], answer: "Salmos", verse: "Salmos 111:4" },
-  { question: "Este livro contém o versículo: 'Eu sou a luz do mundo.' Qual é o livro?", options: ["João", "Mateus", "Lucas", "Marcos"], answer: "João", verse: "João 8:12" },
-  { question: "Este livro contém o versículo: 'O Senhor é minha bandeira.' Qual é o livro?", options: ["Êxodo", "Salmos", "Números", "Josué"], answer: "Êxodo", verse: "Êxodo 17:15" },
-  { question: "Este livro contém o versículo: 'O Senhor é meu libertador.' Qual é o livro?", options: ["Salmos", "Isaías", "Jeremias", "2 Samuel"], answer: "Salmos", verse: "Salmos 18:2" },
-  { question: "Este livro contém o versículo: 'Tudo é possível ao que crê.' Qual é o livro?", options: ["Marcos", "Mateus", "Lucas", "João"], answer: "Marcos", verse: "Marcos 9:23" },
-  { question: "Este livro contém o versículo: 'O Senhor é meu socorro.' Qual é o livro?", options: ["Salmos", "Isaías", "Jeremias", "Hebreus"], answer: "Salmos", verse: "Salmos 121:2" },
-  { question: "Este livro contém o versículo: 'Buscai-me e vivereis.' Qual é o livro?", options: ["Amós", "Oseias", "Miquéias", "Joel"], answer: "Amós", verse: "Amós 5:4" },
-  { question: "Este livro contém o versículo: 'O Senhor é minha porção.' Qual é o livro?", options: ["Salmos", "Lamentações", "Jeremias", "Isaías"], answer: "Salmos", verse: "Salmos 119:57" },
-  { question: "Este livro contém o versículo: 'Eu sou a porta das ovelhas.' Qual é o livro?", options: ["João", "Mateus", "Lucas", "Marcos"], answer: "João", verse: "João 10:7" },
-  { question: "Este livro contém o versículo: 'O Senhor é meu juiz.' Qual é o livro?", options: ["Isaías", "Salmos", "Jeremias", "Daniel"], answer: "Isaías", verse: "Isaías 33:22" },
-  { question: "Este livro contém o versículo: 'O Senhor é meu rei.' Qual é o livro?", options: ["Salmos", "Isaías", "Jeremias", "Zacarias"], answer: "Salmos", verse: "Salmos 10:16" },
-  { question: "Este livro contém o versículo: 'O Senhor é meu Salvador.' Qual é o livro?", options: ["Isaías", "Salmos", "Jeremias", "Zacarias"], answer: "Isaías", verse: "Isaías 12:2" },
+
+{ question: "Este livro contém o versículo: 'Quem não ama não conhece a Deus.' Qual é o livro?", options: ["3 João", "Judas", "1 João", "2 João"], answer: "1 João", verse: "1 João 4:8" },
+{ question: "Este livro contém o versículo: 'O amor é que andemos segundo os seus mandamentos.' Qual é o livro?", options: ["3 João", "2 João", "1 João", "Judas"], answer: "2 João", verse: "2 João 1:6" },
+{ question: "Este livro contém o versículo: 'Meus filhos andam na verdade.' Qual é o livro?", options: ["1 João", "3 João", "Judas", "2 João"], answer: "3 João", verse: "3 João 1:4" },
+{ question: "Este livro contém o versículo: 'Edificai-vos sobre a vossa fé.' Qual é o livro?", options: ["Judas", "Hebreus", "2 João", "1 João"], answer: "Judas", verse: "Judas 1:20" },
+{ question: "Este livro contém o versículo: 'Deus enxugará dos olhos toda lágrima.' Qual é o livro?", options: ["Judas", "1 João", "Apocalipse", "Hebreus"], answer: "Apocalipse", verse: "Apocalipse 21:4" },
+{ question: "Este livro contém o versículo: 'Não to mandei eu? Esforça-te.' Qual é o livro?", options: ["Deuteronômio", "1 Samuel", "Juízes", "Josué"], answer: "Josué", verse: "Josué 1:9" },
+{ question: "Este livro contém o versículo: 'O Senhor é a minha luz e salvação.' Qual é o livro?", options: ["Salmos", "Isaías", "Jeremias", "Provérbios"], answer: "Salmos", verse: "Salmos 27:1" },
+{ question: "Este livro contém o versículo: 'O temor do Senhor é o princípio da sabedoria.' Qual é o livro?", options: ["Salmos", "Jó", "Provérbios", "Eclesiastes"], answer: "Provérbios", verse: "Provérbios 9:10" },
+{ question: "Este livro contém o versículo: 'Um Salvador nasceu em Belém.' Qual é o livro?", options: ["Jeremias", "Zacarias", "Miquéias", "Isaías"], answer: "Miquéias", verse: "Miquéias 5:2" },
+{ question: "Este livro contém o versículo: 'Eis que estou à porta e bato.' Qual é o livro?", options: ["Apocalipse", "Mateus", "João", "Hebreus"], answer: "Apocalipse", verse: "Apocalipse 3:20" },
+{ question: "Este livro contém o versículo: 'O justo viverá pela fé.' Qual é o livro?", options: ["Gálatas", "Hebreus", "Habacuque", "Romanos"], answer: "Habacuque", verse: "Habacuque 2:4" },
+{ question: "Este livro contém o versículo: 'A tua palavra é lâmpada para os meus pés.' Qual é o livro?", options: ["Isaías", "Provérbios", "Jeremias", "Salmos"], answer: "Salmos", verse: "Salmos 119:105" },
+{ question: "Este livro contém o versículo: 'Buscai primeiro o reino de Deus.' Qual é o livro?", options: ["Lucas", "Marcos", "João", "Mateus"], answer: "Mateus", verse: "Mateus 6:33" },
+{ question: "Este livro contém o versículo: 'O Senhor é compassivo e misericordioso.' Qual é o livro?", options: ["Salmos", "Jeremias", "Êxodo", "Isaías"], answer: "Salmos", verse: "Salmos 103:8" },
+{ question: "Este livro contém o versículo: 'Eu sou a ressurreição e a vida.' Qual é o livro?", options: ["Marcos", "João", "Lucas", "Mateus"], answer: "João", verse: "João 11:25" },
+{ question: "Este livro contém o versículo: 'Clama a mim, e responder-te-ei.' Qual é o livro?", options: ["Salmos", "Provérbios", "Isaías", "Jeremias"], answer: "Jeremias", verse: "Jeremias 33:3" },
+{ question: "Este livro contém o versículo: 'Faça-me uma arca de madeira de acácia.' Qual é o livro?", options: ["Levítico", "Números", "Êxodo", "Gênesis"], answer: "Êxodo", verse: "Êxodo 25:10" },
+{ question: "Este livro contém o versículo: 'Amarás o teu próximo como a ti mesmo.' Qual é o livro?", options: ["Números", "Êxodo", "Deuteronômio", "Levítico"], answer: "Levítico", verse: "Levítico 19:18" },
+{ question: "Este livro contém o versículo: 'Não murmureis contra o Senhor.' Qual é o livro?", options: ["Deuteronômio", "Êxodo", "Números", "Levítico"], answer: "Números", verse: "Números 14:27" },
+{ question: "Este livro contém o versículo: 'Amarás o Senhor com todo o coração.' Qual é o livro?", options: ["Levítico", "Deuteronômio", "Josué", "Êxodo"], answer: "Deuteronômio", verse: "Deuteronômio 6:5" },
+{ question: "Este livro contém o versículo: 'O Senhor pelejará por vós.' Qual é o livro?", options: ["Deuteronômio", "Josué", "1 Samuel", "Juízes"], answer: "Josué", verse: "Josué 23:10" },
+{ question: "Este livro contém o versículo: 'Naqueles dias não havia rei em Israel.' Qual é o livro?", options: ["Juízes", "Rute", "Josué", "1 Samuel"], answer: "Juízes", verse: "Juízes 21:25" },
+{ question: "Este livro contém o versículo: 'Teu povo será meu povo.' Qual é o livro?", options: ["Neemias", "Ester", "Rute", "1 Samuel"], answer: "Rute", verse: "Rute 1:16" },
+{ question: "Este livro contém o versículo: 'O Senhor me ungiu rei.' Qual é o livro?", options: ["1 Samuel", "Juízes", "2 Samuel", "1 Reis"], answer: "1 Samuel", verse: "1 Samuel 16:13" },
+{ question: "Este livro contém o versículo: 'O Senhor é minha força.' Qual é o livro?", options: ["1 Samuel", "Salmos", "2 Samuel", "1 Crônicas"], answer: "2 Samuel", verse: "2 Samuel 22:2" },
+{ question: "Este livro contém o versículo: 'Construí um templo ao teu nome.' Qual é o livro?", options: ["1 Reis", "2 Crônicas", "2 Reis", "1 Crônicas"], answer: "1 Reis", verse: "1 Reis 8:20" },
+
+
+ { question: "Este livro contém o versículo: 'O Senhor é meu escudo.' Qual é o livro?", options: ["Salmos", "Isaías", "1 Reis", "2 Reis"], answer: "2 Reis", verse: "2 Reis 19:34" },
+{ question: "Este livro contém o versículo: 'Louvai ao Senhor todas as nações.' Qual é o livro?", options: ["Salmos", "Esdras", "1 Crônicas", "2 Crônicas"], answer: "1 Crônicas", verse: "1 Crônicas 16:8" },
+{ question: "Este livro contém o versículo: 'O Senhor ouviu minha oração.' Qual é o livro?", options: ["Neemias", "Esdras", "1 Crônicas", "2 Crônicas"], answer: "2 Crônicas", verse: "2 Crônicas 7:12" },
+{ question: "Este livro contém o versículo: 'Restaurai o templo do Senhor.' Qual é o livro?", options: ["Neemias", "Ester", "Esdras", "2 Crônicas"], answer: "Esdras", verse: "Esdras 1:3" },
+{ question: "Este livro contém o versículo: 'Reconstruí os muros de Jerusalém.' Qual é o livro?", options: ["Ester", "Neemias", "Esdras", "Zacarias"], answer: "Neemias", verse: "Neemias 6:15" },
+{ question: "Este livro contém o versículo: 'O Senhor livrou seu povo.' Qual é o livro?", options: ["Rute", "Ester", "Neemias", "Esdras"], answer: "Ester", verse: "Ester 8:17" },
+{ question: "Este livro contém o versículo: 'Sei que meu Redentor vive.' Qual é o livro?", options: ["Provérbios", "Jó", "Salmos", "Eclesiastes"], answer: "Jó", verse: "Jó 19:25" },
+{ question: "Este livro contém o versículo: 'Bendize, ó minha alma, ao Senhor.' Qual é o livro?", options: ["Provérbios", "Isaías", "Jeremias", "Salmos"], answer: "Salmos", verse: "Salmos 103:1" },
+{ question: "Este livro contém o versículo: 'O temor do Senhor é o princípio do saber.' Qual é o livro?", options: ["Salmos", "Provérbios", "Eclesiastes", "Jó"], answer: "Provérbios", verse: "Provérbios 1:7" },
+{ question: "Este livro contém o versículo: 'Tudo tem o seu tempo determinado.' Qual é o livro?", options: ["Cânticos", "Eclesiastes", "Provérbios", "Salmos"], answer: "Eclesiastes", verse: "Eclesiastes 3:1" },
+{ question: "Este livro contém o versículo: 'Tu és toda formosa, minha amada.' Qual é o livro?", options: ["Provérbios", "Isaías", "Cânticos", "Salmos"], answer: "Cânticos", verse: "Cânticos 4:7" },
+{ question: "Este livro contém o versículo: 'Eis que a virgem conceberá.' Qual é o livro?", options: ["Miquéias", "Isaías", "Jeremias", "Ezequiel"], answer: "Isaías", verse: "Isaías 7:14" },
+{ question: "Este livro contém o versículo: 'Clama a mim, e responder-te-ei.' Qual é o livro?", options: ["Isaías", "Jeremias", "Salmos", "Ezequiel"], answer: "Jeremias", verse: "Jeremias 33:3" },
+{ question: "Este livro contém o versículo: 'Choro pode durar uma noite.' Qual é o livro?", options: ["Jeremias", "Salmos", "Lamentações", "Isaías"], answer: "Salmos", verse: "Salmos 30:5" },
+{ question: "Este livro contém o versículo: 'Porei em vós o meu Espírito.' Qual é o livro?", options: ["Isaías", "Joel", "Daniel", "Ezequiel"], answer: "Ezequiel", verse: "Ezequiel 36:27" },
+{ question: "Este livro contém o versículo: 'Vi um grande trono branco.' Qual é o livro?", options: ["Apocalipse", "Daniel", "Ezequiel", "Isaías"], answer: "Apocalipse", verse: "Apocalipse 20:11" },
+{ question: "Este livro contém o versículo: 'Voltai-vos para mim.' Qual é o livro?", options: ["Amós", "Miquéias", "Oseias", "Joel"], answer: "Oseias", verse: "Oseias 14:1" },
+{ question: "Este livro contém o versículo: 'Voltem ao Senhor, pois ele é misericordioso.' Qual é o livro?", options: ["Amós", "Oseias", "Joel", "Jonas"], answer: "Joel", verse: "Joel 2:13" },
+{ question: "Este livro contém o versículo: 'Preparemo-nos para o dia do Senhor.' Qual é o livro?", options: ["Oseias", "Miquéias", "Joel", "Amós"], answer: "Amós", verse: "Amós 4:12" },
+{ question: "Este livro contém o versículo: 'A soberba precede a ruína.' Qual é o livro?", options: ["Salmos", "Eclesiastes", "Provérbios", "Jó"], answer: "Provérbios", verse: "Provérbios 16:18" },
+{ question: "Este livro contém o versículo: 'Fui lançado no ventre do peixe.' Qual é o livro?", options: ["Obadias", "Jonas", "Miquéias", "Naum"], answer: "Jonas", verse: "Jonas 2:1" },
+{ question: "Este livro contém o versículo: 'O Senhor deseja justiça e verdade.' Qual é o livro?", options: ["Amós", "Oseias", "Jonas", "Miquéias"], answer: "Miquéias", verse: "Miquéias 6:8" },
+{ question: "Este livro contém o versículo: 'O Senhor é tardio em irar-se.' Qual é o livro?", options: ["Habacuque", "Naum", "Joel", "Sofonias"], answer: "Naum", verse: "Naum 1:3" },
+{ question: "Este livro contém o versículo: 'O justo viverá pela sua fé.' Qual é o livro?", options: ["Romanos", "Sofonias", "Habacuque", "Naum"], answer: "Habacuque", verse: "Habacuque 2:4" },
+{ question: "Este livro contém o versículo: 'Buscai o Senhor, vós todos.' Qual é o livro?", options: ["Sofonias", "Habacuque", "Zacarias", "Malaquias"], answer: "Sofonias", verse: "Sofonias 2:3" },
+{ question: "Este livro contém o versículo: 'Sede fortes no trabalho do Senhor.' Qual é o livro?", options: ["Malaquias", "Zacarias", "Ageu", "Sofonias"], answer: "Ageu", verse: "Ageu 2:4" },
+{ question: "Este livro contém o versículo: 'O Senhor enviará seu Messias.' Qual é o livro?", options: ["Isaías", "Ageu", "Malaquias", "Zacarias"], answer: "Zacarias", verse: "Zacarias 9:9" },
+
+
+  { question: "Este livro contém o versículo: 'A vós enviarei Elias, o profeta.' Qual é o livro?", options: ["Zacarias", "Malaquias", "Ageu", "Isaías"], answer: "Malaquias", verse: "Malaquias 4:5" },
+  { question: "Este livro contém o versículo: 'Não julgueis para não serdes julgados.' Qual é o livro?", options: ["Lucas", "Mateus", "Marcos", "João"], answer: "Mateus", verse: "Mateus 7:1" },
+  { question: "Este livro contém o versículo: 'Vai e não peques mais.' Qual é o livro?", options: ["Mateus", "João", "Lucas", "Marcos"], answer: "João", verse: "João 8:11" },
+  { question: "Este livro contém o versículo: 'O Filho do Homem será traído.' Qual é o livro?", options: ["Lucas", "Marcos", "Mateus", "João"], answer: "Marcos", verse: "Marcos 14:21" },
+  { question: "Este livro contém o versículo: 'Meu Pai, se possível, passe de mim este cálice.' Qual é o livro?", options: ["Lucas", "Mateus", "Marcos", "João"], answer: "Mateus", verse: "Mateus 26:39" },
+  { question: "Este livro contém o versículo: 'Eis o Cordeiro de Deus.' Qual é o livro?", options: ["Mateus", "João", "Lucas", "Atos"], answer: "João", verse: "João 1:29" },
+  { question: "Este livro contém o versículo: 'O Espírito desceu como pomba.' Qual é o livro?", options: ["Mateus", "Lucas", "Marcos", "João"], answer: "Lucas", verse: "Lucas 3:22" },
+  { question: "Este livro contém o versículo: 'Cumpriu-se a Escritura.' Qual é o livro?", options: ["Romanos", "Atos", "João", "Mateus"], answer: "Atos", verse: "Atos 1:16" },
+  { question: "Este livro contém o versículo: 'Não há justo, nem um sequer.' Qual é o livro?", options: ["1 Coríntios", "Romanos", "Gálatas", "Efésios"], answer: "Romanos", verse: "Romanos 3:10" },
+  { question: "Este livro contém o versículo: 'Fomos reconciliados com Deus.' Qual é o livro?", options: ["1 Coríntios", "Efésios", "Romanos", "2 Coríntios"], answer: "2 Coríntios", verse: "2 Coríntios 5:18" },
+  { question: "Este livro contém o versículo: 'Andai pelo Espírito.' Qual é o livro?", options: ["Efésios", "Filipenses", "Gálatas", "Romanos"], answer: "Gálatas", verse: "Gálatas 5:16" },
+  { question: "Este livro contém o versículo: 'Somos membros do corpo de Cristo.' Qual é o livro?", options: ["Gálatas", "Efésios", "Colossenses", "1 Coríntios"], answer: "Efésios", verse: "Efésios 5:30" },
+  { question: "Este livro contém o versículo: 'Alegrai-vos na esperança.' Qual é o livro?", options: ["1 Tessalonicenses", "Filipenses", "Colossenses", "Romanos"], answer: "Filipenses", verse: "Filipenses 1:20" },
+  { question: "Este livro contém o versículo: 'Cristo é o cabeça da igreja.' Qual é o livro?", options: ["Efésios", "Colossenses", "Filipenses", "1 Coríntios"], answer: "Colossenses", verse: "Colossenses 1:18" },
+  { question: "Este livro contém o versículo: 'Deus é o nosso refúgio.' Qual é o livro?", options: ["Isaías", "Salmos", "Jeremias", "Provérbios"], answer: "Salmos", verse: "Salmos 46:1" },
+  { question: "Este livro contém o versículo: 'Vigiai e orai.' Qual é o livro?", options: ["Mateus", "Marcos", "Lucas", "João"], answer: "Marcos", verse: "Marcos 13:33" },
+  { question: "Este livro contém o versículo: 'Eu sou a videira verdadeira.' Qual é o livro?", options: ["Mateus", "Lucas", "Marcos", "João"], answer: "João", verse: "João 15:1" },
+  { question: "Este livro contém o versículo: 'O Senhor está perto dos que o invocam.' Qual é o livro?", options: ["Provérbios", "Salmos", "Isaías", "Jeremias"], answer: "Salmos", verse: "Salmos 145:18" },
+  { question: "Este livro contém o versículo: 'A palavra de Deus é viva e eficaz.' Qual é o livro?", options: ["2 Timóteo", "Hebreus", "Tiago", "1 Pedro"], answer: "Hebreus", verse: "Hebreus 4:12" },
+  { question: "Este livro contém o versículo: 'Seja-vos toda a amargura afastada.' Qual é o livro?", options: ["Gálatas", "Efésios", "Colossenses", "Filipenses"], answer: "Efésios", verse: "Efésios 4:31" },
+
+
+
+  { question: "Este livro contém o versículo: 'Guarda-nos para a vinda do Senhor.' Qual é o livro?", options: ["1 Pedro", "2 Pedro", "1 João", "Judas"], answer: "2 Pedro", verse: "2 Pedro 3:14" },
+  { question: "Este livro contém o versículo: 'Deus é luz, e nele não há trevas.' Qual é o livro?", options: ["2 João", "1 João", "Tiago", "Judas"], answer: "1 João", verse: "1 João 1:5" },
+  { question: "Este livro contém o versículo: 'Andai na verdade.' Qual é o livro?", options: ["1 João", "2 João", "3 João", "Judas"], answer: "2 João", verse: "2 João 1:4" },
+  { question: "Este livro contém o versículo: 'Colaboradores da verdade.' Qual é o livro?", options: ["2 João", "3 João", "1 João", "Judas"], answer: "3 João", verse: "3 João 1:8" },
+  { question: "Este livro contém o versículo: 'Guardai-vos na fé.' Qual é o livro?", options: ["1 João", "Judas", "2 João", "Tiago"], answer: "Judas", verse: "Judas 1:21" },
+  { question: "Este livro contém o versículo: 'Eis que venho sem demora.' Qual é o livro?", options: ["Hebreus", "Apocalipse", "1 João", "Judas"], answer: "Apocalipse", verse: "Apocalipse 22:12" },
+  { question: "Este livro contém o versículo: 'O Senhor é minha fortaleza.' Qual é o livro?", options: ["Isaías", "Salmos", "Jeremias", "Provérbios"], answer: "Salmos", verse: "Salmos 28:7" },
+  { question: "Este livro contém o versículo: 'O Senhor é meu pastor.' Qual é o livro?", options: ["Isaías", "Salmos", "Jeremias", "Ezequiel"], answer: "Salmos", verse: "Salmos 23:1" },
+  { question: "Este livro contém o versículo: 'Alegra-te, jovem, na tua mocidade.' Qual é o livro?", options: ["Provérbios", "Eclesiastes", "Salmos", "Cânticos"], answer: "Eclesiastes", verse: "Eclesiastes 11:9" },
+  { question: "Este livro contém o versículo: 'O Senhor é clemente e misericordioso.' Qual é o livro?", options: ["Êxodo", "Salmos", "Isaías", "Jeremias"], answer: "Salmos", verse: "Salmos 111:4" },
+  { question: "Este livro contém o versículo: 'Eu sou a luz do mundo.' Qual é o livro?", options: ["Mateus", "João", "Lucas", "Marcos"], answer: "João", verse: "João 8:12" },
+  { question: "Este livro contém o versículo: 'O Senhor é minha bandeira.' Qual é o livro?", options: ["Salmos", "Êxodo", "Números", "Josué"], answer: "Êxodo", verse: "Êxodo 17:15" },
+  { question: "Este livro contém o versículo: 'O Senhor é meu libertador.' Qual é o livro?", options: ["Isaías", "Salmos", "Jeremias", "2 Samuel"], answer: "Salmos", verse: "Salmos 18:2" },
+  { question: "Este livro contém o versículo: 'Tudo é possível ao que crê.' Qual é o livro?", options: ["Mateus", "Marcos", "Lucas", "João"], answer: "Marcos", verse: "Marcos 9:23" },
+  { question: "Este livro contém o versículo: 'O Senhor é meu socorro.' Qual é o livro?", options: ["Isaías", "Salmos", "Jeremias", "Hebreus"], answer: "Salmos", verse: "Salmos 121:2" },
+  { question: "Este livro contém o versículo: 'Buscai-me e vivereis.' Qual é o livro?", options: ["Oseias", "Amós", "Miquéias", "Joel"], answer: "Amós", verse: "Amós 5:4" },
+  { question: "Este livro contém o versículo: 'O Senhor é minha porção.' Qual é o livro?", options: ["Lamentações", "Salmos", "Jeremias", "Isaías"], answer: "Salmos", verse: "Salmos 119:57" },
+  { question: "Este livro contém o versículo: 'Eu sou a porta das ovelhas.' Qual é o livro?", options: ["Mateus", "João", "Lucas", "Marcos"], answer: "João", verse: "João 10:7" },
+  { question: "Este livro contém o versículo: 'O Senhor é meu juiz.' Qual é o livro?", options: ["Salmos", "Isaías", "Jeremias", "Daniel"], answer: "Isaías", verse: "Isaías 33:22" },
+  { question: "Este livro contém o versículo: 'O Senhor é meu rei.' Qual é o livro?", options: ["Isaías", "Salmos", "Jeremias", "Zacarias"], answer: "Salmos", verse: "Salmos 10:16" },
+  { question: "Este livro contém o versículo: 'O Senhor é meu Salvador.' Qual é o livro?", options: ["Salmos", "Isaías", "Jeremias", "Zacarias"], answer: "Isaías", verse: "Isaías 12:2" },
 
   { question: "Este livro contém o versículo: 'Guardai-vos de fazer a vossa justiça diante dos homens.' Qual é o livro?", options: ["Mateus", "Lucas", "Marcos", "João"], answer: "Mateus", verse: "Mateus 6:1" },
   { question: "Este livro contém o versículo: 'O reino de Deus está dentro de vós.' Qual é o livro?", options: ["Lucas", "João", "Mateus", "Marcos"], answer: "Lucas", verse: "Lucas 17:21" },
@@ -1242,11 +1253,8 @@
   { question: "Este livro contém o versículo: 'O Senhor é minha confiança.' Qual é o livro?", options: ["Salmos", "Provérbios", "Isaías", "Jeremias"], answer: "Salmos", verse: "Salmos 71:5" },
 
 
+    ];
 
-
-   ];
-
-    // Dados para o Jogo da Memória
     const cardsData = [
       { id: 1, content: "Davi", match: "Golias" },
       { id: 2, content: "Golias", match: "Davi" },
@@ -1266,7 +1274,6 @@
       { id: 16, content: "Leões", match: "Daniel" },
     ];
 
-    // Dados para o Jogo Tap the Bible Items
     const itemTypes = [
       { name: 'Pergaminho', color: '#8b4513', emoji: '📜', desc: 'Escrituras' },
       { name: 'Arca', color: '#a0522d', emoji: '🛶', desc: 'Noé' },
@@ -1280,7 +1287,6 @@
 
     const shuffleArray = (array) => [...array].sort(() => Math.random() - 0.5);
 
-    // Componente para o Jogo de Enigmas Bíblicos
     const RiddleGame = ({ onBack }) => {
       const [riddles, setRiddles] = React.useState(() => {
         const saved = localStorage.getItem('riddleRiddles');
@@ -1434,21 +1440,31 @@
         return (
           <div className="max-w-2xl w-full parchment-bg p-6 rounded-lg shadow-lg">
             <h1 className="text-3xl font-bold mb-4 text-blue-900">Revisão das Respostas</h1>
-            {answers.map((ans, idx) => (
-              <div key={idx} className="mb-4 p-4 bg-gray-100 rounded">
-                <p className="text-lg text-blue-900">{ans.question}</p>
-                <p className={ans.isCorrect ? 'text-green-600' : 'text-red-600'}>
-                  Sua resposta: {ans.selected}
-                </p>
-                <p className="text-green-600">Resposta correta: {ans.correct} ({ans.verse})</p>
-              </div>
-            ))}
-            <button
-              onClick={resetGame}
-              className="mt-4 w-full bg-yellow-500 hover:bg-yellow-600 text-blue-900 py-2 rounded transition duration-300"
-            >
-              Voltar ao Início
-            </button>
+            <div className="review-container">
+              {answers.map((ans, idx) => (
+                <div key={idx} className="mb-4 p-4 bg-gray-100 rounded">
+                  <p className="text-lg text-blue-900">{ans.question}</p>
+                  <p className={ans.isCorrect ? 'text-green-600' : 'text-red-600'}>
+                    Sua resposta: {ans.selected}
+                  </p>
+                  <p className="text-green-600">Resposta correta: {ans.correct} ({ans.verse})</p>
+                </div>
+              ))}
+            </div>
+            <div className="flex space-x-4">
+              <button
+                onClick={resetGame}
+                className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-blue-900 py-2 rounded transition duration-300"
+              >
+                Voltar ao Início
+              </button>
+              <button
+                onClick={onBack}
+                className="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-2 rounded transition duration-300"
+              >
+                Finalizar Jogo
+              </button>
+            </div>
           </div>
         );
       }
@@ -1489,6 +1505,9 @@
       const progress = ((currentRiddleIndex + 1) / riddles.length) * 100;
       const timeProgress = (timeLeft / 30) * 100;
 
+      const correctCount = answers.filter(ans => ans.isCorrect).length;
+      const wrongCount = answers.filter(ans => !ans.isCorrect).length;
+
       return (
         <div className="game-container">
           <div ref={gameRef} className="max-w-2xl w-full parchment-bg p-6 rounded-lg shadow-lg">
@@ -1514,19 +1533,26 @@
                 style={{ width: `${timeProgress}%` }}
               ></div>
             </div>
+            <div className="score-bar">
+              <div className="correct-segment score-bar-segment" style={{ width: `${(correctCount / (correctCount + wrongCount || 1)) * 100}%` }}>
+                Acertos: {correctCount}
+              </div>
+              <div className="wrong-segment score-bar-segment" style={{ width: `${(wrongCount / (correctCount + wrongCount || 1)) * 100}%` }}>
+                Erros: {wrongCount}
+              </div>
+            </div>
             <p className="text-xl mb-6 text-blue-900 fade-in">{currentRiddle.question}</p>
             <div className="space-y-3">
               {currentRiddle.options.map((option) => (
                 <button
                   key={option}
                   onClick={() => handleAnswer(option)}
-                  className={`w-full py-3 rounded transition duration-300 option ${
-                    feedback && feedback.isCorrect && option === feedback.correctOption
+                  className={`w-full py-3 rounded transition duration-300 option ${feedback && feedback.isCorrect && option === feedback.correctOption
                       ? 'correct'
                       : feedback && !feedback.isCorrect && option === feedback.selectedOption
                       ? 'wrong'
                       : 'bg-blue-500 hover:bg-blue-600 text-white'
-                  } disabled:bg-gray-400 disabled:cursor-not-allowed`}
+                    } disabled:bg-gray-400 disabled:cursor-not-allowed`}
                   disabled={feedback}
                 >
                   {option}
@@ -1545,7 +1571,6 @@
       );
     };
 
-    // Componente do Quiz
     const QuizApp = ({ onBack }) => {
       const [topic, setTopic] = React.useState(null);
       const [currentIndex, setCurrentIndex] = React.useState(() => parseInt(localStorage.getItem('quizIndex')) || 0);
@@ -1830,13 +1855,12 @@
                 <button
                   key={option}
                   onClick={() => handleAnswer(option)}
-                  className={`w-full py-3 rounded transition duration-300 option ${
-                    feedback && feedback.isCorrect && option === feedback.correctOption
+                  className={`w-full py-3 rounded transition duration-300 option ${feedback && feedback.isCorrect && option === feedback.correctOption
                       ? 'correct'
                       : feedback && !feedback.isCorrect && option === feedback.selectedOption
                       ? 'wrong'
                       : 'bg-blue-500 hover:bg-blue-600 text-white'
-                  } disabled:bg-gray-400 disabled:cursor-not-allowed`}
+                    } disabled:bg-gray-400 disabled:cursor-not-allowed`}
                   disabled={feedback}
                 >
                   {option}
@@ -1855,7 +1879,6 @@
       );
     };
 
-    // Componente para o Jogo da Memória Bíblica
     const MemoryGame = ({ onBack }) => {
       const [cards, setCards] = React.useState(() => shuffleArray(cardsData));
       const [flipped, setFlipped] = React.useState([]);
@@ -1936,11 +1959,10 @@
               {cards.map((card, index) => (
                 <div
                   key={card.id}
-                  className={`w-20 h-20 flex items-center justify-center text-lg font-bold cursor-pointer rounded-lg transition-transform duration-300 ${
-                    flipped.includes(index) || matched.includes(index)
+                  className={`w-20 h-20 flex items-center justify-center text-lg font-bold cursor-pointer rounded-lg transition-transform duration-300 ${flipped.includes(index) || matched.includes(index)
                       ? 'bg-blue-500 text-white'
                       : 'bg-gray-300 text-gray-300'
-                  }`}
+                    }`}
                   onClick={() => flipCard(index)}
                   style={{ transform: flipped.includes(index) || matched.includes(index) ? 'rotateY(0deg)' : 'rotateY(180deg)' }}
                 >
@@ -1966,7 +1988,6 @@
       );
     };
 
-    // Componente para o Jogo Tap the Bible Items
     const TapBibleItems = ({ onBack }) => {
       const canvasRef = React.useRef(null);
       const [score, setScore] = React.useState(0);
@@ -1978,7 +1999,6 @@
       const canvasWidth = 400;
       const canvasHeight = 500;
 
-      // Função para criar um novo item
       const createItem = () => {
         const itemType = itemTypes[Math.floor(Math.random() * itemTypes.length)];
         return {
@@ -1990,7 +2010,6 @@
         };
       };
 
-      // Função para desenhar um item
       const drawItem = (ctx, item) => {
         ctx.beginPath();
         ctx.arc(item.x, item.y, item.radius, 0, Math.PI * 2);
@@ -2004,7 +2023,6 @@
         ctx.fillText(item.type.emoji, item.x, item.y);
       };
 
-      // Função para desenhar o canvas
       const draw = (ctx) => {
         ctx.clearRect(0, 0, canvasWidth, canvasHeight);
         items.forEach(item => drawItem(ctx, item));
@@ -2022,7 +2040,6 @@
         }
       };
 
-      // Função para atualizar o estado do jogo
       const update = () => {
         if (!gameRunning) return;
 
@@ -2047,7 +2064,6 @@
         setFallSpeed(prev => prev + 0.001);
       };
 
-      // Configurar o canvas e animação
       React.useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
@@ -2065,7 +2081,6 @@
         return () => cancelAnimationFrame(requestRef.current);
       }, [gameRunning, items, score]);
 
-      // Configurar eventos de clique e toque
       React.useEffect(() => {
         const canvas = canvasRef.current;
 
@@ -2108,7 +2123,6 @@
         };
       }, [gameRunning]);
 
-      // Iniciar ou reiniciar o jogo
       const startGame = () => {
         setScore(0);
         setItems([]);
@@ -2155,7 +2169,6 @@
       );
     };
 
-    // Componente de Error Boundary
     class ErrorBoundary extends React.Component {
       state = { hasError: false, error: null };
       static getDerivedStateFromError(error) {
@@ -2180,7 +2193,6 @@
       }
     }
 
-    // Componente Principal
     const App = () => {
       const [currentSection, setCurrentSection] = React.useState('menu');
 
@@ -2223,7 +2235,7 @@
                       onClick={() => setCurrentSection('tap')}
                       className="flex-1 min-w-[150px] bg-yellow-500 hover:bg-yellow-600 text-blue-900 py-3 rounded-lg shadow-md transition duration-300 pulse"
                     >
-                      Pega Itens 
+                     Pega Itens
                     </button>
                   </div>
                   <p className="text-blue-900 mt-4">2 Coríntios 5:7 🕊️ "Vivemos por fé, e não pelo que vemos."</p>
@@ -2243,5 +2255,5 @@
       document.getElementById('error').innerText = 'Erro ao carregar o aplicativo: ' + err.message;
     }
   </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93c385d51909bf6d',t:'MTc0NjY1MDMyNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
