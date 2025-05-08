@@ -208,7 +208,7 @@
 
     const quizzes = {
       ANTIGO: [
-              { question: "Quem construiu a arca para escapar do dilúvio?", options: ["Moisés", "Abraão", "Noé", "Davi"], answer: "Noé", verse: "Gênesis 6:14" },
+         { question: "Quem construiu a arca para escapar do dilúvio?", options: ["Moisés", "Abraão", "Noé", "Davi"], answer: "Noé", verse: "Gênesis 6:14" },
         { question: "Qual o primeiro livro da Bíblia?", options: ["Êxodo", "Gênesis", "Levítico", "Números"], answer: "Gênesis", verse: "Gênesis 1:1" },
         { question: "Quem foi lançado na cova dos leões?", options: ["Elias", "Daniel", "José", "Jonas"], answer: "Daniel", verse: "Daniel 6:16" },
         { question: "Qual rei foi conhecido por sua sabedoria?", options: ["Davi", "Salomão", "Saul", "Ezequias"], answer: "Salomão", verse: "1 Reis 4:29" },
@@ -425,7 +425,7 @@
 
       ],
       NOVO: [
-                { question: "Quem foi o primeiro apóstolo a ser chamado por Jesus?", options: ["Pedro", "João", "Tiago", "André"], answer: "André", verse: "João 1:40-42" },
+         { question: "Quem foi o primeiro apóstolo a ser chamado por Jesus?", options: ["Pedro", "João", "Tiago", "André"], answer: "André", verse: "João 1:40-42" },
         { question: "Quem foi o médico que escreveu o Evangelho de Lucas?", options: ["Lucas", "Marcos", "Mateus", "João"], answer: "Lucas", verse: "Colossenses 4:14" },
         { question: "Qual evangelho é considerado o mais teológico e profundo?", options: ["João", "Mateus", "Marcos", "Lucas"], answer: "João", verse: "João 1:1" },
         { question: "Quem batizou Jesus no rio Jordão?", options: ["João Batista", "Pedro", "Tiago", "André"], answer: "João Batista", verse: "Mateus 3:13-17" },
@@ -637,7 +637,7 @@
 
       ],
       MISTO: [
-            { question: "Quem foi o primeiro apóstolo a ser chamado por Jesus?", options: ["Pedro", "João", "Tiago", "André"], answer: "André", verse: "João 1:40-42" },
+        { question: "Quem foi o primeiro apóstolo a ser chamado por Jesus?", options: ["Pedro", "João", "Tiago", "André"], answer: "André", verse: "João 1:40-42" },
         { question: "Quem foi o médico que escreveu o Evangelho de Lucas?", options: ["Lucas", "Marcos", "Mateus", "João"], answer: "Lucas", verse: "Colossenses 4:14" },
         { question: "Qual evangelho é considerado o mais teológico e profundo?", options: ["João", "Mateus", "Marcos", "Lucas"], answer: "João", verse: "João 1:1" },
         { question: "Quem batizou Jesus no rio Jordão?", options: ["João Batista", "Pedro", "Tiago", "André"], answer: "João Batista", verse: "Mateus 3:13-17" },
@@ -1067,7 +1067,7 @@
     };
 
     const riddleQuestions = [
-      { question: "Este livro contém o versículo: 'No princípio, Deus criou os céus e a terra.' Qual é o livro?", options: ["Êxodo","Mateus","Salmos","Gênesis"], answer: "Gênesis", verse: "Gênesis 1:1" },
+       { question: "Este livro contém o versículo: 'No princípio, Deus criou os céus e a terra.' Qual é o livro?", options: ["Êxodo","Mateus","Salmos","Gênesis"], answer: "Gênesis", verse: "Gênesis 1:1" },
       { question: "Este livro contém o versículo: 'Eu sou o Senhor, teu Deus.' Qual é o livro?", options: ["Levítico","Êxodo","Números","Josué"], answer: "Êxodo", verse: "Êxodo 20:2" },
       { question: "Este livro contém o versículo: 'O Senhor é o meu pastor.' Qual é o livro?", options: ["Provérbios","Isaías","Salmos","Jeremias"], answer: "Salmos", verse: "Salmos 23:1" },
       { question: "Este livro contém o versículo: 'Confia no Senhor de todo o teu coração.' Qual é o livro?", options: ["Eclesiastes", "Salmos", "Isaías","Provérbios"], answer: "Provérbios", verse: "Provérbios 3:5" },
@@ -1251,7 +1251,6 @@
   { question: "Este livro contém o versículo: 'A palavra do Senhor permanece para sempre.' Qual é o livro?", options: ["1 Pedro", "Hebreus", "Tiago", "1 João"], answer: "1 Pedro", verse: "1 Pedro 1:25" },
   { question: "Este livro contém o versículo: 'O Senhor é meu cântico.' Qual é o livro?", options: ["Salmos", "Êxodo", "Isaías", "Jeremias"], answer: "Êxodo", verse: "Êxodo 15:2" },
   { question: "Este livro contém o versículo: 'O Senhor é minha confiança.' Qual é o livro?", options: ["Salmos", "Provérbios", "Isaías", "Jeremias"], answer: "Salmos", verse: "Salmos 71:5" },
-
 
     ];
 
@@ -1727,7 +1726,7 @@
         return (
           <div className="game-container">
             <div className="max-w-2xl w-full parchment-bg p-6 rounded-lg shadow-lg text-center">
-              <h1 className="text-3xl font-bold mb-4 text-blue-900 pulse">PenseQuiz - Bíblia</h1>
+              <h1 className="text-3xl font-bold mb-4 text-blue-900 pulse">QuizBíblia</h1>
               <p className="text-blue-900 mb-4">Estudar a Bíblia é conhecer o autor da vida!!!</p>
               <div className="flex flex-wrap justify-center gap-4">
                 <button
@@ -1766,21 +1765,31 @@
           <div className="game-container">
             <div className="max-w-2xl w-full parchment-bg p-6 rounded-lg shadow-lg">
               <h1 className="text-3xl font-bold mb-4 text-blue-900">Revisão das Respostas</h1>
-              {answers.map((ans, idx) => (
-                <div key={idx} className="mb-4 p-4 bg-gray-100 rounded">
-                  <p className="text-lg text-blue-900">{ans.question}</p>
-                  <p className={ans.isCorrect ? 'text-green-600' : 'text-red-600'}>
-                    Sua resposta: {ans.selected}
-                  </p>
-                  <p className="text-green-600">Resposta correta: {ans.correct} ({ans.verse})</p>
-                </div>
-              ))}
-              <button
-                onClick={resetGame}
-                className="mt-4 w-full bg-yellow-500 hover:bg-yellow-600 text-blue-900 py-2 rounded transition duration-300"
-              >
-                Voltar ao Início
-              </button>
+              <div className="review-container">
+                {answers.map((ans, idx) => (
+                  <div key={idx} className="mb-4 p-4 bg-gray-100 rounded">
+                    <p className="text-lg text-blue-900">{ans.question}</p>
+                    <p className={ans.isCorrect ? 'text-green-600' : 'text-red-600'}>
+                      Sua resposta: {ans.selected}
+                    </p>
+                    <p className="text-green-600">Resposta correta: {ans.correct} ({ans.verse})</p>
+                  </div>
+                ))}
+              </div>
+              <div className="flex space-x-4">
+                <button
+                  onClick={resetGame}
+                  className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-blue-900 py-2 rounded transition duration-300"
+                >
+                  Voltar ao Início
+                </button>
+                <button
+                  onClick={onBack}
+                  className="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-2 rounded transition duration-300"
+                >
+                  Finalizar Quiz
+                </button>
+              </div>
             </div>
           </div>
         );
@@ -1953,7 +1962,7 @@
       return (
         <div className="game-container">
           <div ref={gameRef} className="max-w-2xl w-full parchment-bg p-6 rounded-lg shadow-lg">
-            <h1 className="text-3xl font-bold mb-4 text-blue-900 text-center fade-in">Jogo da Memória Bíblica</h1>
+            <h1 className="text-3xl font-bold mb-4 text-blue-900 text-center fade-in">J.contract da Memória Bíblica</h1>
             <p className="text-lg mb-4 text-blue-900 text-center">Jogadas: {moves}</p>
             <div className="grid grid-cols-4 gap-4">
               {cards.map((card, index) => (
@@ -2227,7 +2236,7 @@
                     </button>
                     <button
                       onClick={() => setCurrentSection('memory')}
-                      className="flex-1 min-w-[150px] bg-yellow-500 hover:bg-yellow-600 text-blue-900 py-3 rounded-lg shadow-md transition duration-300 pulse"
+                      className="flex-1 min-w-[150px] bg-yellow-500 hover:bg.yellow-600 text-blue-900 py-3 rounded-lg shadow-md transition duration-300 pulse"
                     >
                       Jogo da Memória
                     </button>
@@ -2255,5 +2264,5 @@
       document.getElementById('error').innerText = 'Erro ao carregar o aplicativo: ' + err.message;
     }
   </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93c385d51909bf6d',t:'MTc0NjY1MDMyNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
