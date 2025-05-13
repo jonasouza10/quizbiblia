@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PenseQuiz - Bíblia</title>
-  <link rel="icon" type="image/png" href="https://img.icons8.com/?size=100&id=jAc6FZyLm06C&format=png&color=000000" />
+   <link rel="icon" type="image/png" href="iconepq.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
@@ -1495,8 +1495,23 @@
             >
               Voltar ao Menu
             </button>
+			 <button
+                    onClick={() => window.location.href = 'index.html'}
+                    className="fixed bottom-4 right-4 bg-yellow-500 hover:bg-yellow-600 text-blue-900 py-1 px-2 rounded text-sm"
+                  >
+                    PenseQuiz
+                  </button>
+			
             <p className="text-blue-900 mt-4">2 Coríntios 5:7 🕊️ "Vivemos por fé, e não pelo que vemos."</p>
+			
+			<button
+                onClick={() => window.location.href = 'index.html'}
+                className="fixed bottom-4 right-4 bg-yellow-500 hover:bg-yellow-600 text-blue-900 py-1 px-2 rounded text-sm"
+            >
+              PenseQuiz
+            </button>
           </div>
+		  
         );
       }
 
